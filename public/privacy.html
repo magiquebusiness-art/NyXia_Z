@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/NyXia-FavIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Politique de Confidentialite — NyXia Z</title>
+  <meta name="description" content="Politique de confidentialite de NyXia Z">
+  <style>
+    :root{--bg1:#0A0E1A;--bg2:#0F1628;--p:#7B5CFF;--p2:#5A6CFF;--p3:#4FA3FF;--t:#FFFFFF;--t2:#D6D9F0;--t3:#8891B8;--t4:#4a5278}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--bg1);color:var(--t2);font-family:'Outfit',sans-serif;line-height:1.7;min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 50% 40% at 20% 10%,rgba(123,92,255,0.12) 0%,transparent 60%),radial-gradient(ellipse 40% 35% at 80% 85%,rgba(79,163,255,0.07) 0%,transparent 55%)}
+    .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:60px 24px 80px}
+    a{color:var(--p3);text-decoration:none}
+    a:hover{text-decoration:underline}
+    h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;background:linear-gradient(135deg,#a78bfa,var(--p3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+    .sub{font-size:13px;color:var(--t4);margin-bottom:32px}
+    h2{font-size:17px;font-weight:700;color:var(--t);margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(123,92,255,0.1)}
+    p{font-size:14px;color:var(--t3);margin-bottom:12px}
+    ul{padding-left:20px;margin-bottom:12px}
+    li{font-size:14px;color:var(--t3);margin-bottom:6px}
+    .back{text-align:center;margin-top:48px}
+    .back a{display:inline-block;padding:10px 28px;border-radius:50px;border:1px solid rgba(123,92,255,0.3);background:rgba(123,92,255,0.08);color:var(--t2);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;transition:all .2s}
+    .back a:hover{background:rgba(123,92,255,0.2);border-color:var(--p);text-decoration:none}
+    .badge{text-align:center;margin-bottom:24px;display:inline-block;padding:4px 14px;border-radius:50px;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;background:rgba(123,92,255,0.1);border:1px solid rgba(123,92,255,0.2);color:var(--p3)}
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="wrap">
+    <div class="badge">Document juridique</div>
+    <h1>Politique de Confidentialite</h1>
+    <p class="sub">NyXia Z — nyxia.travail-pour-toi.com<br>Derniere mise a jour : Avril 2026</p>
+
+    <h2>1. Responsable du traitement</h2>
+    <p>Le responsable du traitement des donnees est :</p>
+    <p><strong style="color:var(--t)">Magique Business</strong><br>
+    Proprietaire et operateur de la plateforme NyXia Z.</p>
+
+    <h2>2. Donnees collectees</h2>
+    <p>NyXia Z collecte uniquement les donnees necessaires au bon fonctionnement du service :</p>
+    <ul>
+      <li><strong>Identifiants de connexion :</strong> mot de passe securise (hashe), token de session.</li>
+      <li><strong>Historique de conversation :</strong> messages echanges avec l'assistant IA, sauvegardes dans la base de donnees.</li>
+      <li><strong>Instructions et regles :</strong> preferences personnalisees que l'utilisateur definit pour l'IA.</li>
+      <li><strong>Connaissances :</strong> documents et contenus que l'utilisateur charge volontairement.</li>
+      <li><strong>Projets :</strong> informations relatives aux projets de l'utilisateur (nom, domaine, description).</li>
+    </ul>
+
+    <h2>3. Donnees NON collectees</h2>
+    <p>NyXia Z ne collecte pas :</p>
+    <ul>
+      <li>Aucune donnee publicitaire ou de pistage (pas de cookies publicitaires).</li>
+      <li>Aucune donnee de geolocalisation.</li>
+      <li>Aucune information financiere.</li>
+      <li>Aucune donnee partagee avec des tiers a des fins commerciales.</li>
+    </ul>
+
+    <h2>4. Utilisation des donnees</h2>
+    <p>Les donnees collectees sont utilisees exclusivement pour :</p>
+    <ul>
+      <li>Faire fonctionner l'assistant IA (contexte de conversation, memoire).</li>
+      <li>Permettre la persistance de la memoire entre les sessions.</li>
+      <li>Se connecter a des services tiers (ex: Facebook) uniquement si l'utilisateur l'autorise explicitement.</li>
+    </ul>
+
+    <h2>5. Services tiers</h2>
+    <p>Lorsque l'utilisateur connecte des integrations (Facebook, Instagram, etc.), des tokens d'acces OAuth sont stockes de maniere securisee. Ces tokens sont utilises uniquement pour les fonctionnalites autorisees par l'utilisateur et peuvent etre revokes a tout moment depuis le tableau de bord.</p>
+
+    <p>L'IA utilisee par NyXia Z fonctionne via l'API OpenRouter. Les messages envoyes a l'IA transitent par leurs serveurs conformement a leur politique de confidentialite.</p>
+
+    <h2>6. Securite des donnees</h2>
+    <p>Les donnees sont stockees sur des serveurs Cloudflare (D1) avec chiffrement en transit (HTTPS/TLS). L'acces a la plateforme est protege par un systeme d'authentification avec mot de passe et tokens de session.</p>
+
+    <h2>7. Droits de l'utilisateur</h2>
+    <p>Conformement au RGPD (Reglement General sur la Protection des Donnees), l'utilisateur dispose des droits suivants :</p>
+    <ul>
+      <li><strong>Droit d'acces :</strong> consulter ses donnees depuis le dashboard.</li>
+      <li><strong>Droit de modification :</strong> modifier ou supprimer ses instructions, connaissances et projets a tout moment.</li>
+      <li><strong>Droit a l'effacement :</strong> demander la suppression complete de ses donnees en contactant le responsable.</li>
+      <li><strong>Droit de revoquer :</strong> deconnecter toute integration tierce depuis le dashboard.</li>
+    </ul>
+
+    <h2>8. Conservation des donnees</h2>
+    <p>Les donnees sont conservees tant que le compte est actif. En cas de suppression de compte ou sur demande explicite de l'utilisateur, toutes les donnees sont supprimees dans un delai de 30 jours.</p>
+
+    <h2>9. Contact</h2>
+    <p>Pour toute question relative a cette politique de confidentialite ou pour exercer vos droits :</p>
+    <p><strong style="color:var(--t)">Contact :</strong> via le dashboard NyXia Z ou par email a l'adresse indiquee dans les parametres du compte.</p>
+
+    <div class="back">
+      <a href="/">&#x1F49C; Retour a NyXia Z</a>
+    </div>
+  </div>
+</body>
+</html>
