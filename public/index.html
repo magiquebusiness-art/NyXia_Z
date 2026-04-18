@@ -1265,32 +1265,44 @@
     }
     var _nyxiaVoice = null;
     function _getBestFrenchVoice(voices) {
-      // Exclure les voix "network" (distantes/lentes)
-      var localVoices = voices.filter(function(v){ return !v.localService && v.localService !== false ? true : v.localService; });
-      var pool = localVoices.length ? localVoices : voices;
-      // Priorite 1 : Voix Google francaises (Chrome) - naturelles et fiables
-      var preferred = ['Google français','Google fr','Google français (France)'];
-      for (var i = 0; i < preferred.length; i++) {
-        var v = pool.find(function(voice){ return voice.name === preferred[i]; });
+      // On utilise TOUTES les voix (locales + Google/network)
+      // Les voix Google sont prioritaires car plus naturelles et jeunes
+
+      // Priorite 1 : Voix Google francaises (Chrome/Edge) — naturelles, jeunes, fiables
+      var googleNames = ['Google français','Google fr','Google français (France)'];
+      for (var i = 0; i < googleNames.length; i++) {
+        var v = voices.find(function(voice){ return voice.name === googleNames[i]; });
         if (v) return v;
       }
-      // Priorite 2 : Voix macOS feminines
-      var macPreferred = ['Amélie','Denise','Fiona','Virginie'];
-      for (var i = 0; i < macPreferred.length; i++) {
-        var v = pool.find(function(voice){ return voice.name === macPreferred[i]; });
+
+      // Priorite 2 : Toute voix Google fr (variantes selon navigateur/OS)
+      var anyGoogle = voices.find(function(v){ return v.name && v.name.indexOf('Google') !== -1 && v.lang && v.lang.startsWith('fr'); });
+      if (anyGoogle) return anyGoogle;
+
+      // Priorite 3 : Voix Microsoft feminines (Windows 10/11)
+      var msNames = ['Microsoft Pauline Online (Natural) - French (France)','Microsoft Pauline','Microsoft Virginie','Microsoft Hortense'];
+      for (var i = 0; i < msNames.length; i++) {
+        var v = voices.find(function(voice){ return voice.name === msNames[i]; });
         if (v) return v;
       }
-      // Priorite 3 : Voix Windows feminines
-      var winPreferred = ['Microsoft Pauline','Microsoft Virginie','Microsoft Hortense'];
-      for (var i = 0; i < winPreferred.length; i++) {
-        var v = pool.find(function(voice){ return voice.name === winPreferred[i]; });
+
+      // Priorite 4 : Voix macOS feminines
+      var macNames = ['Amélie','Denise','Fiona','Virginie'];
+      for (var i = 0; i < macNames.length; i++) {
+        var v = voices.find(function(voice){ return voice.name === macNames[i]; });
         if (v) return v;
       }
-      // Priorite 4 : Toute voix fr-FR (locale exacte)
-      var exactFr = pool.find(function(v){ return v.lang === 'fr-FR'; });
+
+      // Priorite 5 : Toute voix fr-FR avec "female" ou "femme" dans le nom
+      var femaleFr = voices.find(function(v){ return v.lang === 'fr-FR' && /female|femme|woman/i.test(v.name); });
+      if (femaleFr) return femaleFr;
+
+      // Priorite 6 : Toute voix fr-FR locale
+      var exactFr = voices.find(function(v){ return v.lang === 'fr-FR'; });
       if (exactFr) return exactFr;
-      // Priorite 5 : Toute voix fr-
-      var anyFr = pool.find(function(v){ return v.lang && v.lang.startsWith('fr'); });
+
+      // Priorite 7 : Toute voix fr-
+      var anyFr = voices.find(function(v){ return v.lang && v.lang.startsWith('fr'); });
       return anyFr || null;
     }
     _loadVoices();
