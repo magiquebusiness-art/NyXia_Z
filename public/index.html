@@ -732,13 +732,20 @@
                 <div class="creation-input-wrap"><span>&#x1F3AC;</span><input class="creation-input" id="vbank-query" placeholder="Rechercher des videos HD pour tes publications..."></div>
                 <button class="btn-create" id="btn-vbank-search" onclick="searchVideoBank()">&#x1F3AC; Rechercher</button>
               </div>
-              <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
-                <span style="font-size:12px;color:var(--t3);font-weight:600">Format :</span>
-                <div style="display:flex;gap:4px;background:rgba(11,13,23,0.6);border:1px solid rgba(123,92,255,0.15);border-radius:8px;padding:3px">
-                  <button class="vbank-orient active" data-orient="landscape" onclick="setVideoOrientation(this,'landscape')" style="padding:6px 16px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">16:9</button>
-                  <button class="vbank-orient" data-orient="portrait" onclick="setVideoOrientation(this,'portrait')" style="padding:6px 16px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">9:16</button>
+              <div class="creation-options">
+                <div class="creation-opt"><label>Format</label>
+                  <div style="display:flex;gap:3px;background:rgba(11,13,23,0.6);border:1px solid rgba(123,92,255,0.15);border-radius:50px;padding:3px">
+                    <button class="vbank-orient active" data-orient="landscape" onclick="setVideoOrientation(this,'landscape')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">16:9</button>
+                    <button class="vbank-orient" data-orient="portrait" onclick="setVideoOrientation(this,'portrait')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">9:16</button>
+                  </div>
                 </div>
-                <span id="vbank-orient-label" style="font-size:11px;color:var(--t3)">&#x1F4FA; Horizontal</span>
+                <div class="creation-opt"><label>Taille</label>
+                  <select id="vbank-size" style="background:rgba(10,22,40,0.6);border:1px solid rgba(123,92,255,0.2);border-radius:50px;color:var(--t2);font-family:'Outfit',sans-serif;font-size:12px;padding:6px 12px;outline:none;cursor:pointer">
+                    <option value="hd">HD (720p)</option>
+                    <option value="4k">4K (UHD)</option>
+                    <option value="sd">SD (rapide)</option>
+                  </select>
+                </div>
               </div>
               <div class="creation-suggestions" id="vbank-suggestions"></div>
             </div>
@@ -1873,7 +1880,6 @@
       vbankOrientation=orient;
       document.querySelectorAll('.vbank-orient').forEach(function(b){b.style.background='transparent';b.style.color='var(--t3)';b.classList.remove('active');});
       btn.style.background='rgba(123,92,255,0.2)';btn.style.color='#fff';btn.classList.add('active');
-      document.getElementById('vbank-orient-label').textContent=orient==='landscape'?'\u{1F4FA} Horizontal':'\u{1F4F1} Vertical';
     }
     // Init orientation button style
     setTimeout(function(){var first=document.querySelector('.vbank-orient.active');if(first){first.style.background='rgba(123,92,255,0.2)';first.style.color='#fff';}var others=document.querySelectorAll('.vbank-orient:not(.active)');others.forEach(function(b){b.style.background='transparent';b.style.color='var(--t3)';});},0);
@@ -2028,43 +2034,27 @@
       document.getElementById('vbank-result').classList.remove('visible');
       var token=sessionStorage.getItem('nyxia_z_token')||'';
       var orient=vbankOrientation||'landscape';
-      fetch('/api/media/search',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({query:query,type:'video',orientation:orient})}).then(function(r){return r.json()}).then(function(data){
+      var size=document.getElementById('vbank-size').value||'hd';
+      fetch('/api/media/search',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({query:query,type:'video',orientation:orient,videoSize:size})}).then(function(r){return r.json()}).then(function(data){
         btn.disabled=false;btn.innerHTML='&#x1F3AC; Rechercher';
         if(!data.success){showToast(data.error||'Aucun resultat');return;}
         var result=document.getElementById('vbank-result');
-        var videos=data.videos||[];
+        var v=data.video;
+        if(!v){showToast('Aucune video trouvee');return;}
         var orientLabel=orient==='portrait'?'9:16 Vertical':'16:9 Horizontal';
-        // Build grid of 2 videos side by side
-        var html='<div style="padding:12px 18px;background:rgba(19,21,42,0.7);border-bottom:1px solid rgba(123,92,255,0.1);display:flex;align-items:center;justify-content:space-between"><div style="font-size:13px;color:var(--t2)"><span style="font-weight:700;color:#fff">&#x1F3AC; '+escHtml(query)+'</span> <span style="color:var(--t3)">&middot; '+orientLabel+(data.totalResults?' &middot; '+data.totalResults+' resultats':'')+'</span></div><button class="creation-btn-sm" onclick="searchVideoBank()">&#x1F504;</button></div>';
-        html+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px">';
-        videos.forEach(function(v,i){
-          var aspectStyle=orient==='portrait'?'aspect-ratio:9/16;max-height:380px':'aspect-ratio:16/9;';
-          html+='<div style="position:relative;border-radius:12px;overflow:hidden;border:1px solid rgba(123,92,255,0.12);background:rgba(11,13,23,0.6);transition:all .2s" onmouseover="this.style.borderColor=\'rgba(123,92,255,0.4)\'" onmouseout="this.style.borderColor=\'rgba(123,92,255,0.12)\'">';
-          html+='<div style="position:relative;'+aspectStyle+'overflow:hidden"><video class="creation-result-video" controls '+(i===0?'autoplay muted':'preload="metadata"')+' loop playsinline src="'+v.videoUrl+'" poster="'+(v.thumbnail||'')+'" style="width:100%;height:100%;object-fit:cover"></video>';
-          html+='<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;padding:3px 8px;border-radius:6px;font-weight:600">#'+(i+1)+' Populaire</div>';
-          if(v.duration)html+='<div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;padding:3px 8px;border-radius:6px">'+v.duration+'s</div>';
-          html+='</div>';
-          html+='<div style="padding:8px 10px;display:flex;align-items:center;justify-content:space-between">';
-          html+='<div style="font-size:11px;color:var(--t3)">'+(v.photographer||'Pexels')+(v.width&&v.height?' &middot; '+v.width+'x'+v.height:'')+'</div>';
-          html+='<a class="creation-btn-sm accent" href="'+v.videoUrl+'" target="_blank" download style="padding:4px 10px;font-size:11px">&#x2B07;</a>';
-          html+='</div></div>';
-        });
-        html+='</div>';
+        var sizeLabel=size==='4k'?'4K UHD':(size==='sd'?'SD':'HD');
+        var metaParts=[orientLabel,sizeLabel];
+        if(v.duration)metaParts.push(v.duration+'s');
+        if(v.fileSize)metaParts.push(v.fileSize);
+        if(v.photographer)metaParts.push(v.photographer);
+        var html='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta"><span class="creation-badge">Pexels</span><span>'+escHtml(query)+' &middot; '+metaParts.join(' &middot; ')+'</span></div><div class="creation-result-actions"><button class="creation-btn-sm" onclick="searchVideoBank()">&#x1F504;</button><a class="creation-btn-sm accent" href="'+v.videoUrl+'" target="_blank" download>&#x2B07; Telecharger</a></div></div><video class="creation-result-video" controls autoplay muted loop playsinline src="'+v.videoUrl+'" poster="'+(v.thumbnail||'')+'"></video></div>';
         result.innerHTML=html;
-        // Save to history (first video)
-        var firstV=videos[0];
-        if(firstV){
-          vbankHistory.unshift({query:query,videoUrl:firstV.videoUrl,thumbnail:firstV.thumbnail||'',duration:firstV.duration||0,width:firstV.width||0,height:firstV.height||0,photographer:firstV.photographer||'',date:new Date().toISOString()});
-          if(vbankHistory.length>50)vbankHistory=vbankHistory.slice(0,50);
-          try{localStorage.setItem('nyxia_z_vbank_history',JSON.stringify(vbankHistory));}catch(e){}
-          renderVBankHistory();
-        }
+        vbankHistory.unshift({query:query,videoUrl:v.videoUrl,thumbnail:v.thumbnail||'',duration:v.duration||0,width:v.width||0,height:v.height||0,photographer:v.photographer||'',date:new Date().toISOString()});
+        if(vbankHistory.length>50)vbankHistory=vbankHistory.slice(0,50);
+        try{localStorage.setItem('nyxia_z_vbank_history',JSON.stringify(vbankHistory));}catch(e){}
+        renderVBankHistory();
         result.classList.add('visible');
       }).catch(function(){btn.disabled=false;btn.innerHTML='&#x1F3AC; Rechercher';showToast('Erreur');});
-    }
-    function playExtraVideo(url,thumb){
-      var result=document.getElementById('vbank-result');
-      result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta">&#x1F3AC; Video HD</div><div class="creation-result-actions"><a class="creation-btn-sm accent" href="'+url+'" target="_blank" download>&#x2B07; Telecharger</a></div></div><video class="creation-result-video" controls autoplay muted loop playsinline src="'+url+'" poster="'+thumb+'"></video>';
     }
     function renderVBankHistory(){
       var grid=document.getElementById('vbank-history');
