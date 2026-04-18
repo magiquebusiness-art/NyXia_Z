@@ -3,18 +3,31 @@
  * NYXIA Z — FACEBOOK PUBLISH API
  * POST : Publier sur la Page Facebook de Diane
  * GET  : Lister les publications planifiees
+ *
+ * Le token Facebook est dans env.FB_ACCESS_TOKEN (Cloudflare secret)
+ * JAMAIS dans le code ni dans la base de donnees.
  * ══════════════════════════════════════════
  */
 
 export async function onRequestGet(context) {
   const { env } = context;
   try {
+    // Vérifier que Facebook est configuré
+    if (!env.FB_ACCESS_TOKEN) {
+      return new Response(JSON.stringify({
+        success: true,
+        connected: false,
+        posts: []
+      }), { headers: { 'Content-Type': 'application/json' } });
+    }
+
     // Récupérer les publications planifiées
     var scheduled = await env.MEMORY.prepare(
       "SELECT * FROM fb_scheduled_posts ORDER BY scheduled_at ASC"
     ).all();
     return new Response(JSON.stringify({
       success: true,
+      connected: true,
       posts: (scheduled.results || []).map(function(p) {
         return {
           id: p.id,
@@ -40,25 +53,13 @@ export async function onRequestPost(context) {
     var body = await request.json();
     var action = body.action || 'publish';
 
-    // Récupérer le token depuis la config Facebook
-    var intRow = await env.MEMORY.prepare(
-      "SELECT config FROM integrations WHERE name = 'facebook'"
-    ).first();
-
-    if (!intRow || !intRow.config) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Facebook non connecte. Connecte ton compte dans Integrations.'
-      }), { headers: { 'Content-Type': 'application/json' } });
-    }
-
-    var config = JSON.parse(intRow.config);
-    var token = config.access_token;
+    // Token depuis la variable d'environnement (Cloudflare secret)
+    var token = env.FB_ACCESS_TOKEN || '';
 
     if (!token) {
       return new Response(JSON.stringify({
         success: false,
-        error: 'Token Facebook manquant.'
+        error: 'Facebook non configure. Ajoute FB_ACCESS_TOKEN dans les secrets Cloudflare.'
       }), { headers: { 'Content-Type': 'application/json' } });
     }
 
@@ -75,12 +76,8 @@ export async function onRequestPost(context) {
         }), { headers: { 'Content-Type': 'application/json' } });
       }
 
-      var fbUrl = 'https://graph.facebook.com/v19.0/' + pageId + '/feed';
-      var fbBody = { message: message, access_token: token };
-
-      // Si image, d'abord uploader puis publier avec l'ID de l'image
+      // Si image, uploader la photo
       if (imageUrl) {
-        // Upload photo
         var uploadUrl = 'https://graph.facebook.com/v19.0/' + pageId + '/photos';
         var uploadRes = await fetch(uploadUrl, {
           method: 'POST',
@@ -108,10 +105,11 @@ export async function onRequestPost(context) {
       }
 
       // Post texte seulement
+      var fbUrl = 'https://graph.facebook.com/v19.0/' + pageId + '/feed';
       var fbRes = await fetch(fbUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fbBody)
+        body: JSON.stringify({ message: message, access_token: token })
       });
       var fbData = await fbRes.json();
 
@@ -149,7 +147,6 @@ export async function onRequestPost(context) {
         }), { headers: { 'Content-Type': 'application/json' } });
       }
 
-      // S'assurer que la table existe
       try {
         await env.MEMORY.prepare(`CREATE TABLE IF NOT EXISTS fb_scheduled_posts (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
