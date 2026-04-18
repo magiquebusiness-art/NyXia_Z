@@ -704,9 +704,16 @@
                 <button class="btn-create" id="btn-vid-gen" onclick="genWanVideo()">&#x1F3AC; Generer</button>
               </div>
               <div class="creation-options">
-                <div class="creation-opt"><label>Modele</label><select id="vid-model"><option value="wan2.7-t2v">NyXia 2.7</option><option value="wan2.6-t2v">NyXia 2.6</option></select></div>
-                <div class="creation-opt"><label>Resolution</label><select id="vid-res"><option value="720p">720p</option><option value="1080p">1080p</option></select></div>
-                <div class="creation-opt"><label>Duree</label><select id="vid-dur"><option value="5">5s</option><option value="10">10s</option></select></div>
+                <div class="creation-opt"><label>Modele</label><select id="vid-model"><option value="wan2.7-t2v">NyXia 2.7</option><option value="wan2.6-t2v">NyXia 2.6</option><option value="wan2.5-t2v-preview">NyXia 2.5</option></select></div>
+                <div class="creation-opt"><label>Format</label>
+                  <div style="display:flex;gap:3px;background:rgba(11,13,23,0.6);border:1px solid rgba(123,92,255,0.15);border-radius:50px;padding:3px">
+                    <button class="vid-format active" data-format="16:9" onclick="setVideoFormat(this,'16:9')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">16:9</button>
+                    <button class="vid-format" data-format="9:16" onclick="setVideoFormat(this,'9:16')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">9:16</button>
+                    <button class="vid-format" data-format="1:1" onclick="setVideoFormat(this,'1:1')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">1:1</button>
+                  </div>
+                </div>
+                <div class="creation-opt"><label>Resolution</label><select id="vid-res"><option value="1280*720">720p</option><option value="1920*1080">1080p</option></select></div>
+                <div class="creation-opt"><label>Duree</label><select id="vid-dur"><option value="5">5s</option><option value="10">10s</option><option value="15">15s</option></select></div>
               </div>
               <div class="creation-suggestions" id="vid-suggestions"></div>
             </div>
@@ -1949,41 +1956,95 @@
     }
     function clearImgHistory(){if(!imgHistory.length)return;if(confirm('Effacer l\'historique des images?')){imgHistory=[];localStorage.removeItem('nyxia_z_img_history');renderImgHistory();}}
 
+    var videoFormat='16:9';
+    function setVideoFormat(btn,fmt){
+      videoFormat=fmt;
+      document.querySelectorAll('.vid-format').forEach(function(b){b.style.background='transparent';b.style.color='var(--t3)';b.classList.remove('active');});
+      btn.style.background='rgba(123,92,255,0.2)';btn.style.color='#fff';btn.classList.add('active');
+    }
+    setTimeout(function(){var first=document.querySelector('.vid-format.active');if(first){first.style.background='rgba(123,92,255,0.2)';first.style.color='#fff';}var others=document.querySelectorAll('.vid-format:not(.active)');others.forEach(function(b){b.style.background='transparent';b.style.color='var(--t3)';});},0);
+
+    function getVideoSize(format,resolution){
+      if(format==='9:16'){return resolution==='1920*1080'?'1080*1920':'720*1280';}
+      if(format==='1:1'){return resolution==='1920*1080'?'1080*1080':'720*720';}
+      return resolution;
+    }
+
+    var vidPollIntervals={};
+
     function genWanVideo(){
       var prompt=document.getElementById('vid-prompt').value.trim();
       if(!prompt){showToast('Decris ta scene');return}
       var model=document.getElementById('vid-model').value;
       var res=document.getElementById('vid-res').value;
       var dur=document.getElementById('vid-dur').value;
+      var size=getVideoSize(videoFormat,res);
       var btn=document.getElementById('btn-vid-gen');btn.disabled=true;btn.innerHTML='<span class="creation-spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></span>Envoi...';
       document.getElementById('vid-result').classList.remove('visible');
       var token=sessionStorage.getItem('nyxia_z_token')||'';
-      fetch('/api/wan/video',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({prompt:prompt,model:model,resolution:res,duration:parseInt(dur),mode:'t2v'})}).then(function(r){return r.json()}).then(function(data){
+      fetch('/api/wan/video',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({prompt:prompt,model:model,size:size,duration:parseInt(dur),mode:'t2v'})}).then(function(r){return r.json()}).then(function(data){
         btn.disabled=false;btn.innerHTML='&#x1F3AC; Generer';
         if(!data.success){showToast(data.error||'Erreur');return;}
-        showToast('Tache soumise! La generation prend 1-5 min.');
-        vidHistory.unshift({id:data.taskId,prompt:prompt,model:model,status:'pending',date:new Date().toISOString(),videoUrl:null});
+        showToast('Tache soumise! Generation en cours...');
+        var taskId=data.taskId;
+        vidHistory.unshift({id:taskId,prompt:prompt,model:model,status:'PENDING',date:new Date().toISOString(),videoUrl:null,format:videoFormat});
         if(vidHistory.length>30)vidHistory=vidHistory.slice(0,30);
         try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
         renderVidHistory();
+        startVidPolling(taskId);
       }).catch(function(){btn.disabled=false;btn.innerHTML='&#x1F3AC; Generer';showToast('Erreur de connexion');});
     }
+
+    function startVidPolling(taskId){
+      if(vidPollIntervals[taskId])return;
+      showToast('Generation en cours (1-5 min)...');
+      vidPollIntervals[taskId]=setInterval(function(){
+        var token=sessionStorage.getItem('nyxia_z_token')||'';
+        fetch('/api/wan/video-status',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({taskId:taskId})}).then(function(r){return r.json()}).then(function(data){
+          if(!data.success)return;
+          var idx=vidHistory.findIndex(function(v){return v.id===taskId;});
+          if(idx===-1){clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];return;}
+          vidHistory[idx].status=data.status;
+          if(data.videoUrl){
+            vidHistory[idx].videoUrl=data.videoUrl;
+            showToast('Video generee avec succes!');
+            clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
+          }
+          if(data.status==='FAILED'){
+            showToast('Echec de la generation video');
+            clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
+          }
+          try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
+          renderVidHistory();
+        }).catch(function(){});
+      },8000);
+    }
+
     function renderVidHistory(){
       var grid=document.getElementById('vid-history');
       document.getElementById('vid-count').textContent=vidHistory.length;
       if(!vidHistory.length){grid.innerHTML='<div class="creation-empty"><p>Aucune video IA pour le moment</p></div>';return;}
-      grid.innerHTML=vidHistory.map(function(item){
-        var isPending=item.status==='pending';
-        var isDone=item.status==='done'&&item.videoUrl;
-        return '<div class="creation-hist-item" '+(isDone?'onclick="playVid(\''+item.videoUrl+'\')"':'')+'><div style="width:100%;height:120px;background:rgba(10,22,40,0.6);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--t4)">'+(isPending?'&#x23F3;':(isDone?'&#x25B6;':'&#x274C;'))+'</div><div class="creation-hist-info"><div class="creation-hist-query">'+escHtml(item.prompt)+'</div><div class="creation-hist-type">'+(isPending?'En cours...':(isDone?'&#x2705; Terminee':'Echouee'))+'</div></div></div>';
+      grid.innerHTML=vidHistory.map(function(item,i){
+        var isPending=item.status==='PENDING'||item.status==='RUNNING';
+        var isDone=(item.status==='SUCCEEDED'||item.status==='done')&&item.videoUrl;
+        var isFailed=item.status==='FAILED';
+        var fmtLabel=item.format||'16:9';
+        var statusText=isPending?'En cours...':(isDone?'Terminee':(isFailed?'Echouee':'Inconnu'));
+        var statusIcon=isPending?'&#x23F3;':(isDone?'&#x25B6;':(isFailed?'&#x274C;':'&#x2753;'));
+        return '<div class="creation-hist-item" '+(isDone?'onclick="playVid(\''+item.videoUrl+'\')"':'')+'><div style="width:100%;height:120px;background:rgba(10,22,40,0.6);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--t4)">'+statusIcon+'</div><div class="creation-hist-info"><div class="creation-hist-query">'+escHtml(item.prompt)+'</div><div class="creation-hist-type">'+fmtLabel+' &middot; '+statusText+'</div></div></div>';
       }).join('');
+      // Relancer le polling pour les taches en cours
+      vidHistory.forEach(function(item){
+        if((item.status==='PENDING'||item.status==='RUNNING')&&!vidPollIntervals[item.id]){
+          startVidPolling(item.id);
+        }
+      });
     }
     function playVid(url){
       currentVidUrl=url;
       var result=document.getElementById('vid-result');
       result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta"><span class="creation-badge">NyXia AI</span><span>Video generee</span></div><div class="creation-result-actions"><a class="creation-btn-sm accent" href="'+url+'" target="_blank" download>&#x2B07; Telecharger</a></div></div><video class="creation-result-video" controls autoplay muted loop playsinline src="'+url+'"></video></div>';
       result.classList.add('visible');
-
     }
 
     function searchBank(){
