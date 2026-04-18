@@ -9,9 +9,13 @@
       ;(function() {
         var token = sessionStorage.getItem('nyxia_z_token')
         if (!token) { window.location.href = '/login.html'; return }
-        fetch('/api/auth/check', { method: 'GET', headers: { 'X-Nyxia-Token': token } })
+        fetch('/api/auth/check', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ token: token })
+        })
         .then(function(r) { return r.json() })
-        .then(function(data) { if (!data.valid) window.location.href = '/login.html' })
+        .then(function(data) { if (!data.valid) { sessionStorage.removeItem('nyxia_z_token'); window.location.href = '/login.html'; } })
         .catch(function() { window.location.href = '/login.html' })
       })()
     </script>
