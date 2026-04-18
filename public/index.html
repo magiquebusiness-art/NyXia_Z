@@ -7,7 +7,7 @@
   <meta name="description" content="NyXia Z — Ta copilote IA permanente">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&family=Lato:wght@400;700&family=Open+Sans:wght@400;700&family=Raleway:wght@400;700&family=Poppins:wght@400;700&family=Roboto:wght@400;700&family=Nunito:wght@400;700&family=Merriweather:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=Ubuntu:wght@400;700&family=Droid+Serif:wght@400;700&family=PT+Serif:wght@400;700&family=Lora:wght@400;700&family=Vollkorn:wght@400;700&family=Arvo:wght@400;700&family=Bitter:wght@400;700&family=Old+Standard+TT:wght@400;700&family=EB+Garamond:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Zilla+Slab:wght@400;700&family=Abril+Fatface&family=Dancing+Script:wght@400;700&family=Pacifico&family=Satisfy&family=Great+Vibes&family=Amatic+SC:wght@400;700&family=Kalam:wght@400;700&family=Caveat:wght@400;700&family=Permanent+Marker&family=Indie+Flower&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg1:#0A0E1A;--bg2:#0F1628;--bg3:#1A2554;--sidebar:#060B16;
@@ -300,7 +300,38 @@
 
     @media(max-width:768px){aside{width:180px}.h-brand{width:180px}}
     @media(max-width:600px){aside{display:none}.h-brand{width:auto;border:none}}
+
+    /* ===== EDITOR STYLES ===== */
+    .image-element img, .video-element video, .video-element iframe { max-width: 100%; border-radius: var(--r); display: block; }
+        .video-element iframe { pointer-events: none; }
+        .audio-element audio { width: 100%; }
+        .faq-item { margin-bottom: 10px; border: 1px solid var(--nx-border); border-radius: var(--r); overflow: hidden; }
+        .faq-question { padding: 15px; background: rgba(26, 29, 53, 0.6); cursor: pointer; font-weight: 600; }
+        .faq-answer { padding: 15px; background: rgba(11, 13, 23, 0.6); display: none; }
+        .faq-answer.open { display: block; }
+        .countdown-element { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .countdown-block { background: rgba(26, 29, 53, 0.6); padding: 15px; border-radius: var(--r); text-align: center; min-width: 80px; }
+        .countdown-number { font-size: 1.5rem; font-weight: 700; color: var(--nx-primary); }
+        .countdown-label { font-size: 0.8rem; color: var(--nx-text-dim); }
+        .shadow-none { box-shadow: none !important; }
+        .shadow-soft { box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; }
+        .shadow-medium { box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important; }
+        .shadow-intense { box-shadow: 0 15px 40px rgba(0,0,0,0.3) !important; }
+        .shadow-inner-soft { box-shadow: inset 0 2px 10px rgba(0,0,0,0.1) !important; }
+        .shadow-inner-medium { box-shadow: inset 0 4px 15px rgba(0,0,0,0.2) !important; }
+        .shadow-inner-intense { box-shadow: inset 0 6px 20px rgba(0,0,0,0.3) !important; }
+        .shadow-float { box-shadow: 0 10px 30px rgba(123,92,255,0.3) !important; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .menu-element nav ul { list-style: none; display: flex; gap: 20px; padding: 0; margin: 0; }
+        .menu-element nav ul li { position: relative; }
+        .menu-element nav ul li a { text-decoration: none; color: var(--nx-text); font-weight: 500; transition: color 0.2s; outline: none; }
+        .menu-element nav ul li a:hover { color: var(--nx-primary); }
+        .menu-element nav ul li ul { display: none; position: absolute; top: 100%; left: 0; background: var(--nx-surface); flex-direction: column; gap: 10px; padding: 10px; border-radius: var(--r); border: 1px solid var(--nx-border); min-width: 150px; }
+        .menu-element nav ul li:hover ul { display: flex; }
+        @media (max-width: 1024px) { .editor-container { flex-direction: column; } .sidebar, .properties-panel { width: 100%; height: auto; max-height: 300px; } .workspace { padding: 20px; } }
+    /* ===== END EDITOR STYLES ===== */
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -343,7 +374,7 @@
         <div class="sb-item" onclick="showPanel('knowledge')"><span class="sb-icon">&#x1F4D6;</span> Base de Connaissance</div>
         <div class="sb-item" onclick="showPanel('integrations')"><span class="sb-icon">&#x1F517;</span> Integrations</div>
         <div class="sb-item" onclick="showPanel('creation')"><span class="sb-icon">&#x2728;</span> Creation IA</div>
-        <div class="sb-item" onclick="window.open('/editor.html','_blank')"><span class="sb-icon">&#x270F;</span> Editeur</div>
+        <div class="sb-item" onclick="showPanel('editor')"><span class="sb-icon">&#x270F;</span> Editeur</div>
         <div class="sb-item" onclick="showPanel('heartbeat')"><span class="sb-icon">&#x1F493;</span> Heartbeat</div>
       </div>
     </aside>
@@ -543,6 +574,129 @@
           <div id="heartbeat-stats" style="margin-top:30px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap"></div>
         </div>
       </div>
+      <!-- Editor -->
+      <div class="panel" id="panel-editor" style="padding:0;display:flex;flex-direction:column;height:100%">
+        <!-- ACTION BAR -->
+    <div class="action-bar">
+      <div class="action-bar-left">
+        <img src="/Logo.png" alt="NyXia">
+        <span class="action-bar-title">NyXia Editor</span>
+      </div>
+      <div class="action-bar-center">
+        <input type="text" id="project-name" placeholder="Nom de la page..." value="Ma page">
+      </div>
+      <div class="action-bar-right">
+        <button class="ab-btn" onclick="showPanel('chat')">&#x1F3E0; Dashboard</button>
+        <button class="ab-btn" onclick="openDraftsModal()">📂 Mes pages</button>
+        <button class="ab-btn" onclick="saveDraft()">💾 Sauvegarder</button>
+        <button class="ab-btn green" onclick="previewPage()">👁 Aperçu</button>
+        <button class="ab-btn primary" onclick="publishPage()">🚀 Publier</button>
+      </div>
+    </div>
+
+    <!-- DRAFTS MODAL -->
+    <div class="modal-overlay" id="drafts-modal">
+      <div class="modal">
+        <h2>📂 Mes Pages</h2>
+        <div id="drafts-list" class="drafts-list">
+          <p style="color:var(--nx-text-dim);text-align:center;padding:30px 0">Chargement...</p>
+        </div>
+        <button class="btn-primary" onclick="document.getElementById('drafts-modal').style.display='none'" style="margin-top:15px">Fermer</button>
+      </div>
+    </div>
+
+    <!-- PUBLISH SUCCESS MODAL -->
+    <div class="modal-overlay" id="publish-modal">
+      <div class="modal" style="text-align:center">
+        <h2 style="color:var(--nx-green)">🚀 Page publiée !</h2>
+        <p style="margin:16px 0;color:var(--nx-text)">Ta page est en ligne :</p>
+        <a id="publish-url" href="#" target="_blank" style="display:inline-block;padding:12px 24px;background:rgba(123,92,255,0.15);border:1px solid rgba(123,92,255,0.3);border-radius:50px;color:#a78bfa;text-decoration:none;font-weight:600;font-size:14px;word-break:break-all;margin-bottom:16px">—</a>
+        <br>
+        <button class="btn-primary" onclick="document.getElementById('publish-modal').style.display='none'" style="margin-top:10px">Fermer</button>
+      </div>
+    </div>
+
+    <div class="editor-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="user-avatar">N</div>
+                <span class="gradient-text" style="font-weight:700; font-size:18px;">Nyxia Editor</span>
+            </div>
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="structure">Structure</button>
+                <button class="tab-btn" data-tab="contenu">Contenu</button>
+                <button class="tab-btn" data-tab="forms">Forms</button>
+                <button class="tab-btn" data-tab="avance">Avancé</button>
+            </div>
+            <div class="tab-content active" id="structure">
+                <div class="tool-item" draggable="true" data-type="section">Section</div>
+                <div class="tool-item" draggable="true" data-type="row">Rangée</div>
+                <div class="tool-item" draggable="true" data-type="col2">2 Colonnes</div>
+                <div class="tool-item" draggable="true" data-type="col3">3 Colonnes</div>
+                <div class="tool-item" draggable="true" data-type="col4">4 Colonnes</div>
+            </div>
+            <div class="tab-content" id="contenu">
+                <div class="tool-item" draggable="true" data-type="title">Titre</div>
+                <div class="tool-item" draggable="true" data-type="text">Texte</div>
+                <div class="tool-item" draggable="true" data-type="list">Liste à puces</div>
+                <div class="tool-item" draggable="true" data-type="content-box">Boîte de contenu</div>
+                <div class="tool-item" draggable="true" data-type="image">Image</div>
+                <div class="tool-item" draggable="true" data-type="video">Vidéo</div>
+                <div class="tool-item" draggable="true" data-type="audio">Audio</div>
+                <div class="tool-item" draggable="true" data-type="button">Bouton</div>
+            </div>
+            <div class="tab-content" id="forms">
+                <div class="tool-item" draggable="true" data-type="form-field">Champ texte</div>
+                <div class="tool-item" draggable="true" data-type="checkbox">Case à cocher</div>
+                <div class="tool-item" draggable="true" data-type="calendar">Calendrier</div>
+                <div class="tool-item" draggable="true" data-type="submit">Bouton Envoie</div>
+            </div>
+            <div class="tab-content" id="avance">
+                <div class="tool-item" draggable="true" data-type="countdown">Compte à rebours</div>
+                <div class="tool-item" draggable="true" data-type="menu">Menu</div>
+                <div class="tool-item" draggable="true" data-type="hr">Ligne horizontale</div>
+                <div class="tool-item" draggable="true" data-type="html-code">Code HTML</div>
+                <div class="tool-item" draggable="true" data-type="faq">FAQ</div>
+            </div>
+        </aside>
+        <main class="workspace" id="workspace">
+            <div class="canvas-area" id="canvas"></div>
+        </main>
+        <aside class="properties-panel" id="properties">
+            <h3>Propriétés</h3>
+            <div id="prop-content"><p>Sélectionnez un élément pour modifier ses propriétés.</p></div>
+        </aside>
+    </div>
+    <div class="text-toolbar" id="text-toolbar">
+        <button onclick="formatDoc('bold')" title="Gras"><i class="fas fa-bold"></i></button>
+        <button onclick="formatDoc('italic')" title="Italique"><i class="fas fa-italic"></i></button>
+        <button onclick="formatDoc('underline')" title="Souligné"><i class="fas fa-underline"></i></button>
+        <button onclick="formatDoc('strikeThrough')" title="Barré"><i class="fas fa-strikethrough"></i></button>
+        <button onclick="addLink()" title="Lien URL"><i class="fas fa-link"></i></button>
+        <button onclick="formatDoc('hiliteColor', '#FFFF00')" title="Surligner"><i class="fas fa-highlighter"></i></button>
+        <input type="color" onchange="formatDoc('foreColor', this.value)" title="Couleur du texte" style="width:20px; height:20px; border:none; background:none; cursor:pointer;">
+    </div>
+    <button class="settings-btn" id="settings-btn"><i class="fas fa-cog"></i></button>
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <h2>Paramètres Globaux & SEO</h2>
+            <div class="modal-content">
+                <label>Couleur de fond globale</label><input type="color" id="global-bg-color" value="#0B0D17">
+                <label>Image de fond globale</label><input type="file" id="global-bg-image" accept="image/*" class="input-field"><button class="btn-secondary" onclick="clearGlobalBgImage()">Retirer l'image</button>
+                <label>Langue du site</label><select id="site-lang"><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option></select>
+                <label>Titre SEO</label><input type="text" id="seo-title" class="input-field">
+                <label>Description SEO</label><textarea id="seo-desc" class="textarea-field"></textarea>
+                <label>Mots-clés</label><input type="text" id="seo-keywords" class="input-field">
+                <label>Auteur</label><input type="text" id="seo-author" class="input-field">
+                <label>Image réseaux sociaux</label><input type="file" id="seo-image" class="input-field">
+                <label><input type="checkbox" id="seo-hide"> Masquer aux moteurs de recherche</label>
+                <label>Code d'en-tête (Header)</label><textarea id="header-code" class="textarea-field"></textarea>
+                <label>Code de pied de page (Footer)</label><textarea id="footer-code" class="textarea-field"></textarea>
+            </div>
+            <button class="btn-primary" onclick="document.getElementById('settings-modal').style.display='none'">Fermer</button>
+        </div>
+    </div>
+      </div>
     </div>
   </div>
 
@@ -645,6 +799,7 @@
       if (name==='knowledge') loadKnowledge();
       if (name==='integrations') loadIntegrations();
       if (name==='heartbeat') loadHeartbeat();
+      if (name==='editor') initEditorPanel();
     }
 
     /* CHAT */
@@ -857,7 +1012,8 @@
       var html = '<html><head><meta charset="UTF-8"><title>NyXia Z</title>';
       html += '<style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;padding:20px;color:#222;line-height:1.7}';
       html += 'h2{color:#7B5CFF;margin-bottom:16px;border-bottom:2px solid #7B5CFF;padding-bottom:8px}';
-      html += '.meta{color:#888;font-size:12px;margin-bottom:20px}</style></head><body>';
+      html += '.meta{color:#888;font-size:12px;margin-bottom:20px}</style>  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head><body>';
       html += '<h2>NyXia Z</h2>';
       html += '<div class="meta">' + timeNow() + ' — nyxia.travail-pour-toi.com</div>';
       html += '<div>' + raw.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>') + '</div>';
@@ -1674,6 +1830,498 @@
     addBotMsg("Bienvenue dans **ma maison**, Diane &#x1F49C;\n\nJe suis **NyXia Z** — ta copilote permanente.\n\nJe me souviens de tout : tes projets, nos regles, nos decisions.\nRien ne sera jamais perdu.\n\nMa maison est pres de ton coeur. Dis-moi, qu'est-ce qu'on construit aujourd'hui ?");
     loadSidebarProjects();
     updateMemCount();
+
+    /* ===== EDITOR JAVASCRIPT ===== */
+        let _editorInitialized = false;
+    let currentDraftId = null;
+
+    function initEditorPanel() {
+        if (_editorInitialized) return;
+        _editorInitialized = true;
+        initTabs(); initDragAndDrop(); initSettings();
+        document.addEventListener('click', (e) => {
+            const toolbar = document.getElementById('text-toolbar');
+            if (!e.target.closest('.title-element') && !e.target.closest('.text-element') && !e.target.closest('.content-box') && !e.target.closest('.faq-question') && !e.target.closest('.faq-answer') && !e.target.closest('.text-toolbar')) toolbar.style.display = 'none';
+            if (!e.target.closest('.canvas-element') && !e.target.closest('.properties-panel') && !e.target.closest('.ed-sidebar') && !e.target.closest('.element-controls') && !e.target.closest('.text-toolbar')) deselectAll();
+        });
+    }
+
+let selectedElement = null;
+
+        function initTabs() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => { tab.addEventListener('click', () => { tabs.forEach(t => t.classList.remove('active')); contents.forEach(c => c.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.tab).classList.add('active'); }); });
+        }
+
+        function initDragAndDrop() {
+            const tools = document.querySelectorAll('.tool-item');
+            const canvas = document.getElementById('canvas');
+            tools.forEach(tool => { tool.addEventListener('dragstart', (e) => { e.dataTransfer.setData('type', tool.dataset.type); }); });
+            canvas.addEventListener('dragover', (e) => { e.preventDefault(); canvas.style.borderColor = 'var(--nx-primary)'; });
+            canvas.addEventListener('dragleave', () => { canvas.style.borderColor = 'transparent'; });
+            canvas.addEventListener('drop', (e) => { e.preventDefault(); canvas.style.borderColor = 'transparent'; createElement(e.dataTransfer.getData('type'), canvas); });
+            document.addEventListener('dragover', (e) => { const target = e.target.closest('.section-element, .row-element, .col-element'); if (target) { e.preventDefault(); target.style.borderColor = 'var(--nx-green)'; } });
+            document.addEventListener('dragleave', (e) => { const target = e.target.closest('.section-element, .row-element, .col-element'); if (target) target.style.borderColor = 'var(--nx-border)'; });
+            document.addEventListener('drop', (e) => { const target = e.target.closest('.section-element, .row-element, .col-element'); if (target) { e.preventDefault(); e.stopPropagation(); target.style.borderColor = 'var(--nx-border)'; createElement(e.dataTransfer.getData('type'), target); } });
+        }
+
+        function createElement(type, container) {
+            const el = document.createElement('div');
+            el.classList.add('canvas-element');
+            el.dataset.type = type;
+            el.id = 'el-' + Date.now() + Math.random().toString(16).slice(2);
+            const controls = document.createElement('div');
+            controls.classList.add('element-controls');
+            controls.innerHTML = `<button class="ctrl-btn" onclick="moveElement('${el.id}', -1)" title="Monter"><i class="fas fa-arrow-up"></i></button><button class="ctrl-btn" onclick="moveElement('${el.id}', 1)" title="Descendre"><i class="fas fa-arrow-down"></i></button><button class="ctrl-btn delete" onclick="deleteElement('${el.id}')" title="Supprimer"><i class="fas fa-trash"></i></button>`;
+            el.appendChild(controls);
+
+            switch(type) {
+                case 'section': el.classList.add('section-element'); break;
+                case 'row': el.classList.add('row-element'); break;
+                case 'col2': case 'col3': case 'col4':
+                    el.classList.add('col-container');
+                    const cols = type === 'col2' ? 2 : type === 'col3' ? 3 : 4;
+                    let wrapper = document.createElement('div'); wrapper.className = 'columns-wrapper';
+                    for(let i=0; i<cols; i++) {
+                        let colDiv = document.createElement('div');
+                        colDiv.className = 'col-element canvas-element';
+                        colDiv.dataset.type = 'single-col';
+                        colDiv.id = 'el-' + Date.now() + Math.random().toString(16).slice(2) + '-c' + i;
+                        colDiv.addEventListener('click', (e) => { e.stopPropagation(); selectElement(colDiv); });
+                        colDiv.addEventListener('dragover', (e) => { e.preventDefault(); colDiv.style.borderColor = 'var(--nx-green)'; });
+                        colDiv.addEventListener('dragleave', () => { colDiv.style.borderColor = 'var(--nx-border)'; });
+                        colDiv.addEventListener('drop', (e) => { e.preventDefault(); e.stopPropagation(); colDiv.style.borderColor = 'var(--nx-border)'; createElement(e.dataTransfer.getData('type'), colDiv); });
+                        wrapper.appendChild(colDiv);
+                    }
+                    el.appendChild(wrapper); break;
+                case 'title': el.classList.add('title-element'); el.contentEditable = true; el.innerText = 'Titre modifiable'; setupTextToolbar(el); break;
+                case 'text': el.classList.add('text-element'); el.contentEditable = true; el.innerText = 'Texte modifiable. Sélectionnez pour éditer.'; setupTextToolbar(el); break;
+                case 'list': el.innerHTML = `<ul class="list-element" style="padding-left:20px; list-style-type: disc;"><li>Élément 1</li><li>Élément 2</li><li>Élément 3</li></ul>`; el.querySelector('ul').contentEditable = true; break;
+                case 'content-box': el.classList.add('content-box'); el.style.padding = '20px'; el.style.background = 'rgba(26,29,53,0.6)'; el.style.borderRadius = 'var(--r)'; el.innerText = 'Boîte de contenu modifiable'; el.contentEditable = true; setupTextToolbar(el); break;
+                case 'image': el.classList.add('image-element'); el.innerHTML = `<img src="https://via.placeholder.com/400x200" alt="Image" style="width:100%;">`; break;
+                case 'video': el.classList.add('video-element'); el.innerHTML = `<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen style="width:100%; height:315px;"></iframe>`; break;
+                case 'audio': el.classList.add('audio-element'); el.innerHTML = `<audio controls style="width:100%;"><source src="" type="audio/mpeg"></audio>`; break;
+                case 'button': el.innerHTML = `<button class="button-element" id="btn-${el.id}">Bouton</button>`; break;
+                case 'form-field': el.innerHTML = `<label style="display:block; margin-bottom:5px;">Label du champ</label><input type="text" class="input-field" placeholder="Votre texte">`; break;
+                case 'checkbox': el.innerHTML = `<label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"><span>Texte de la case à cocher</span></label>`; break;
+                case 'calendar': el.innerHTML = `<input type="date" class="input-field" style="width:100%;">`; break;
+                case 'submit': el.innerHTML = `<button class="btn-primary button-element" style="width:100%;" id="btn-${el.id}">Envoie</button>`; break;
+                case 'countdown': el.classList.add('countdown-element'); el.innerHTML = `<div class="countdown-block"><div class="countdown-number">00</div><div class="countdown-label">Jours</div></div><div class="countdown-block"><div class="countdown-number">00</div><div class="countdown-label">Heures</div></div><div class="countdown-block"><div class="countdown-number">00</div><div class="countdown-label">Minutes</div></div><div class="countdown-block"><div class="countdown-number">00</div><div class="countdown-label">Secondes</div></div>`; break;
+                case 'menu': el.classList.add('menu-element'); el.innerHTML = `<nav><ul><li><a href="#" contenteditable="true">Accueil</a></li><li><a href="#" contenteditable="true">Services</a></li><li><a href="#" contenteditable="true">Contact</a></li></ul></nav>`; break;
+                case 'hr': el.innerHTML = `<hr style="border:0; border-top:1px solid var(--nx-border); margin:20px 0;">`; break;
+                case 'html-code': el.classList.add('html-code-render'); break;
+                case 'faq': el.classList.add('faq-container'); el.innerHTML = `<div class="faq-item"><div class="faq-question" contenteditable="true">Question 1</div><div class="faq-answer" contenteditable="true">Réponse 1</div></div>`; el.addEventListener('click', (e) => { if(e.target.classList.contains('faq-question')) e.target.nextElementSibling.classList.toggle('open'); }); break;
+            }
+            if (!['col2', 'col3', 'col4'].includes(type)) { if(el.firstChild !== controls) el.insertBefore(controls, el.firstChild); }
+            if (container.classList.contains('col-element')) container.appendChild(el);
+            else if (container.classList.contains('columns-wrapper')) container.appendChild(el);
+            else container.appendChild(el);
+            el.addEventListener('click', (e) => { e.stopPropagation(); selectElement(el); });
+            selectElement(el); adjustCanvasHeight();
+        }
+
+        function setupTextToolbar(el) { el.addEventListener('mouseup', showTextToolbar); el.addEventListener('keyup', showTextToolbar); }
+        function showTextToolbar() { const selection = window.getSelection(); if (selection.rangeCount > 0 && !selection.isCollapsed) { const range = selection.getRangeAt(0); const rect = range.getBoundingClientRect(); const toolbar = document.getElementById('text-toolbar'); toolbar.style.display = 'flex'; toolbar.style.top = (rect.top + window.scrollY - 40) + 'px'; toolbar.style.left = (rect.left + window.scrollX + (rect.width / 2) - 100) + 'px'; } }
+        function formatDoc(cmd, value = null) { document.execCommand(cmd, false, value); }
+        function addLink() { const sel = window.getSelection(); if (sel.rangeCount > 0 && !sel.isCollapsed) { const range = sel.getRangeAt(0); const startNode = range.startContainer; const editableEl = startNode.nodeType === 3 ? startNode.parentElement : startNode; const url = prompt('Entrez l\'URL du lien :'); if (url) { editableEl.focus(); sel.removeAllRanges(); sel.addRange(range); document.execCommand('createLink', false, url); } } }
+        
+        function alignElement(id, align) {
+            const el = document.getElementById(id);
+            if(!el) return;
+            el.style.textAlign = align;
+            Array.from(el.children).forEach(child => {
+                if(child.classList.contains('element-controls')) return;
+                child.style.marginLeft = '0';
+                child.style.marginRight = '0';
+                child.style.justifyContent = 'flex-start';
+                const style = window.getComputedStyle(child);
+                if (style.display === 'flex' || style.display === 'inline-flex') {
+                    child.style.justifyContent = align === 'right' ? 'flex-end' : align === 'center' ? 'center' : 'flex-start';
+                } else {
+                    if(align === 'center') { child.style.marginLeft = 'auto'; child.style.marginRight = 'auto'; }
+                    else if(align === 'right') { child.style.marginLeft = 'auto'; child.style.marginRight = '0'; }
+                }
+            });
+        }
+
+        // NOUVELLE FONCTION UNIQUE POUR LES BOUTONS
+        function alignButton(id, align) {
+            const btn = document.getElementById('btn-' + id);
+            if(!btn) return;
+            btn.style.marginLeft = align === 'center' || align === 'right' ? 'auto' : '0';
+            btn.style.marginRight = align === 'center' ? 'auto' : '0';
+        }
+
+        function selectElement(el) { deselectAll(); selectedElement = el; el.classList.add('selected'); updatePropertiesPanel(el); }
+        function deselectAll() { document.querySelectorAll('.canvas-element').forEach(e => e.classList.remove('selected')); selectedElement = null; document.getElementById('prop-content').innerHTML = '<p>Sélectionnez un élément.</p>'; }
+        function deleteElement(id) { const el = document.getElementById(id); if (el) { el.remove(); deselectAll(); adjustCanvasHeight(); } }
+        function moveElement(id, direction) { const el = document.getElementById(id); if (!el) return; const parent = el.parentElement; if (direction === -1 && el.previousElementSibling) { if (!el.previousElementSibling.classList.contains('element-controls')) parent.insertBefore(el, el.previousElementSibling); else if (el.previousElementSibling.previousElementSibling) parent.insertBefore(el, el.previousElementSibling.previousElementSibling); } else if (direction === 1 && el.nextElementSibling) parent.insertBefore(el.nextElementSibling, el); adjustCanvasHeight(); }
+
+        function updatePropertiesPanel(el) {
+            const panel = document.getElementById('prop-content');
+            if (!el) return;
+            const type = el.dataset.type;
+            const id = el.id; 
+            let html = '';
+
+            html += `<div class="prop-group"><label>Effets & Ombres</label><select class="select-field" onchange="applyShadow('${id}', this.value)"><option value="shadow-none">Aucun</option><option value="shadow-soft">Ombre douce</option><option value="shadow-medium">Ombre moyenne</option><option value="shadow-intense">Ombre intense</option><option value="shadow-inner-soft">Intérieure douce</option><option value="shadow-inner-medium">Intérieure moyenne</option><option value="shadow-inner-intense">Intérieure intense</option><option value="shadow-float">Flottement lumineux</option></select><label style="margin-top:10px;">Couleur de l'ombre</label><div class="color-row"><input type="color" id="shadow-color-${id}" value="#000000" oninput="applyCustomShadow('${id}')"><input type="text" class="input-field" id="shadow-color-text-${id}" value="rgba(0,0,0,0.2)" onchange="applyCustomShadow('${id}')"></div><label style="margin-top:10px;">Flou (px)</label><input type="range" min="0" max="50" value="10" class="input-field" id="shadow-blur-${id}" oninput="applyCustomShadow('${id}')"><label style="margin-top:10px;">Décalage (px)</label><input type="range" min="-20" max="20" value="5" class="input-field" id="shadow-offset-${id}" oninput="applyCustomShadow('${id}')"></div>`;
+
+            if (type === 'single-col') {
+                html += `<div class="prop-group"><label>Fond de la colonne</label><div class="color-row"><input type="color" oninput="document.getElementById('${id}').style.backgroundColor = this.value"><input type="text" class="input-field" placeholder="#0B0D17" onchange="document.getElementById('${id}').style.backgroundColor = this.value"><button class="btn-secondary" onclick="document.getElementById('${id}').style.backgroundColor = 'transparent'">Transparent</button></div></div>`;
+            }
+
+            if (['title', 'text', 'content-box', 'list'].includes(type)) {
+                html += `<div class="prop-group"><label>Police</label><select class="select-field" onchange="document.getElementById('${id}').style.fontFamily = this.value"><option value="'Outfit', sans-serif">Outfit</option><option value="'Cormorant Garamond', serif">Cormorant Garamond</option><option value="'Playfair Display', serif">Playfair Display</option><option value="'Montserrat', sans-serif">Montserrat</option><option value="'Poppins', sans-serif">Poppins</option><option value="'Lora', serif">Lora</option><option value="'Dancing Script', cursive">Dancing Script</option></select><label style="margin-top:10px;">Alignement</label><div class="btn-group"><button class="btn-secondary" onclick="alignElement('${id}', 'left')">Gauche</button><button class="btn-secondary" onclick="alignElement('${id}', 'center')">Centre</button><button class="btn-secondary" onclick="alignElement('${id}', 'right')">Droite</button></div><label style="margin-top:10px;">Couleur du texte</label><div class="color-row"><input type="color" oninput="document.getElementById('${id}').style.color = this.value"><input type="text" class="input-field" placeholder="#FFFFFF" onchange="document.getElementById('${id}').style.color = this.value"></div></div>`;
+            }
+            if (type === 'list') { html += `<div class="prop-group"><label>Style des puces</label><select class="select-field" onchange="document.getElementById('${id}').querySelector('ul').style.listStyleType = this.value"><option value="disc">Disque</option><option value="circle">Cercle</option><option value="square">Carré</option><option value="none">Aucun</option></select></div>`; }
+
+            if (['section', 'row', 'col2', 'col3', 'col4', 'content-box'].includes(type)) {
+                html += `<div class="prop-group"><label>Fond (Couleur)</label><div class="color-row"><input type="color" oninput="document.getElementById('${id}').style.backgroundColor = this.value"><input type="text" class="input-field" placeholder="#0B0D17" onchange="document.getElementById('${id}').style.backgroundColor = this.value"><button class="btn-secondary" onclick="document.getElementById('${id}').style.backgroundColor = 'transparent'">Transparent</button></div><label style="margin-top:10px;">Bordure</label><div class="color-row"><input type="color" id="border-color-picker" value="#7B5CFF" oninput="updateBorder('${id}', this.value, 'color')"><input type="number" placeholder="Épaisseur (px)" value="1" min="0" class="input-field" style="width:80px;" oninput="updateBorder('${id}', this.value, 'width')"></div><input type="text" class="input-field" placeholder="ex: 1px solid rgba(...)" onchange="document.getElementById('${id}').style.border = this.value"></div>`;
+            }
+            if (type === 'section') { html += `<div class="prop-group"><label>Image de fond</label><input type="file" accept="image/*" class="input-field" onchange="uploadBgImage('${id}', this)"><button class="btn-secondary" onclick="document.getElementById('${id}').style.backgroundImage = 'none'">Retirer l'image</button></div>`; }
+
+            if (['image', 'video', 'audio'].includes(type)) {
+                let currentSrc = '';
+                if(type === 'image' && el.querySelector('img')) currentSrc = el.querySelector('img').src;
+                if(type === 'video' && el.querySelector('iframe')) currentSrc = el.querySelector('iframe').src;
+                html += `<div class="prop-group"><label>Source</label><input type="text" class="input-field" placeholder="URL..." value="${currentSrc}" oninput="updateMediaSource('${id}', '${type}', this.value)"><label style="margin-top:10px;">Uploader</label><input type="file" accept="${type === 'image' ? 'image/*' : (type === 'video' ? 'video/*' : 'audio/*')}" class="input-field" onchange="uploadMedia('${id}', '${type}', this)"></div><div class="prop-group"><label>Largeur (%)</label><input type="range" min="10" max="100" value="100" class="input-field" oninput="updateMediaWidth('${id}', '${type}', this.value)">${type === 'video' ? '<label style="margin-top:5px;">Hauteur (px)</label><input type="number" value="315" class="input-field" oninput="updateMediaHeight(\''+id+'\', this.value)">' : ''}<label style="margin-top:10px;">Alignement</label><div class="btn-group"><button class="btn-secondary" onclick="updateMediaAlign('${id}', '${type}', 'left')">Gauche</button><button class="btn-secondary" onclick="updateMediaAlign('${id}', '${type}', 'center')">Centre</button><button class="btn-secondary" onclick="updateMediaAlign('${id}', '${type}', 'right')">Droite</button></div></div>`;
+            }
+
+            // CORRECTION BOUTONS : Utilise alignButton au lieu de alignElement
+            if (['button', 'submit'].includes(type)) {
+                const btn = el.querySelector('button');
+                html += `<div class="prop-group">
+                    <label>Texte du bouton</label><input type="text" class="input-field" value="${btn ? btn.innerText : ''}" oninput="document.getElementById('btn-${id}').innerText = this.value">
+                    <label style="margin-top:10px;">Couleur de fond</label><div class="color-row"><input type="color" value="#7B5CFF" oninput="document.getElementById('btn-${id}').style.background = this.value"></div>
+                    <label style="margin-top:10px;">Largeur (%)</label><input type="range" min="10" max="100" value="100" class="input-field" oninput="document.getElementById('btn-${id}').style.width = this.value + '%'">
+                    <label style="margin-top:5px;">Hauteur (Padding)</label><input type="range" min="5" max="50" value="12" class="input-field" oninput="document.getElementById('btn-${id}').style.padding = this.value + 'px 24px'">
+                    <label style="margin-top:5px;">Arrondi (px)</label><input type="range" min="0" max="50" value="50" class="input-field" oninput="document.getElementById('btn-${id}').style.borderRadius = this.value + 'px'">
+                    <label style="margin-top:10px;">Alignement du bouton</label><div class="btn-group"><button class="btn-secondary" onclick="alignButton('${id}', 'left')">Gauche</button><button class="btn-secondary" onclick="alignButton('${id}', 'center')">Centre</button><button class="btn-secondary" onclick="alignButton('${id}', 'right')">Droite</button></div></div>`;
+            }
+
+            if (['form-field', 'checkbox', 'calendar', 'submit'].includes(type)) {
+                html += `<div class="prop-group"><label>Largeur (%)</label><input type="range" min="10" max="100" value="100" class="input-field" oninput="document.getElementById('${id}').style.width = this.value + '%'"><label style="margin-top:10px;">Alignement</label><div class="btn-group"><button class="btn-secondary" onclick="alignElement('${id}', 'left')">Gauche</button><button class="btn-secondary" onclick="alignElement('${id}', 'center')">Centre</button><button class="btn-secondary" onclick="alignElement('${id}', 'right')">Droite</button></div></div>`;
+            }
+            if (type === 'form-field') { const labelEl = el.querySelector('label'); html += `<div class="prop-group"><label>Label du champ</label><input type="text" class="input-field" value="${labelEl.innerText}" oninput="document.querySelector('#${id} label').innerText = this.value"><label style="margin-top:10px;">Type de champ</label><select class="select-field" onchange="document.querySelector('#${id} input').type = this.value"><option value="text">Texte</option><option value="email">Email</option><option value="tel">Téléphone</option><option value="number">Nombre</option></select><label style="margin-top:10px;">Couleur de fond du champ</label><div class="color-row"><input type="color" value="#13152A" oninput="document.querySelector('#${id} input').style.background = this.value"></div></div>`; }
+            if (type === 'checkbox') { html += `<div class="prop-group"><label>Texte de la case</label><input type="text" class="input-field" value="${el.querySelector('span').innerText}" oninput="document.querySelector('#${id} span').innerText = this.value"></div>`; }
+
+            if (type === 'countdown') { html += `<div class="prop-group"><label>Couleur des blocs (Fond)</label><div class="color-row"><input type="color" value="#1A1D35" oninput="updateCountdownBlocks('${id}', 'bg', this.value)"></div><label style="margin-top:10px;">Couleur du texte (Jours, Heures...)</label><div class="color-row"><input type="color" value="#6B7094" oninput="updateCountdownBlocks('${id}', 'text', this.value)"></div><label style="margin-top:10px;">Couleur des chiffres</label><div class="color-row"><input type="color" value="#7B5CFF" oninput="updateCountdownBlocks('${id}', 'num', this.value)"></div></div>`; }
+            if (type === 'menu') { html += `<div class="prop-group"><label>Gestion du menu</label><p style="font-size:11px; color:var(--nx-text-dim); margin-bottom:10px;">Cliquez directement sur les textes des liens dans l'éditeur pour les modifier.</p><button class="btn-secondary" style="width:100%; margin-bottom:10px;" onclick="addMenuItem('${id}')">+ Ajouter un lien</button><label>Alignement du menu</label><div class="btn-group"><button class="btn-secondary" onclick="document.querySelector('#${id} nav ul').style.justifyContent='flex-start'">Gauche</button><button class="btn-secondary" onclick="document.querySelector('#${id} nav ul').style.justifyContent='center'">Centre</button><button class="btn-secondary" onclick="document.querySelector('#${id} nav ul').style.justifyContent='flex-end'">Droite</button></div></div>`; }
+            if (type === 'hr') { html += `<div class="prop-group"><label>Couleur de la ligne</label><div class="color-row"><input type="color" value="#7B5CFF" oninput="document.querySelector('#${id} hr').style.borderColor = this.value"></div></div>`; }
+            if (type === 'html-code') { html += `<div class="prop-group"><label>Code HTML / Embed</label><textarea class="textarea-field" rows="10" placeholder="Collez votre code ici" oninput="renderHtmlCodeSafe('${id}', this.value)"></textarea></div>`; }
+            if (type === 'faq') { html += `<div class="prop-group"><label>Gestion de la FAQ</label><button class="btn-secondary" style="width:100%; margin-bottom:10px;" onclick="addFaqItem('${id}')">+ Ajouter une question</button><p style="font-size:11px; color:var(--nx-text-dim);">Cliquez sur les questions/réponses dans l'éditeur pour modifier le texte directement.</p><label style="margin-top:10px;">Couleur Fond Question</label><div class="color-row"><input type="color" value="#1A1D35" oninput="updateFaqColors('${id}', 'q-bg', this.value)"></div><label style="margin-top:10px;">Couleur Fond Réponse</label><div class="color-row"><input type="color" value="#0B0D17" oninput="updateFaqColors('${id}', 'a-bg', this.value)"></div></div>`; }
+
+            panel.innerHTML = html;
+        }
+
+        function applyShadow(id, className) { const el = document.getElementById(id); if(!el) return; el.classList.remove('shadow-none', 'shadow-soft', 'shadow-medium', 'shadow-intense', 'shadow-inner-soft', 'shadow-inner-medium', 'shadow-inner-intense', 'shadow-float'); el.classList.add(className); el.style.boxShadow = ''; }
+        function applyCustomShadow(id) { const el = document.getElementById(id); if(!el) return; el.classList.remove('shadow-none', 'shadow-soft', 'shadow-medium', 'shadow-intense', 'shadow-inner-soft', 'shadow-inner-medium', 'shadow-inner-intense', 'shadow-float'); const colorText = document.getElementById('shadow-color-text-' + id)?.value || 'rgba(0,0,0,0.2)'; const blur = document.getElementById('shadow-blur-' + id)?.value || '0'; const offset = document.getElementById('shadow-offset-' + id)?.value || '0'; el.style.boxShadow = `${offset}px ${offset}px ${blur}px ${colorText}`; }
+        function updateBorder(id, val, type) { const el = document.getElementById(id); if(!el) return; const width = el.querySelector('input[placeholder="Épaisseur (px)"]')?.value || 1; const color = document.getElementById('border-color-picker').value; el.style.border = `${width}px solid ${color}`; }
+        function uploadBgImage(id, input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => { const el = document.getElementById(id); el.style.backgroundImage = `url(${e.target.result})`; el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; }; reader.readAsDataURL(input.files[0]); } }
+        function updateMediaSource(id, type, url) { const el = document.getElementById(id); if(!el) return; if(type === 'image') { const img = el.querySelector('img'); if(img) img.src = url; } if(type === 'video') { if(url.includes('watch?v=')) url = url.replace('watch?v=', 'embed/'); const iframe = el.querySelector('iframe'); if(iframe) iframe.src = url; } }
+        function uploadMedia(id, type, input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => { const el = document.getElementById(id); if(type === 'image') el.querySelector('img').src = e.target.result; if(type === 'video') { const vid = document.createElement('video'); vid.controls = true; vid.src = e.target.result; vid.style.width = '100%'; el.querySelector('iframe').replaceWith(vid); } if(type === 'audio') { const aud = el.querySelector('audio'); aud.querySelector('source').src = e.target.result; aud.load(); } }; reader.readAsDataURL(input.files[0]); } }
+        function updateMediaWidth(id, type, val) { const el = document.getElementById(id); if(!el) return; const media = el.querySelector('img, video, iframe, audio'); if(media) media.style.width = val + '%'; }
+        function updateMediaHeight(id, val) { const el = document.getElementById(id); if(!el) return; const iframe = el.querySelector('iframe'); if(iframe) iframe.style.height = val + 'px'; }
+        function updateMediaAlign(id, type, align) { const el = document.getElementById(id); if(!el) return; const media = el.querySelector('img, video, iframe, audio'); if(!media) return; el.style.textAlign = align; media.style.display = 'inline-block'; media.style.margin = '0'; if(align === 'left') media.style.float = 'left'; else if(align === 'right') media.style.float = 'right'; else media.style.float = 'none'; }
+        function updateCountdownBlocks(id, target, color) { const el = document.getElementById(id); if(!el) return; if(target === 'bg') el.querySelectorAll('.countdown-block').forEach(b => b.style.background = color); if(target === 'text') el.querySelectorAll('.countdown-label').forEach(l => l.style.color = color); if(target === 'num') el.querySelectorAll('.countdown-number').forEach(n => n.style.color = color); }
+        function addMenuItem(id) { const el = document.getElementById(id); if(!el) return; const ul = el.querySelector('ul'); const li = document.createElement('li'); li.innerHTML = `<a href="#" contenteditable="true">Nouveau lien</a>`; ul.appendChild(li); }
+        function addFaqItem(id) { const el = document.getElementById(id); if(!el) return; const div = document.createElement('div'); div.className = 'faq-item'; div.innerHTML = `<div class="faq-question" contenteditable="true">Nouvelle Question</div><div class="faq-answer" contenteditable="true">Nouvelle Réponse</div>`; div.querySelector('.faq-question').addEventListener('click', function() { this.nextElementSibling.classList.toggle('open'); }); el.appendChild(div); }
+        function updateFaqColors(id, target, color) { const el = document.getElementById(id); if(!el) return; if(target === 'q-bg') el.querySelectorAll('.faq-question').forEach(q => q.style.background = color); if(target === 'a-bg') el.querySelectorAll('.faq-answer').forEach(a => a.style.background = color); }
+        function renderHtmlCodeSafe(id, code) { const el = document.getElementById(id); if(!el) return; const controls = el.querySelector('.element-controls'); Array.from(el.childNodes).forEach(node => { if(node !== controls) el.removeChild(node); }); const div = document.createElement('div'); div.innerHTML = code; el.appendChild(div); }
+        
+        function initSettings() { document.getElementById('settings-btn').onclick = () => document.getElementById('settings-modal').style.display = 'flex'; document.getElementById('global-bg-color').oninput = (e) => document.getElementById('canvas').style.backgroundColor = e.target.value; document.getElementById('global-bg-image').onchange = (e) => { if(e.target.files && e.target.files[0]) { const reader = new FileReader(); reader.onload = (ev) => { document.getElementById('canvas').style.backgroundImage = `url(${ev.target.result})`; document.getElementById('canvas').style.backgroundSize = 'cover'; }; reader.readAsDataURL(e.target.files[0]); } }; }
+        function clearGlobalBgImage() { document.getElementById('canvas').style.backgroundImage = 'none'; }
+
+        function adjustCanvasHeight() { const canvas = document.getElementById('canvas'); if(canvas) canvas.style.minHeight = canvas.scrollHeight + 40 + 'px'; }
+
+        /* ══════════════════════════════════════
+           EXPORT — Extrait le HTML propre du canvas
+        ══════════════════════════════════════ */
+        function exportCleanHTML() {
+            const canvas = document.getElementById('canvas');
+            const clone = canvas.cloneNode(true);
+            // Retirer les controls d'édition
+            clone.querySelectorAll('.element-controls').forEach(c => c.remove());
+            // Retirer les classes d'édition
+            clone.querySelectorAll('.canvas-element').forEach(el => {
+                el.classList.remove('canvas-element', 'selected');
+                el.style.border = '';
+                el.style.cursor = '';
+                el.removeAttribute('draggable');
+                el.removeAttribute('contenteditable');
+            });
+            clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+            // Retirer les bordures dashed
+            clone.querySelectorAll('.section-element, .row-element, .col-container, .col-element').forEach(el => {
+                el.style.borderStyle = 'none';
+            });
+            clone.classList.remove('canvas-area');
+            clone.removeAttribute('id');
+
+            // Récupérer SEO
+            const title = document.getElementById('seo-title')?.value || document.getElementById('project-name')?.value || 'Ma Page NyXia';
+            const desc = document.getElementById('seo-desc')?.value || '';
+            const keywords = document.getElementById('seo-keywords')?.value || '';
+            const author = document.getElementById('seo-author')?.value || '';
+            const lang = document.getElementById('site-lang')?.value || 'fr';
+            const headerCode = document.getElementById('header-code')?.value || '';
+            const footerCode = document.getElementById('footer-code')?.value || '';
+            const bgColor = canvas.style.backgroundColor || '#0B0D17';
+            const bgImage = canvas.style.backgroundImage || '';
+
+            // Collecter les styles inline des éléments
+            let html = `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title}</title>
+${desc ? '<meta name="description" content="' + desc.replace(/"/g, '&quot;') + '">' : ''}
+${keywords ? '<meta name="keywords" content="' + keywords.replace(/"/g, '&quot;') + '">' : ''}
+${author ? '<meta name="author" content="' + author.replace(/"/g, '&quot;') + '">' : ''}
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Lora:wght@400;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;color:#C8CCF0;background:${bgColor};${bgImage && bgImage !== 'none' ? 'background-image:' + bgImage + ';background-size:cover;background-position:center;' : ''}}
+.section-element,.row-element,.col-container{padding:15px;margin-bottom:15px}
+.columns-wrapper{display:flex;gap:15px;width:100%}
+.col-element{flex:1;padding:10px}
+.button-element{display:block;padding:12px 24px;background:#7B5CFF;color:#fff;border-radius:50px;text-decoration:none;font-weight:600;border:none;cursor:pointer;text-align:center}
+.faq-item{margin-bottom:10px;border:1px solid rgba(123,92,255,0.15);border-radius:14px;overflow:hidden}
+.faq-question{padding:15px;background:rgba(26,29,53,0.6);cursor:pointer;font-weight:600}
+.faq-answer{padding:15px;background:rgba(11,13,23,0.6);display:none}
+.countdown-element{display:flex;gap:15px;justify-content:center;flex-wrap:wrap}
+.countdown-block{background:rgba(26,29,53,0.6);padding:15px;border-radius:14px;text-align:center;min-width:80px}
+.countdown-number{font-size:1.5rem;font-weight:700;color:#7B5CFF}
+.countdown-label{font-size:0.8rem;color:#6B7094}
+nav ul{list-style:none;display:flex;gap:20px;padding:0;margin:0}
+nav ul li a{text-decoration:none;color:#C8CCF0;font-weight:500;transition:color 0.2s}
+nav ul li a:hover{color:#7B5CFF}
+img,video,iframe{max-width:100%;border-radius:14px}
+audio{width:100%}
+.shadow-soft{box-shadow:0 4px 15px rgba(0,0,0,0.1)}
+.shadow-medium{box-shadow:0 8px 25px rgba(0,0,0,0.2)}
+.shadow-intense{box-shadow:0 15px 40px rgba(0,0,0,0.3)}
+.shadow-float{box-shadow:0 10px 30px rgba(123,92,255,0.3);animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@media(max-width:768px){.columns-wrapper{flex-direction:column}}
+</style>
+${headerCode}
+</head>
+<body>
+${clone.innerHTML}
+<script>
+document.querySelectorAll('.faq-question').forEach(function(q){q.addEventListener('click',function(){this.nextElementSibling.classList.toggle('open');var a=this.nextElementSibling;a.style.display=a.style.display==='block'?'none':'block'})});
+<\/script>
+${footerCode}
+</body>
+</html>`;
+            return html;
+        }
+
+        /* ══════════════════════════════════════
+           SAUVEGARDE (brouillon dans KV)
+        ══════════════════════════════════════ */
+        
+
+        function saveDraft() {
+            var name = document.getElementById('project-name').value.trim() || 'Ma page';
+            var canvasHTML = document.getElementById('canvas').innerHTML;
+            var canvasBg = document.getElementById('canvas').style.cssText;
+            var token = sessionStorage.getItem('nyxia_z_token');
+
+            showToast('💾 Sauvegarde en cours...');
+
+            fetch('/api/editor/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: token,
+                    id: currentDraftId,
+                    name: name,
+                    canvasHTML: canvasHTML,
+                    canvasStyle: canvasBg,
+                    seo: {
+                        title: document.getElementById('seo-title')?.value || '',
+                        desc: document.getElementById('seo-desc')?.value || '',
+                        keywords: document.getElementById('seo-keywords')?.value || '',
+                        author: document.getElementById('seo-author')?.value || '',
+                        lang: document.getElementById('site-lang')?.value || 'fr',
+                        headerCode: document.getElementById('header-code')?.value || '',
+                        footerCode: document.getElementById('footer-code')?.value || ''
+                    }
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    currentDraftId = data.id;
+                    showToast('✅ Page sauvegardée !');
+                } else {
+                    showToast('❌ ' + (data.error || 'Erreur de sauvegarde'));
+                }
+            })
+            .catch(() => showToast('❌ Erreur réseau'));
+        }
+
+        /* ══════════════════════════════════════
+           CHARGER LES BROUILLONS
+        ══════════════════════════════════════ */
+        function openDraftsModal() {
+            document.getElementById('drafts-modal').style.display = 'flex';
+            var token = sessionStorage.getItem('nyxia_z_token');
+
+            fetch('/api/editor/list', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token })
+            })
+            .then(r => r.json())
+            .then(data => {
+                var list = document.getElementById('drafts-list');
+                if (!data.success || !data.drafts || !data.drafts.length) {
+                    list.innerHTML = '<p style="color:var(--nx-text-dim);text-align:center;padding:30px 0">Aucune page sauvegardée</p>';
+                    return;
+                }
+                list.innerHTML = data.drafts.map(function(d) {
+                    var date = new Date(d.date).toLocaleDateString('fr-CA') + ' ' + new Date(d.date).toLocaleTimeString('fr-CA', {hour:'2-digit',minute:'2-digit'});
+                    var pubBadge = d.slug ? ' · <span style="color:var(--nx-green)">✅ Publiée</span>' : '';
+                    return '<div class="draft-item">'
+                        + '<div class="draft-info"><div class="draft-name">' + editorEscH(d.name) + '</div><div class="draft-date">' + date + pubBadge + '</div></div>'
+                        + '<div class="draft-actions">'
+                        + '<button class="draft-btn load" onclick="loadDraft(\'' + d.id + '\')">📂 Ouvrir</button>'
+                        + '<button class="draft-btn publish" onclick="publishDraft(\'' + d.id + '\')">🚀 Publier</button>'
+                        + '<button class="draft-btn delete" onclick="deleteDraft(\'' + d.id + '\')">🗑</button>'
+                        + '</div></div>';
+                }).join('');
+            })
+            .catch(() => {
+                document.getElementById('drafts-list').innerHTML = '<p style="color:#ff8fab;text-align:center;padding:20px">Erreur de chargement</p>';
+            });
+        }
+
+        function loadDraft(id) {
+            var token = sessionStorage.getItem('nyxia_z_token');
+            fetch('/api/editor/load', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token, id: id })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success || !data.draft) { showToast('❌ Brouillon introuvable'); return; }
+                currentDraftId = data.draft.id;
+                document.getElementById('project-name').value = data.draft.name || 'Ma page';
+                document.getElementById('canvas').innerHTML = data.draft.canvasHTML || '';
+                if (data.draft.canvasStyle) document.getElementById('canvas').style.cssText = data.draft.canvasStyle;
+                if (data.draft.seo) {
+                    if (data.draft.seo.title) document.getElementById('seo-title').value = data.draft.seo.title;
+                    if (data.draft.seo.desc) document.getElementById('seo-desc').value = data.draft.seo.desc;
+                    if (data.draft.seo.keywords) document.getElementById('seo-keywords').value = data.draft.seo.keywords;
+                    if (data.draft.seo.author) document.getElementById('seo-author').value = data.draft.seo.author;
+                    if (data.draft.seo.lang) document.getElementById('site-lang').value = data.draft.seo.lang;
+                    if (data.draft.seo.headerCode) document.getElementById('header-code').value = data.draft.seo.headerCode;
+                    if (data.draft.seo.footerCode) document.getElementById('footer-code').value = data.draft.seo.footerCode;
+                }
+                // Réattacher les listeners sur les éléments rechargés
+                reattachListeners();
+                document.getElementById('drafts-modal').style.display = 'none';
+                showToast('✅ Page "' + data.draft.name + '" chargée');
+            })
+            .catch(() => showToast('❌ Erreur de chargement'));
+        }
+
+        function deleteDraft(id) {
+            if (!confirm('Supprimer cette page ?')) return;
+            var token = sessionStorage.getItem('nyxia_z_token');
+            fetch('/api/editor/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token, id: id })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    if (currentDraftId === id) currentDraftId = null;
+                    openDraftsModal(); // Refresh
+                    showToast('🗑 Page supprimée');
+                }
+            });
+        }
+
+        function reattachListeners() {
+            document.querySelectorAll('.canvas-element').forEach(el => {
+                el.addEventListener('click', function(e) { e.stopPropagation(); selectElement(el); });
+            });
+            document.querySelectorAll('.faq-question').forEach(q => {
+                q.addEventListener('click', function() { this.nextElementSibling.classList.toggle('open'); });
+            });
+            document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+                el.addEventListener('focus', function() {
+                    const toolbar = document.getElementById('text-toolbar');
+                    const rect = this.getBoundingClientRect();
+                    toolbar.style.display = 'flex';
+                    toolbar.style.left = rect.left + 'px';
+                    toolbar.style.top = (rect.top + window.scrollY) + 'px';
+                });
+            });
+            adjustCanvasHeight();
+        }
+
+        /* ══════════════════════════════════════
+           PUBLICATION (sous-domaine via /api/publish)
+        ══════════════════════════════════════ */
+        function publishPage() {
+            var name = document.getElementById('project-name').value.trim() || 'ma-page';
+            var html = exportCleanHTML();
+
+            showToast('🚀 Publication en cours...');
+
+            fetch('/api/publish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ html: html, projectName: name })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success && data.url) {
+                    document.getElementById('publish-url').href = data.url;
+                    document.getElementById('publish-url').textContent = data.url;
+                    document.getElementById('publish-modal').style.display = 'flex';
+                    // Sauvegarder aussi le brouillon avec le slug
+                    saveDraft();
+                } else {
+                    showToast('❌ ' + (data.error || 'Erreur de publication'));
+                }
+            })
+            .catch(() => showToast('❌ Erreur réseau'));
+        }
+
+        function publishDraft(id) {
+            loadDraft(id);
+            setTimeout(function() { publishPage(); }, 1000);
+        }
+
+        /* ══════════════════════════════════════
+           APERÇU
+        ══════════════════════════════════════ */
+        function previewPage() {
+            var html = exportCleanHTML();
+            var win = window.open('', '_blank');
+            win.document.write(html);
+            win.document.close();
+        }
+
+        /* ══════════════════════════════════════
+           UTILS
+        ══════════════════════════════════════ */
+        , 3500);
+        }
+
+        function editorEscH(str) { var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    /* ===== END EDITOR JAVASCRIPT ===== */
   </script>
 </body>
 </html>
