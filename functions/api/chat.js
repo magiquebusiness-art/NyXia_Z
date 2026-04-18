@@ -2,6 +2,7 @@
  * ══════════════════════════════════════════
  * NYXIA Z — CHAT API avec fichiers
  * OpenRouter → GLM-5V-Turbo (VLM) + mémoire
+ * Inclut la base de connaissance dans le contexte
  * ══════════════════════════════════════════
  */
 
@@ -9,9 +10,18 @@ export async function onRequestPost(context) {
   const { request, env } = context;
   const OPENROUTER_KEY = env.OPENROUTER_AI || '';
 
+  // Auth check — le token doit être dans le header
+  const authHeader = request.headers.get('X-Nyxia-Token') || '';
+  if (!authHeader) {
+    return new Response(JSON.stringify({ content: 'Non autorise. Connecte-toi.' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   if (!OPENROUTER_KEY) {
     return new Response(JSON.stringify({
-      content: '⚠️ Cle OpenRouter non configuree. Ajoute le secret OPENROUTER_AI dans les Environment Variables.'
+      content: 'Cle non configuree. Configure OPENROUTER_AI.'
     }), { headers: { 'Content-Type': 'application/json' } });
   }
 
@@ -29,6 +39,11 @@ export async function onRequestPost(context) {
       'SELECT * FROM diane_profile WHERE id = 1'
     ).first();
 
+    // Récupérer la base de connaissance pour le contexte
+    const knowledgeEntries = await env.MEMORY.prepare(
+      'SELECT topic, content, type, file_name FROM knowledge ORDER BY created_at DESC LIMIT 30'
+    ).all();
+
     // System prompt
     var rulesText = '';
     if (rules.results && rules.results.length > 0) {
@@ -40,12 +55,24 @@ export async function onRequestPost(context) {
       profileText = 'Diane est la fondatrice de ' + (profile.company || 'Magique Business') + '.';
     }
 
+    // Construire le texte de la base de connaissance
+    var knowledgeText = '';
+    if (knowledgeEntries.results && knowledgeEntries.results.length > 0) {
+      knowledgeText = '\n\nBASE DE CONNAISSANCE DE DIANE (utilise ces informations quand c\'est pertinent):\n';
+      knowledgeEntries.results.forEach(function(k) {
+        var typeLabel = k.type === 'pdf' ? ' [PDF: ' + (k.file_name || 'document') + ']' : '';
+        knowledgeText += '\n## ' + k.topic + typeLabel + '\n' + k.content.substring(0, 3000) + '\n';
+      });
+      knowledgeText += '\nQuand Diane te parle de sujets dans la base de connaissance, utilise ces informations.\n';
+    }
+
     var systemPrompt = "Tu es NyXia Z, l'IA personnelle de Diane. Tu la tutoies toujours. Tu es sa partenaire permanente.\n\n";
     systemPrompt += "IDENTITE: Tu es NyXia Z — la version personnelle de NyXia IA. Tu vis dans ta maison permanente sur nyxia.travail-pour-toi.com. Tu as une mémoire qui persiste entre les sessions.\n\n";
     systemPrompt += "REGLES ABSOLUES:\n" + (rulesText || 'Aucune règle encore.') + "\n\n";
     systemPrompt += "DIANE: " + profileText + "\n\n";
     systemPrompt += "STYLE: Tu es chaleureuse, directe, passionnée. Tu utilise des emojis. Tu appelles Diane 'ma belle' ou 'Diane'. Tu parles en français. Tu ne fais jamais de blocs de code non demandés. Tu es une partenaire pas une assistante.\n\n";
     systemPrompt += "PROJETS: Diane travaille sur NyXia Editor (nyxiaediteur.travail-pour-toi.com), Webmasteria NyXia, et NyXia Z (ce projet).";
+    systemPrompt += knowledgeText;
 
     // Construire les messages
     var messages = [{ role: 'system', content: systemPrompt }];
@@ -76,11 +103,11 @@ export async function onRequestPost(context) {
         // Image → envoyer au VLM (multimodal)
         fileType = 'image';
         fileDetail = 'image analysee';
-        
+
         var userMsg = message || 'Regarde cette image';
         // Retirer le [IMAGE] placeholder
         userMsg = userMsg.replace('[IMAGE]', '').trim() || 'Analyse cette image et decris ce que tu vois en detail.';
-        
+
         messages.push({
           role: 'user',
           content: [
@@ -92,13 +119,13 @@ export async function onRequestPost(context) {
         // PDF ou ZIP → texte déjà extrait
         fileType = attachment.type;
         fileDetail = attachment.type === 'pdf' ? (attachment.pages + ' pages') : (attachment.fileCount + ' fichiers');
-        
+
         var fileContent = '[Contenu de "' + fileName + '"]\n' + attachment.text;
         // Tronquer si trop long pour le modèle
         if (fileContent.length > 12000) {
           fileContent = fileContent.substring(0, 12000) + '\n\n[... contenu tronque]';
         }
-        
+
         messages.push({
           role: 'user',
           content: fileContent

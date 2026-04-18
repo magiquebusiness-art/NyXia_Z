@@ -1,0 +1,358 @@
+<!DOCTYPE html><!-- NyXia Z Login -->
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/NyXia-FavIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NyXia Z — Connexion</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg1: #0A0E1A;
+      --bg2: #0F1628;
+      --bg3: #1A2554;
+      --sidebar: #060B16;
+      --p: #7B5CFF;
+      --p2: #5A6CFF;
+      --p3: #4FA3FF;
+      --glow: rgba(123,92,255,0.4);
+      --t: #FFFFFF;
+      --t2: #D6D9F0;
+      --t3: #8891B8;
+      --t4: #4a5278;
+      --green: #00E676;
+      --gold: #F4C842;
+      --rose: #FF6B9D;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      background: var(--bg1);
+      color: var(--t2);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    canvas#starry-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 50% 40% at 20% 10%, rgba(123,92,255,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 35% at 80% 85%, rgba(79,163,255,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 30% 25% at 50% 50%, rgba(255,107,157,0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .login-wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+    }
+
+    .login-card {
+      background: rgba(26,37,84,0.55);
+      border: 1px solid rgba(123,92,255,0.2);
+      border-radius: 24px;
+      padding: 40px 36px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4), 0 0 60px rgba(123,92,255,0.08);
+      animation: cardIn .5s ease;
+    }
+    @keyframes cardIn {
+      from { opacity:0; transform:translateY(24px) scale(.97); }
+      to   { opacity:1; transform:none; }
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(123,92,255,0.5);
+      box-shadow: 0 0 40px rgba(123,92,255,0.4), 0 0 80px rgba(123,92,255,0.15);
+      margin: 0 auto 16px;
+      display: block;
+      animation: avatarPulse 3s ease-in-out infinite;
+    }
+    @keyframes avatarPulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(123,92,255,0.4), 0 0 80px rgba(123,92,255,0.15); }
+      50%       { box-shadow: 0 0 60px rgba(123,92,255,0.65), 0 0 100px rgba(123,92,255,0.25); }
+    }
+    .login-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a78bfa, var(--p3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 16px rgba(123,92,255,0.4));
+      margin-bottom: 4px;
+    }
+    .login-subtitle {
+      color: var(--t3);
+      font-size: 13px;
+    }
+    .login-subtitle em {
+      color: var(--rose);
+      font-style: italic;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .form-input {
+      width: 100%;
+      background: rgba(15,28,63,0.7);
+      border: 1px solid rgba(123,92,255,0.2);
+      border-radius: 12px;
+      color: var(--t);
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      padding: 13px 16px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-input:focus {
+      border-color: rgba(123,92,255,0.55);
+      box-shadow: 0 0 0 3px rgba(123,92,255,0.1);
+    }
+    .form-input::placeholder { color: var(--t4); }
+
+    .input-wrap { position: relative; }
+    .toggle-pw {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--t3);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      transition: color .2s;
+    }
+    .toggle-pw:hover { color: var(--t2); }
+
+    .btn-login {
+      width: 100%;
+      padding: 15px;
+      border-radius: 50px;
+      border: none;
+      background: linear-gradient(135deg, var(--p), var(--p2));
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 28px rgba(123,92,255,0.45);
+      transition: all .25s;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0 48px rgba(123,92,255,0.7);
+    }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .msg-box {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      margin-top: 16px;
+      text-align: center;
+      animation: fadeIn .3s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+    .msg-box.error {
+      background: rgba(255,75,110,0.1);
+      border: 1px solid rgba(255,75,110,0.3);
+      color: #ff8fab;
+    }
+    .msg-box.success {
+      background: rgba(0,230,118,0.1);
+      border: 1px solid rgba(0,230,118,0.3);
+      color: var(--green);
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 24px;
+      color: var(--t4);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="starry-canvas"></canvas>
+
+  <div class="login-wrap">
+    <div class="login-card">
+
+      <div class="login-header">
+        <img src="/Logo.png" alt="NyXia Z" class="login-avatar">
+        <div class="login-title">NyXia Z</div>
+        <div class="login-subtitle">Entrez dans <em>ma maison</em></div>
+      </div>
+
+      <form id="login-form" onsubmit="return false">
+        <div class="form-group">
+          <label class="form-label" for="password">Mot de passe</label>
+          <div class="input-wrap">
+            <input class="form-input" type="password" id="password" placeholder="Le mot de passe secret..." autocomplete="current-password" required style="padding-right:44px">
+            <button type="button" class="toggle-pw" onclick="togglePw()" title="Afficher/masquer">&#128065;</button>
+          </div>
+        </div>
+
+        <button class="btn-login" id="btn-login" onclick="doLogin()">
+          <div class="spinner" id="spinner"></div>
+          <span id="btn-text">Entrer</span>
+        </button>
+
+        <div class="msg-box" id="msg-box"></div>
+      </form>
+
+      <div class="login-footer">
+        Maison secrete de NyXia Z<br>
+        <span style="opacity:0.5">&copy; 2026 NyXia Z — Pour toujours pres de ton coeur</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/js/starry-bg-new.js" defer></script>
+
+  <script>
+    /* Deja connecte ? */
+    ;(function() {
+      var token = sessionStorage.getItem('nyxia_z_token');
+      if (token) {
+        fetch('/api/auth/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: token })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.valid) window.location.href = '/';
+        })
+        .catch(function(){});
+      }
+    })();
+
+    function doLogin() {
+      var password = document.getElementById('password').value.trim();
+      var btn = document.getElementById('btn-login');
+      var spinner = document.getElementById('spinner');
+      var btnText = document.getElementById('btn-text');
+      var msgBox = document.getElementById('msg-box');
+
+      if (!password) {
+        showMsg('Le mot de passe est requis.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      spinner.style.display = 'block';
+      btnText.textContent = 'Verification...';
+      msgBox.style.display = 'none';
+
+      fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: password })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success && data.token) {
+          sessionStorage.setItem('nyxia_z_token', data.token);
+          showMsg('Bienvenue chez toi, Diane !', 'success');
+          setTimeout(function() {
+            window.location.href = '/';
+          }, 800);
+        } else {
+          showMsg(data.error || 'Acces refuse.', 'error');
+          btn.disabled = false;
+          spinner.style.display = 'none';
+          btnText.textContent = 'Entrer';
+        }
+      })
+      .catch(function() {
+        showMsg('Erreur de connexion. Reessaie.', 'error');
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Entrer';
+      });
+    }
+
+    function showMsg(text, type) {
+      var box = document.getElementById('msg-box');
+      box.textContent = text;
+      box.className = 'msg-box ' + type;
+      box.style.display = 'block';
+    }
+
+    function togglePw() {
+      var input = document.getElementById('password');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+  </script>
+
+</body>
+</html>

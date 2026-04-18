@@ -46,13 +46,16 @@ CREATE TABLE IF NOT EXISTS session_logs (
   created_at TEXT DEFAULT (datetime('now'))
 );
 
--- Les connaissances techniques apprises
+-- Les connaissances techniques apprises (texte + PDF)
 CREATE TABLE IF NOT EXISTS knowledge (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   topic TEXT NOT NULL,
   content TEXT NOT NULL,
   source TEXT DEFAULT '',
   tags TEXT DEFAULT '[]',
+  type TEXT DEFAULT 'text',
+  file_name TEXT DEFAULT '',
+  page_count INTEGER DEFAULT 0,
   created_at TEXT DEFAULT (datetime('now'))
 );
 
@@ -64,4 +67,26 @@ CREATE TABLE IF NOT EXISTS agents (
   capabilities TEXT DEFAULT '[]',
   status TEXT DEFAULT 'ready',
   created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Intégrations tierces
+CREATE TABLE IF NOT EXISTS integrations (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE,
+  display_name TEXT NOT NULL,
+  icon TEXT NOT NULL DEFAULT '🔗',
+  status TEXT DEFAULT 'disconnected',
+  config TEXT DEFAULT '{}',
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Tâches WAN vidéo
+CREATE TABLE IF NOT EXISTS wan_tasks (
+  task_id TEXT PRIMARY KEY,
+  prompt TEXT,
+  model TEXT,
+  status TEXT DEFAULT 'pending',
+  video_url TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
 );
