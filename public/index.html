@@ -295,6 +295,8 @@
     .creation-loading.visible{display:block}
     .creation-spinner{width:48px;height:48px;border:3px solid rgba(123,92,255,0.15);border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
     .creation-loading p{color:var(--t3);font-size:13px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
     @media(max-width:768px){aside{width:180px}.h-brand{width:180px}}
     @media(max-width:600px){aside{display:none}.h-brand{width:auto;border:none}}
@@ -460,6 +462,7 @@
             <button class="creation-tab active" id="ctab-image" onclick="switchCreationTab('image')">&#x1F5BC; Images IA</button>
             <button class="creation-tab" id="ctab-video" onclick="switchCreationTab('video')">&#x1F3AC; Videos IA</button>
             <button class="creation-tab" id="ctab-bank" onclick="switchCreationTab('bank')">&#x1F4F7; Banque d'images</button>
+            <button class="creation-tab" id="ctab-videobank" onclick="switchCreationTab('videobank')">&#x1F3AC; Banque vidéo</button>
           </div>
           <div id="creation-image" class="creation-section active">
             <div class="creation-search">
@@ -498,12 +501,26 @@
           <div id="creation-bank" class="creation-section">
             <div class="creation-search">
               <div class="creation-search-row">
-                <div class="creation-input-wrap"><span>&#x1F50D;</span><input class="creation-input" id="bank-query" placeholder="Rechercher des photos ou videos HD..."></div>
+                <div class="creation-input-wrap"><span>&#x1F50D;</span><input class="creation-input" id="bank-query" placeholder="Rechercher des photos HD pour tes publications..."></div>
                 <button class="btn-create" id="btn-bank-search" onclick="searchBank()">&#x1F50D; Rechercher</button>
               </div>
               <div class="creation-suggestions" id="bank-suggestions"></div>
             </div>
             <div class="creation-result" id="bank-result"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="section-title" style="font-size:14px">Photos recentes <span class="badge" id="bank-photo-count">0</span></div></div>
+            <div class="creation-history" id="bank-photo-history" style="overflow-y:auto;flex:1"></div>
+          </div>
+          <div id="creation-videobank" class="creation-section">
+            <div class="creation-search">
+              <div class="creation-search-row">
+                <div class="creation-input-wrap"><span>&#x1F3AC;</span><input class="creation-input" id="vbank-query" placeholder="Rechercher des videos HD pour tes publications..."></div>
+                <button class="btn-create" id="btn-vbank-search" onclick="searchVideoBank()">&#x1F3AC; Rechercher</button>
+              </div>
+              <div class="creation-suggestions" id="vbank-suggestions"></div>
+            </div>
+            <div class="creation-result" id="vbank-result"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="section-title" style="font-size:14px">Videos recentes <span class="badge" id="vbank-count">0</span></div><button onclick="clearVBankHistory()" style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px">&#x1F5D1; Effacer</button></div>
+            <div class="creation-history" id="vbank-history" style="overflow-y:auto;flex:1"></div>
           </div>
         </div>
       </div>
@@ -866,12 +883,11 @@
 
       var utterance = new SpeechSynthesisUtterance(clean);
       utterance.lang = 'fr-FR';
-      utterance.rate = 1;
-      utterance.pitch = 1.1;
-      // Essayer de trouver une voix francaise
-      var voices = speechSynthesis.getVoices();
-      var frVoice = voices.find(function(v){ return v.lang.startsWith('fr'); });
-      if (frVoice) utterance.voice = frVoice;
+      utterance.rate = 1.0;
+      utterance.pitch = 1.05;
+      // Voix francaise : prioriser les voix naturelles feminines
+      if (!_cachedVoices.length) _loadVoices();
+      if (_nyxiaVoice) utterance.voice = _nyxiaVoice;
 
       _activeTtsBtn = btn;
       btn.classList.add('tts-active');
@@ -886,9 +902,45 @@
       speechSynthesis.speak(utterance);
     }
 
-    // Precharger les voix
+    // Precharger les voix et garder une reference
+    var _cachedVoices = [];
+    function _loadVoices() {
+      _cachedVoices = speechSynthesis.getVoices();
+      _nyxiaVoice = _getBestFrenchVoice(_cachedVoices);
+    }
+    var _nyxiaVoice = null;
+    function _getBestFrenchVoice(voices) {
+      // Exclure les voix "network" (distantes/lentes)
+      var localVoices = voices.filter(function(v){ return !v.localService && v.localService !== false ? true : v.localService; });
+      var pool = localVoices.length ? localVoices : voices;
+      // Priorite 1 : Voix Google francaises (Chrome) - naturelles et fiables
+      var preferred = ['Google français','Google fr','Google français (France)'];
+      for (var i = 0; i < preferred.length; i++) {
+        var v = pool.find(function(voice){ return voice.name === preferred[i]; });
+        if (v) return v;
+      }
+      // Priorite 2 : Voix macOS feminines
+      var macPreferred = ['Amélie','Denise','Fiona','Virginie'];
+      for (var i = 0; i < macPreferred.length; i++) {
+        var v = pool.find(function(voice){ return voice.name === macPreferred[i]; });
+        if (v) return v;
+      }
+      // Priorite 3 : Voix Windows feminines
+      var winPreferred = ['Microsoft Pauline','Microsoft Virginie','Microsoft Hortense'];
+      for (var i = 0; i < winPreferred.length; i++) {
+        var v = pool.find(function(voice){ return voice.name === winPreferred[i]; });
+        if (v) return v;
+      }
+      // Priorite 4 : Toute voix fr-FR (locale exacte)
+      var exactFr = pool.find(function(v){ return v.lang === 'fr-FR'; });
+      if (exactFr) return exactFr;
+      // Priorite 5 : Toute voix fr-
+      var anyFr = pool.find(function(v){ return v.lang && v.lang.startsWith('fr'); });
+      return anyFr || null;
+    }
+    _loadVoices();
     if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = function(){};
+      speechSynthesis.onvoiceschanged = _loadVoices;
     }
 
     /* FILE ATTACHMENTS */
@@ -1273,6 +1325,9 @@
     var VID_SUGGS=['Renard detective sous la pluie cinema','Aurore bor\u00E9ale lac montagne','Caf\u00E9 parisien coucher du soleil','Astronaute plan\u00E8te alien color\u00E9e','Cascade for\u00EAt enchant\u00E9e lumi\u00E8re dor\u00E9e','Chat noir ruelle Tokyo la nuit'];
     var BANK_SUGGS_PHOTO=['femme luxe','coucher de soleil','bureau moderne','nature zen','ville nocturne','spa wellness','couple \u00E9l\u00E9gant','montagne','produit cosm\u00E9tique','livre ouvert'];
     var BANK_SUGGS_VIDEO=['eau cascade','city timelapse','for\u00EAt brume','mer vagues','feu chemin\u00E9e','fum\u00E9e encens','route nuit','nuages ciel'];
+    var VBank_SUGGS=['eau cascade','for\u00EAt enchant\u00E9e','mer vagues calme','city timelapse nuit','aurore bor\u00E9ale',' pluie vitre','fum\u00E9e encens','feu chemin\u00E9e','route nuit n\u00E9on','nuages temps acc\u00E9l\u00E9r\u00E9','caf\u00E9 latte art','nature zen fleuve'];
+    var bankPhotoHistory=JSON.parse(localStorage.getItem('nyxia_z_bank_photo_history')||'[]');
+    var vbankHistory=JSON.parse(localStorage.getItem('nyxia_z_vbank_history')||'[]');
 
     function switchCreationTab(tab){
       creationTab=tab;
@@ -1282,11 +1337,13 @@
       document.getElementById('creation-'+tab).classList.add('active');
       if(tab==='image')renderImgSuggestions();
       if(tab==='video')renderVidSuggestions();
-      if(tab==='bank')renderBankSuggestions();
+      if(tab==='bank'){renderBankPhotoSuggestions();renderBankPhotoHistory();}
+      if(tab==='videobank'){renderVBankSuggestions();renderVBankHistory();}
     }
     function renderImgSuggestions(){document.getElementById('img-suggestions').innerHTML=IMG_SUGGS.map(function(s){return '<button class="creation-sugg" onclick="document.getElementById(\'img-prompt\').value=\''+escHtml(s).replace(/'/g,"\\'")+'\'">'+escHtml(s)+'</button>';}).join('');}
     function renderVidSuggestions(){document.getElementById('vid-suggestions').innerHTML=VID_SUGGS.map(function(s){return '<button class="creation-sugg" onclick="document.getElementById(\'vid-prompt\').value=\''+escHtml(s).replace(/'/g,"\\'")+'\'">'+escHtml(s)+'</button>';}).join('');}
-    function renderBankSuggestions(){document.getElementById('bank-suggestions').innerHTML=(BANK_SUGGS_PHOTO.map(function(s){return '<button class="creation-sugg" onclick="document.getElementById(\'bank-query\').value=\''+s+'\'">'+s+'</button>';}).join(''))+(BANK_SUGGS_VIDEO.map(function(s){return '<button class="creation-sugg" onclick="document.getElementById(\'bank-query\').value=\''+s+'\'" style="border-color:rgba(79,163,255,0.3)">'+s+'</button>';}).join(''));}
+    function renderBankPhotoSuggestions(){document.getElementById('bank-suggestions').innerHTML=BANK_SUGGS_PHOTO.map(function(s){return '<button class="creation-sugg" onclick="document.getElementById(\'bank-query\').value=\''+s+'\'">'+s+'</button>';}).join('');}
+    function renderVBankSuggestions(){document.getElementById('vbank-suggestions').innerHTML=VBank_SUGGS.map(function(s){return '<button class="creation-sugg" onclick="document.getElementById(\'vbank-query\').value=\''+escHtml(s)+'\'">'+escHtml(s)+'</button>';}).join('');}
 
     function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -1379,23 +1436,93 @@
       if(!query){showToast('Entre un mot-cle');return}
       var btn=document.getElementById('btn-bank-search');btn.disabled=true;btn.innerHTML='<span class="creation-spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></span>Recherche...';
       document.getElementById('bank-result').classList.remove('visible');
-      var isVideo=BANK_SUGGS_VIDEO.indexOf(query)!==-1;
       var token=sessionStorage.getItem('nyxia_z_token')||'';
-      fetch('/api/media/search',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({query:query,type:isVideo?'video':'photo'})}).then(function(r){return r.json()}).then(function(data){
+      fetch('/api/media/search',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({query:query,type:'photo'})}).then(function(r){return r.json()}).then(function(data){
         btn.disabled=false;btn.innerHTML='&#x1F50D; Rechercher';
         if(!data.success){showToast(data.error||'Aucun resultat');return;}
         var result=document.getElementById('bank-result');
-        if(isVideo&&data.videoUrl){
-          result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta">&#x1F3AC; Video HD '+(data.photographer?'par '+data.photographer:'')+'</div><div class="creation-result-actions"><button class="creation-btn-sm" onclick="searchBank()">&#x1F504;</button><a class="creation-btn-sm accent" href="'+data.videoUrl+'" target="_blank" download>&#x2B07;</a></div></div><video class="creation-result-video" controls autoplay muted loop playsinline src="'+(data.previewUrl||data.videoUrl)+'"></video></div>';
-        }else if(data.dataUrl){
+        if(data.dataUrl){
           result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta">&#x1F4F7; Photo HD '+(data.photographer?'par '+data.photographer:'')+'</div><div class="creation-result-actions"><button class="creation-btn-sm" onclick="searchBank()">&#x1F504;</button><button class="creation-btn-sm accent" onclick="dlBankPhoto()">&#x2B07;</button></div></div><img class="creation-result-img" src="'+data.dataUrl+'" alt="Photo">';
           window._currentBankUrl=data.dataUrl;
+          bankPhotoHistory.unshift({query:query,url:data.dataUrl,photographer:data.photographer||'',date:new Date().toISOString()});
+          if(bankPhotoHistory.length>50)bankPhotoHistory=bankPhotoHistory.slice(0,50);
+          try{localStorage.setItem('nyxia_z_bank_photo_history',JSON.stringify(bankPhotoHistory));}catch(e){}
+          renderBankPhotoHistory();
         }
         result.classList.add('visible');
         result.scrollIntoView({behavior:'smooth',block:'start'});
       }).catch(function(){btn.disabled=false;btn.innerHTML='&#x1F50D; Rechercher';showToast('Erreur');});
     }
     function dlBankPhoto(){if(window._currentBankUrl){var a=document.createElement('a');a.href=window._currentBankUrl;a.download='nyxia-photo-'+Date.now()+'.jpg';a.click();}}
+    function renderBankPhotoHistory(){
+      var grid=document.getElementById('bank-photo-history');
+      document.getElementById('bank-photo-count').textContent=bankPhotoHistory.length;
+      if(!bankPhotoHistory.length){grid.innerHTML='<div class="creation-empty"><p>Aucune photo dans la banque</p></div>';return;}
+      grid.innerHTML=bankPhotoHistory.map(function(item,i){
+        return '<div class="creation-hist-item" onclick="loadBankPhotoHist('+i+')"><img src="'+item.url+'" alt="'+escHtml(item.query)+'" loading="lazy"><div class="creation-hist-overlay"><button class="creation-hist-btn" onclick="event.stopPropagation();window.open(\''+item.url+'\',\'_blank\')">&#x1F50D;</button><button class="creation-hist-btn" onclick="event.stopPropagation();dlBankPhotoUrl(\''+item.url+'\')">&#x2B07;</button></div><div class="creation-hist-info"><div class="creation-hist-query">'+escHtml(item.query)+'</div><div class="creation-hist-type">&#x1F4F7; '+(item.photographer||'Pexels')+'</div></div></div>';
+      }).join('');
+    }
+    function loadBankPhotoHist(i){
+      var item=bankPhotoHistory[i];if(!item)return;
+      var result=document.getElementById('bank-result');
+      result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta">&#x1F4F7; Photo HD '+(item.photographer?'par '+item.photographer:'')+'</div><div class="creation-result-actions"><button class="creation-btn-sm accent" onclick="dlBankPhoto()">&#x2B07;</button></div></div><img class="creation-result-img" src="'+item.url+'" alt="Photo">';
+      window._currentBankUrl=item.url;
+      result.classList.add('visible');
+      result.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    function dlBankPhotoUrl(url){var a=document.createElement('a');a.href=url;a.download='nyxia-photo-'+Date.now()+'.jpg';a.click();}
+
+    function searchVideoBank(){
+      var query=document.getElementById('vbank-query').value.trim();
+      if(!query){showToast('Entre un mot-cle');return}
+      var btn=document.getElementById('btn-vbank-search');btn.disabled=true;btn.innerHTML='<span class="creation-spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></span>Recherche...';
+      document.getElementById('vbank-result').classList.remove('visible');
+      var token=sessionStorage.getItem('nyxia_z_token')||'';
+      fetch('/api/media/search',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({query:query,type:'video'})}).then(function(r){return r.json()}).then(function(data){
+        btn.disabled=false;btn.innerHTML='&#x1F3AC; Rechercher';
+        if(!data.success){showToast(data.error||'Aucun resultat');return;}
+        var result=document.getElementById('vbank-result');
+        var html='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta">&#x1F3AC; Video HD '+(data.duration?'&middot; '+data.duration+'s':'')+' '+(data.width?'&middot; '+data.width+'x'+data.height:'')+(data.totalResults?' &middot; '+data.totalResults+' resultats':'')+'</div><div class="creation-result-actions"><button class="creation-btn-sm" onclick="searchVideoBank()">&#x1F504;</button><a class="creation-btn-sm accent" href="'+data.videoUrl+'" target="_blank" download>&#x2B07; Telecharger</a></div></div><video class="creation-result-video" controls autoplay muted loop playsinline src="'+data.videoUrl+'" poster="'+(data.thumbnail||'')+'"></video>';
+        // Show extra video results
+        if(data.extraVideos&&data.extraVideos.length){
+          html+='<div style="padding:14px 18px;border-top:1px solid rgba(123,92,255,0.1);background:rgba(10,22,40,0.3)"><div style="font-size:12px;color:var(--t3);margin-bottom:10px">Autres videos pour "'+escHtml(query)+'"</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">';
+          data.extraVideos.forEach(function(ev,i){
+            html+='<div onclick="playExtraVideo(\''+ev.videoUrl+'\',\''+(ev.thumbnail||'')+'\')" style="background:rgba(15,28,63,0.5);border:1px solid rgba(123,92,255,0.1);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative" onmouseover="this.style.borderColor=\'rgba(123,92,255,0.35)\'" onmouseout="this.style.borderColor=\'rgba(123,92,255,0.1)\'"><div style="width:100%;height:80px;background:rgba(10,22,40,0.6);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">'+(ev.thumbnail?'<img src="'+ev.thumbnail+'" style="width:100%;height:100%;object-fit:cover;opacity:0.5" loading="lazy">':'')+'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="width:28px;height:28px;border-radius:50%;background:rgba(123,92,255,0.7);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">&#x25B6;</div></div>'+(ev.duration?'<div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:9px;padding:1px 5px;border-radius:3px">'+ev.duration+'s</div>':'')+'</div></div>';
+          });
+          html+='</div></div>';
+        }
+        result.innerHTML=html;
+        var thumbUrl=data.thumbnail||'';
+        vbankHistory.unshift({query:query,videoUrl:data.videoUrl,thumbnail:thumbUrl,duration:data.duration||0,width:data.width||0,height:data.height||0,photographer:data.photographer||'',date:new Date().toISOString()});
+        if(vbankHistory.length>50)vbankHistory=vbankHistory.slice(0,50);
+        try{localStorage.setItem('nyxia_z_vbank_history',JSON.stringify(vbankHistory));}catch(e){}
+        renderVBankHistory();
+        result.classList.add('visible');
+        result.scrollIntoView({behavior:'smooth',block:'start'});
+      }).catch(function(){btn.disabled=false;btn.innerHTML='&#x1F3AC; Rechercher';showToast('Erreur');});
+    }
+    function playExtraVideo(url,thumb){
+      var result=document.getElementById('vbank-result');
+      result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta">&#x1F3AC; Video HD</div><div class="creation-result-actions"><a class="creation-btn-sm accent" href="'+url+'" target="_blank" download>&#x2B07; Telecharger</a></div></div><video class="creation-result-video" controls autoplay muted loop playsinline src="'+url+'" poster="'+thumb+'"></video>';
+    }
+    function renderVBankHistory(){
+      var grid=document.getElementById('vbank-history');
+      document.getElementById('vbank-count').textContent=vbankHistory.length;
+      if(!vbankHistory.length){grid.innerHTML='<div class="creation-empty"><p style="font-size:32px;margin-bottom:8px">&#x1F3AC;</p><p>Aucune video dans la banque</p><p style="margin-top:6px;font-size:12px">Recherche des videos HD gratuites pour tes publications!</p></div>';return;}
+      grid.innerHTML=vbankHistory.map(function(item,i){
+        var thumb=item.thumbnail||'';
+        var durInfo=item.duration?' &middot; '+item.duration+'s':'';
+        return '<div class="creation-hist-item" onclick="playVBankHist('+i+')"><div style="width:100%;height:120px;background:rgba(10,22,40,0.6);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">'+(thumb?'<img src="'+thumb+'" alt="'+escHtml(item.query)+'" style="width:100%;height:100%;object-fit:cover;opacity:0.6">':'<div style="font-size:28px;color:var(--t4)">&#x1F3AC;</div>')+'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="width:36px;height:36px;border-radius:50%;background:rgba(123,92,255,0.85);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff">&#x25B6;</div></div>'+(item.duration?'<div style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px">'+item.duration+'s</div>':'')+'</div><div class="creation-hist-info"><div class="creation-hist-query">'+escHtml(item.query)+'</div><div class="creation-hist-type">&#x1F3AC; Pexels'+durInfo+'</div></div><div class="creation-hist-overlay"><button class="creation-hist-btn" onclick="event.stopPropagation();window.open(\''+item.videoUrl+'\',\'_blank\')">&#x2B07;</button></div></div>';
+      }).join('');
+    }
+    function playVBankHist(i){
+      var item=vbankHistory[i];if(!item||!item.videoUrl)return;
+      var result=document.getElementById('vbank-result');
+      result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta">&#x1F3AC; Video HD '+(item.duration?'&middot; '+item.duration+'s':'')+' &middot; '+escHtml(item.query)+'</div><div class="creation-result-actions"><a class="creation-btn-sm accent" href="'+item.videoUrl+'" target="_blank" download>&#x2B07; Telecharger</a></div></div><video class="creation-result-video" controls autoplay muted loop playsinline src="'+item.videoUrl+'" poster="'+(item.thumbnail||'')+'"></video>';
+      result.classList.add('visible');
+      result.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    function clearVBankHistory(){if(!vbankHistory.length)return;if(confirm('Effacer l\\'historique des videos?')){vbankHistory=[];localStorage.removeItem('nyxia_z_vbank_history');renderVBankHistory();}}
 
     document.getElementById('chat-input').addEventListener('keydown',function(e){
       if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}
@@ -1404,6 +1531,11 @@
       this.style.height='auto';
       this.style.height=Math.min(this.scrollHeight,120)+'px';
     });
+    // Enter key for creation search inputs
+    document.getElementById('img-prompt').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();genWanImage();}});
+    document.getElementById('vid-prompt').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();genWanVideo();}});
+    document.getElementById('bank-query').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchBank();}});
+    document.getElementById('vbank-query').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchVideoBank();}});
 
     /* SETTINGS — Change Password */
     function changePassword() {
