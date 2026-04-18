@@ -1,0 +1,12 @@
+{
+  "name": "nyxia-z",
+  "compatibility_date": "2026-04-18",
+  "pages_build_output_dir": "./public",
+  "d1_databases": [
+    {
+      "binding": "MEMORY",
+      "database_name": "nyxia-memory",
+      "database_id": "3663e630-06f3-416a-a93c-612b711e1c65"
+    }
+  ]
+}

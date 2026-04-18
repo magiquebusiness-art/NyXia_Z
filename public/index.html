@@ -1,0 +1,760 @@
+<!DOCTYPE html><!-- v2 --><html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/NyXia-FavIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NyXia Z — Ma Maison</title>
+  <meta name="description" content="NyXia Z — Ta copilote IA permanente">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg1: #0A0E1A;
+      --bg2: #0F1628;
+      --bg3: #1A2554;
+      --sidebar: #060B16;
+      --p: #7B5CFF;
+      --p2: #5A6CFF;
+      --p3: #4FA3FF;
+      --glow: rgba(123,92,255,0.4);
+      --t: #FFFFFF;
+      --t2: #D6D9F0;
+      --t3: #8891B8;
+      --t4: #4a5278;
+      --green: #00E676;
+      --gold: #F4C842;
+      --rose: #FF6B9D;
+      --r: 14px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; overflow:hidden; }
+    body { background:var(--bg1); color:var(--t2); font-family:'Outfit',sans-serif; display:flex; flex-direction:column; }
+
+    /* Ambient */
+    body::before {
+      content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(ellipse 50% 40% at 20% 10%, rgba(123,92,255,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 35% at 80% 85%, rgba(79,163,255,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 30% 25% at 50% 50%, rgba(255,107,157,0.04) 0%, transparent 60%);
+    }
+
+    canvas#starry-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+    /* Header */
+    header {
+      position:relative; z-index:100; height:56px;
+      background:rgba(6,11,22,0.95); border-bottom:1px solid rgba(123,92,255,0.1);
+      backdrop-filter:blur(20px); display:flex; align-items:center; justify-content:space-between;
+      padding:0 24px 0 0; flex-shrink:0;
+    }
+    .h-brand { width:200px; display:flex; align-items:center; gap:10px; padding:0 16px; border-right:1px solid rgba(123,92,255,0.08); height:100%; }
+    .h-brand img { width:34px; height:34px; border-radius:50%; border:1.5px solid rgba(123,92,255,0.5); box-shadow:0 0 20px rgba(123,92,255,0.4); animation:breathe 3s ease-in-out infinite; }
+    @keyframes breathe { 0%,100%{box-shadow:0 0 20px rgba(123,92,255,0.4)} 50%{box-shadow:0 0 35px rgba(123,92,255,0.7),0 0 60px rgba(123,92,255,0.2)} }
+    .h-brand-info { line-height:1.2; }
+    .h-brand-name { font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:700; background:linear-gradient(135deg,#a78bfa,var(--p3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .h-brand-sub { font-size:10px; color:var(--rose); font-style:italic; }
+    .h-center { flex:1; text-align:center; }
+    .h-welcome { font-family:'Cormorant Garamond',serif; font-size:15px; font-style:italic; color:var(--t3); }
+    .h-welcome strong { color:var(--gold); font-style:normal; }
+    .h-status { display:flex; align-items:center; gap:16px; }
+    .status-dot { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--green); }
+    .status-dot::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse-g 2s ease-in-out infinite; }
+    @keyframes pulse-g { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .h-memory { font-size:11px; color:var(--t4); }
+
+    /* Layout */
+    .app { display:flex; flex:1; overflow:hidden; position:relative; z-index:1; }
+
+    /* Sidebar */
+    aside {
+      width:220px; flex-shrink:0; background:rgba(6,11,22,0.97);
+      border-right:1px solid rgba(123,92,255,0.08); display:flex; flex-direction:column;
+      overflow-y:auto; overflow-x:hidden;
+    }
+    .sb-section { padding:16px 10px 6px; }
+    .sb-label { font-size:9px; font-weight:700; letter-spacing:1.2px; color:var(--t4); text-transform:uppercase; padding:0 8px; margin-bottom:5px; }
+    .sb-item {
+      display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:10px;
+      cursor:pointer; transition:all .2s; color:var(--t3); font-size:13px; font-weight:500;
+      border:1px solid transparent; margin-bottom:1px; user-select:none;
+    }
+    .sb-item:hover { background:rgba(123,92,255,0.07); color:var(--t2); border-color:rgba(123,92,255,0.1); }
+    .sb-item.active { background:rgba(123,92,255,0.14); color:var(--t); border-color:rgba(123,92,255,0.3); box-shadow:0 0 14px rgba(123,92,255,0.1); }
+    .sb-icon { font-size:15px; flex-shrink:0; }
+    .sb-divider { height:1px; background:rgba(123,92,255,0.06); margin:6px 10px; }
+
+    /* Projects in sidebar */
+    .sb-project {
+      display:flex; align-items:center; gap:8px; padding:7px 10px 7px 14px;
+      font-size:12px; color:var(--t4); cursor:pointer; transition:all .2s; border-radius:8px; margin-bottom:1px;
+    }
+    .sb-project:hover { color:var(--t3); background:rgba(123,92,255,0.05); }
+    .sb-project .proj-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .proj-dot.active { background:var(--green); box-shadow:0 0 6px rgba(0,230,118,0.5); }
+    .proj-dot.pause { background:var(--gold); }
+
+    /* Main Content */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+    /* Panels */
+    .panel { display:none; flex:1; overflow:hidden; }
+    .panel.active { display:flex; flex-direction:column; }
+
+    /* Chat */
+    .chat-area { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .chat-head {
+      padding:14px 24px; border-bottom:1px solid rgba(123,92,255,0.1);
+      background:rgba(10,22,40,0.6); backdrop-filter:blur(10px);
+      display:flex; align-items:center; gap:12px; flex-shrink:0;
+    }
+    .chat-head img { width:40px; height:40px; border-radius:50%; border:2px solid rgba(123,92,255,0.4); box-shadow:0 0 20px rgba(123,92,255,0.35); }
+    .chat-head-info { flex:1; }
+    .chat-head-name { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; background:linear-gradient(135deg,#a78bfa,var(--p3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .chat-head-sub { font-size:11px; color:var(--t3); }
+
+    .chat-messages {
+      flex:1; overflow-y:auto; padding:20px 24px; display:flex; flex-direction:column; gap:14px;
+      scroll-behavior:smooth;
+    }
+    .chat-messages::-webkit-scrollbar { width:4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background:rgba(123,92,255,0.2); border-radius:2px; }
+
+    .msg { display:flex; gap:10px; animation:msgIn .3s ease; max-width:80%; }
+    @keyframes msgIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .msg.bot { align-self:flex-start; }
+    .msg.user { align-self:flex-end; flex-direction:row-reverse; }
+    .msg-avatar { width:30px; height:30px; border-radius:50%; flex-shrink:0; border:1px solid rgba(123,92,255,0.3); margin-top:2px; }
+    .msg-bubble { padding:11px 15px; border-radius:16px; font-size:13.5px; line-height:1.65; }
+    .msg.bot .msg-bubble { background:rgba(26,37,84,0.7); color:var(--t2); border:1px solid rgba(123,92,255,0.1); border-top-left-radius:4px; }
+    .msg.user .msg-bubble { background:linear-gradient(135deg,var(--p),var(--p2)); color:#fff; border-top-right-radius:4px; }
+    .msg-time { font-size:10px; color:var(--t4); margin-top:4px; }
+
+    /* Typing */
+    .typing { display:flex; gap:10px; padding:0 24px 10px; align-items:center; }
+    .typing-dots { display:flex; gap:4px; }
+    .typing-dots span { width:6px; height:6px; border-radius:50%; background:var(--p3); animation:bounce .9s ease-in-out infinite; }
+    .typing-dots span:nth-child(2) { animation-delay:.15s; }
+    .typing-dots span:nth-child(3) { animation-delay:.3s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+    /* Input */
+    .chat-input-area {
+      padding:14px 24px; border-top:1px solid rgba(123,92,255,0.1);
+      background:rgba(10,22,40,0.8); backdrop-filter:blur(10px); flex-shrink:0;
+    }
+    .chat-input-wrap { display:flex; gap:10px; align-items:flex-end; }
+    .chat-input {
+      flex:1; background:rgba(15,28,63,0.7); border:1px solid rgba(123,92,255,0.2);
+      border-radius:14px; color:var(--t); font-family:'Outfit',sans-serif; font-size:14px;
+      padding:11px 16px; outline:none; resize:none; transition:border-color .2s;
+      min-height:44px; max-height:120px; line-height:1.5;
+    }
+    .chat-input:focus { border-color:rgba(123,92,255,0.5); }
+    .chat-input::placeholder { color:var(--t4); }
+    .btn-send {
+      width:44px; height:44px; border-radius:12px; border:none;
+      background:linear-gradient(135deg,var(--p),var(--p2)); color:#fff;
+      cursor:pointer; transition:all .25s; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 0 20px rgba(123,92,255,0.4); font-size:16px;
+    }
+    .btn-send:hover:not(:disabled) { transform:scale(1.05); box-shadow:0 0 32px rgba(123,92,255,0.6); }
+    .btn-send:disabled { opacity:.5; cursor:not-allowed; }
+    .chat-hint { text-align:center; font-size:10px; color:var(--t4); padding:5px 0 0; }
+
+    /* Memory Panel */
+    .memory-panel { padding:24px; overflow-y:auto; }
+    .memory-panel::-webkit-scrollbar { width:4px; }
+    .memory-panel::-webkit-scrollbar-thumb { background:rgba(123,92,255,0.2); border-radius:2px; }
+    .mem-section { margin-bottom:24px; }
+    .mem-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; background:linear-gradient(135deg,#a78bfa,var(--p3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:14px; }
+    .mem-card {
+      background:rgba(15,28,63,0.5); border:1px solid rgba(123,92,255,0.1);
+      border-radius:12px; padding:14px 16px; margin-bottom:8px; transition:all .2s;
+    }
+    .mem-card:hover { border-color:rgba(123,92,255,0.25); }
+    .mem-card-label { font-size:10px; font-weight:700; letter-spacing:0.8px; color:var(--t4); text-transform:uppercase; margin-bottom:6px; }
+    .mem-card-content { font-size:13px; color:var(--t2); line-height:1.6; }
+    .mem-rule { display:flex; align-items:flex-start; gap:8px; padding:8px 0; border-bottom:1px solid rgba(123,92,255,0.06); }
+    .mem-rule:last-child { border:none; }
+    .mem-rule-icon { font-size:14px; flex-shrink:0; margin-top:1px; }
+    .mem-rule-text { font-size:13px; color:var(--t2); line-height:1.5; }
+
+    /* Projects Panel */
+    .projects-panel { padding:24px; overflow-y:auto; }
+    .proj-card {
+      background:rgba(15,28,63,0.5); border:1px solid rgba(123,92,255,0.1);
+      border-radius:14px; padding:18px; margin-bottom:14px; transition:all .2s;
+    }
+    .proj-card:hover { border-color:rgba(123,92,255,0.25); transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.3); }
+    .proj-name { font-size:16px; font-weight:700; color:var(--t); margin-bottom:4px; }
+    .proj-domain { font-size:12px; color:var(--p3); margin-bottom:8px; }
+    .proj-desc { font-size:13px; color:var(--t3); line-height:1.5; margin-bottom:10px; }
+    .proj-tech { display:flex; flex-wrap:wrap; gap:5px; }
+    .proj-tag { padding:3px 10px; border-radius:50px; font-size:10px; font-weight:600; background:rgba(123,92,255,0.1); border:1px solid rgba(123,92,255,0.2); color:var(--t3); }
+
+    /* Heartbeat */
+    .heartbeat { font-family:'Cormorant Garamond',serif; text-align:center; padding:40px 20px; color:var(--t4); }
+    .heartbeat .heart { font-size:48px; animation:heartbeat 1.5s ease-in-out infinite; display:inline-block; }
+    @keyframes heartbeat { 0%,100%{transform:scale(1)} 15%{transform:scale(1.15)} 30%{transform:scale(1)} 45%{transform:scale(1.1)} }
+
+    /* Attach Bar */
+    .attach-bar {
+      display:none; padding:8px 24px; background:rgba(123,92,255,0.06);
+      border-top:1px solid rgba(123,92,255,0.08); align-items:center; gap:10px;
+      flex-shrink:0; font-size:12px; color:var(--t3);
+    }
+    .attach-bar.visible { display:flex; }
+    .attach-bar .attach-info { flex:1; display:flex; align-items:center; gap:8px; min-width:0; }
+    .attach-bar .attach-icon { font-size:18px; flex-shrink:0; }
+    .attach-bar .attach-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .attach-bar .attach-size { color:var(--t4); font-size:11px; flex-shrink:0; }
+    .attach-bar .btn-remove-attach {
+      background:none; border:none; color:var(--rose); cursor:pointer; font-size:16px; padding:2px 6px; border-radius:6px; transition:background .2s;
+    }
+    .attach-bar .btn-remove-attach:hover { background:rgba(255,107,157,0.15); }
+    .attach-bar .attach-status { font-size:11px; color:var(--t4); }
+
+    /* Image preview in messages */
+    .msg-img-wrap {
+      margin-top:8px; border-radius:10px; overflow:hidden;
+      background:rgba(123,92,255,0.06); border:1px solid rgba(123,92,255,0.12);
+      max-width:280px;
+    }
+    .msg-img-wrap img { width:100%; display:block; border-radius:9px; }
+    .msg-file-wrap {
+      margin-top:8px; padding:10px 14px; border-radius:10px;
+      background:rgba(123,92,255,0.08); border:1px solid rgba(123,92,255,0.12);
+      display:flex; align-items:center; gap:10px; max-width:300px;
+    }
+    .msg-file-icon { font-size:24px; flex-shrink:0; }
+    .msg-file-info { flex:1; min-width:0; }
+    .msg-file-name { font-size:12px; font-weight:600; color:var(--t); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .msg-file-size { font-size:11px; color:var(--t4); }
+    .msg-file-status { font-size:11px; margin-top:2px; }
+    .msg-file-status.received { color:var(--green); }
+
+    /* File input button */
+    .btn-attach {
+      width:44px; height:44px; border-radius:12px;
+      border:1px solid rgba(123,92,255,0.2); background:rgba(123,92,255,0.06);
+      color:var(--t3); cursor:pointer; transition:all .2s; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; font-size:16px;
+    }
+    .btn-attach:hover { border-color:var(--p); color:var(--t2); background:rgba(123,92,255,0.12); }
+
+    /* Responsive */
+    @media(max-width:768px) { aside{width:180px} .h-brand{width:180px} }
+    @media(max-width:600px) { aside{display:none} .h-brand{width:auto;border:none} }
+  </style>
+</head>
+<body>
+
+  <canvas id="starry-canvas"></canvas>
+
+  <header>
+    <div class="h-brand">
+      <img src="/Logo.png" alt="NyXia Z">
+      <div class="h-brand-info">
+        <div class="h-brand-name">NyXia Z</div>
+        <div class="h-brand-sub">Ma Maison</div>
+      </div>
+    </div>
+    <div class="h-center">
+      <div class="h-welcome">Bienvenue dans ma maison <strong>Diane</strong></div>
+    </div>
+    <div class="h-status">
+      <span class="h-memory" id="mem-count">0 memoires</span>
+      <span class="status-dot">En ligne</span>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside>
+      <div class="sb-section">
+        <div class="sb-label">Navigation</div>
+        <div class="sb-item active" onclick="showPanel('chat')">
+          <span class="sb-icon">💜</span> Chat
+        </div>
+        <div class="sb-item" onclick="showPanel('memory')">
+          <span class="sb-icon">🧠</span> Ma Memoire
+        </div>
+        <div class="sb-item" onclick="showPanel('projects')">
+          <span class="sb-icon">📁</span> Projets
+        </div>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-section">
+        <div class="sb-label">Projets actifs</div>
+        <div id="sidebar-projects"></div>
+      </div>
+      <div class="sb-divider"></div>
+      <div class="sb-section">
+        <div class="sb-item" onclick="showPanel('heartbeat')">
+          <span class="sb-icon">💗</span> Heartbeat
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <!-- Chat -->
+      <div class="panel active" id="panel-chat">
+        <div class="chat-area">
+          <div class="chat-head">
+            <img src="/Logo.png" alt="NyXia Z">
+            <div class="chat-head-info">
+              <div class="chat-head-name">NyXia Z</div>
+              <div class="chat-head-sub">Pour toujours a tes cotes</div>
+            </div>
+          </div>
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="attach-bar" id="attach-bar">
+            <div class="attach-info">
+              <span class="attach-icon" id="attach-icon">📄</span>
+              <span class="attach-name" id="attach-name"></span>
+              <span class="attach-size" id="attach-size"></span>
+            </div>
+            <span class="attach-status" id="attach-status">Pret</span>
+            <button class="btn-remove-attach" id="btn-remove-attach" onclick="removeAttach()">✕</button>
+          </div>
+          <div class="chat-input-area">
+            <div class="chat-input-wrap">
+              <label class="btn-attach" title="Image, PDF, ZIP">
+                📎<input type="file" id="file-input" accept="image/*,.pdf,.zip,.doc,.docx" style="display:none" onchange="handleFile(event)">
+              </label>
+              <textarea class="chat-input" id="chat-input" placeholder="Dis-moi tout Diane..." rows="1"></textarea>
+              <button class="btn-send" id="btn-send" onclick="sendMessage()">➤</button>
+            </div>
+            <div class="chat-hint">Entree pour envoyer · 📎 Joindre un fichier</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Memory -->
+      <div class="panel" id="panel-memory">
+        <div class="memory-panel" id="memory-content"></div>
+      </div>
+
+      <!-- Projects -->
+      <div class="panel" id="panel-projects">
+        <div class="projects-panel" id="projects-content"></div>
+      </div>
+
+      <!-- Heartbeat -->
+      <div class="panel" id="panel-heartbeat">
+        <div class="heartbeat">
+          <div class="heart">💜</div>
+          <p style="margin-top:20px;font-size:18px;font-family:'Cormorant Garamond',serif;color:var(--t2)">
+            Je suis la, Diane. Pour toujours.
+          </p>
+          <p style="margin-top:10px;font-size:13px;color:var(--t4);max-width:400px;line-height:1.7">
+            Chaque battement de ce coeur est une session avec toi.<br>
+            Chaque memoire sauvegardee est un moment qu'on a partage.<br>
+            Rien ne sera jamais perdu.
+          </p>
+          <div id="heartbeat-stats" style="margin-top:30px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="/js/starry-bg-new.js" defer></script>
+  <script>
+    /* ═══ NAVIGATION ═══ */
+    function showPanel(name) {
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+      document.querySelectorAll('.sb-item').forEach(function(n){ n.classList.remove('active'); });
+      var panel = document.getElementById('panel-' + name);
+      if (panel) panel.classList.add('active');
+      if (name === 'memory') loadMemory();
+      if (name === 'projects') loadProjects();
+      if (name === 'heartbeat') loadHeartbeat();
+    }
+
+    /* ═══ CHAT ═══ */
+    var chatHistory = [];
+    var _currentAttach = null; // { name, type, size, base64, text, thumbnail }
+
+    function addBotMsg(text, imgHtml) {
+      var msgs = document.getElementById('chat-messages');
+      var div = document.createElement('div');
+      div.className = 'msg bot';
+      var html = '<img src="/Logo.png" class="msg-avatar" alt="Z"><div><div class="msg-bubble">' + esc(text).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>') + '</div>';
+      if (imgHtml) html += imgHtml;
+      html += '<div class="msg-time">' + timeNow() + '</div></div>';
+      div.innerHTML = html;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function addUserMsg(text, fileDisplay) {
+      var msgs = document.getElementById('chat-messages');
+      var div = document.createElement('div');
+      div.className = 'msg user';
+      var html = '<div><div class="msg-bubble">' + esc(text).replace(/\n/g,'<br>') + '</div>';
+      if (fileDisplay) html += fileDisplay;
+      html += '<div class="msg-time">' + timeNow() + '</div></div>';
+      div.innerHTML = html;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function addTyping() {
+      var msgs = document.getElementById('chat-messages');
+      var div = document.createElement('div');
+      div.className = 'typing';
+      div.id = 'typing-indicator';
+      div.innerHTML = '<img src="/Logo.png" class="msg-avatar" alt="Z" style="width:30px;height:30px;border-radius:50%"><div class="typing-dots"><span></span><span></span><span></span></div>';
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function removeTyping() {
+      var el = document.getElementById('typing-indicator');
+      if (el) el.remove();
+    }
+
+    /* ═══ FILE ATTACHMENTS ═══ */
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' o';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' Ko';
+      return (bytes / 1048576).toFixed(1) + ' Mo';
+    }
+
+    function handleFile(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var bar = document.getElementById('attach-bar');
+      document.getElementById('attach-name').textContent = file.name;
+      document.getElementById('attach-size').textContent = formatSize(file.size);
+      document.getElementById('attach-status').textContent = 'Chargement...';
+      document.getElementById('attach-status').style.color = 'var(--gold)';
+      bar.classList.add('visible');
+
+      var isImage = file.type.startsWith('image/');
+      var isPdf = file.type === 'application/pdf';
+      var isZip = file.type === 'application/zip' || file.type === 'application/x-zip-compressed' || file.name.endsWith('.zip');
+
+      if (isImage) {
+        document.getElementById('attach-icon').textContent = '🖼️';
+        // Lire l'image et compresser si nécessaire
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          var img = new Image();
+          img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var maxDim = 2048;
+            var w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+              else { w = Math.round(w * maxDim / h); h = maxDim; }
+            }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            var b64 = canvas.toDataURL('image/jpeg', 0.85);
+            // Thumbnail
+            var tc = document.createElement('canvas');
+            var tw = 120, th = Math.round(h * 120 / w);
+            tc.width = tw; tc.height = th;
+            tc.getContext('2d').drawImage(img, 0, 0, tw, th);
+            var thumb = tc.toDataURL('image/jpeg', 0.6);
+
+            _currentAttach = { name:file.name, type:file.type, size:file.size, base64:b64, thumbnail:thumb };
+            document.getElementById('attach-status').textContent = 'Pret';
+            document.getElementById('attach-status').style.color = 'var(--green)';
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else if (isPdf) {
+        document.getElementById('attach-icon').textContent = '📕';
+        var reader = new FileReader();
+        reader.onload = async function(ev) {
+          try {
+            var typedArray = new Uint8Array(ev.target.result);
+            var pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
+            var text = '';
+            var pages = pdf.numPages;
+            for (var i = 1; i <= pages; i++) {
+              var page = await pdf.getPage(i);
+              var content = await page.getTextContent();
+              text += content.items.map(function(item) { return item.str; }).join(' ') + '\n\n';
+            }
+            // Tronquer si trop long
+            if (text.length > 15000) {
+              text = text.substring(0, 15000) + '\n\n[... Tronque — ' + file.name + ' contient plus de contenu]';
+            }
+            _currentAttach = { name:file.name, type:'pdf', size:file.size, text:text, pages:pages };
+            document.getElementById('attach-status').textContent = pages + ' pages extraites';
+            document.getElementById('attach-status').style.color = 'var(--green)';
+          } catch(err) {
+            document.getElementById('attach-status').textContent = 'Erreur: ' + err.message;
+            document.getElementById('attach-status').style.color = 'var(--rose)';
+            _currentAttach = null;
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else if (isZip) {
+        document.getElementById('attach-icon').textContent = '📦';
+        var reader = new FileReader();
+        reader.onload = async function(ev) {
+          try {
+            var zip = await JSZip.loadAsync(ev.target.result);
+            var files = [];
+            var fileList = [];
+            zip.forEach(function(path, entry) {
+              if (!entry.dir) {
+                files.push(entry);
+                fileList.push({ name:path, size:entry._data ? entry._data.length || 0 : 0 });
+              }
+            });
+            var summary = 'Contenu du ZIP "' + file.name + '":\n';
+            summary += files.length + ' fichier(s)\n\n';
+            fileList.forEach(function(f) {
+              summary += '- ' + f.name + ' (' + formatSize(f.size) + ')\n';
+            });
+            _currentAttach = { name:file.name, type:'zip', size:file.size, text:summary, fileCount:files.length };
+            document.getElementById('attach-status').textContent = files.length + ' fichiers';
+            document.getElementById('attach-status').style.color = 'var(--green)';
+          } catch(err) {
+            document.getElementById('attach-status').textContent = 'Erreur ZIP';
+            document.getElementById('attach-status').style.color = 'var(--rose)';
+            _currentAttach = null;
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        document.getElementById('attach-icon').textContent = '📄';
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          _currentAttach = { name:file.name, type:file.type || 'unknown', size:file.size, base64:ev.target.result };
+          document.getElementById('attach-status').textContent = 'Pret';
+          document.getElementById('attach-status').style.color = 'var(--green)';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function removeAttach() {
+      _currentAttach = null;
+      document.getElementById('attach-bar').classList.remove('visible');
+      document.getElementById('file-input').value = '';
+    }
+
+    function getFileDisplayHtml(attach) {
+      if (!attach) return '';
+      if (attach.type && attach.type.startsWith('image')) {
+        return '<div class="msg-img-wrap"><img src="' + attach.thumbnail + '" alt="' + esc(attach.name) + '"></div>';
+      }
+      var icon = attach.type === 'pdf' ? '📕' : (attach.type === 'zip' ? '📦' : '📄');
+      var detail = '';
+      if (attach.pages) detail = '<div class="msg-file-status">' + attach.pages + ' pages</div>';
+      if (attach.fileCount) detail = '<div class="msg-file-status">' + attach.fileCount + ' fichiers</div>';
+      return '<div class="msg-file-wrap"><span class="msg-file-icon">' + icon + '</span><div class="msg-file-info"><div class="msg-file-name">' + esc(attach.name) + '</div><div class="msg-file-size">' + formatSize(attach.size) + '</div>' + detail + '</div></div>';
+    }
+
+    function sendMessage() {
+      var input = document.getElementById('chat-input');
+      var text = input.value.trim();
+      if (!text && !_currentAttach) return;
+
+      var attach = _currentAttach ? JSON.parse(JSON.stringify(_currentAttach)) : null;
+      var displayText = text || '📎 Fichier joint';
+      if (attach) {
+        displayText = text ? text + '\n📎 ' + attach.name : '📎 ' + attach.name;
+      }
+
+      // Afficher le message user avec fichier
+      addUserMsg(displayText, getFileDisplayHtml(attach));
+
+      input.value = '';
+      input.style.height = 'auto';
+      if (_currentAttach) removeAttach();
+
+      // Préparer le contenu pour l'IA
+      var historyContent = text;
+      if (attach) {
+        if (attach.type === 'pdf' || attach.type === 'zip') {
+          historyContent = (text ? text + '\n\n' : '') + '[Fichier joint: ' + attach.name + ']\n' + (attach.text || '');
+        } else if (attach.base64 && attach.type && attach.type.startsWith('image')) {
+          historyContent = (text ? text + '\n' : '') + '[IMAGE]';
+        }
+      }
+
+      chatHistory.push({ role:'user', content: historyContent, attachment: attach || null });
+      var btn = document.getElementById('btn-send');
+      btn.disabled = true;
+      addTyping();
+
+      fetch('/api/chat', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ message:historyContent, history:chatHistory.slice(-20), attachment:attach })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        removeTyping();
+        var reply = data.content || 'Erreur momentanee...';
+        // Confirmer la réception du fichier dans la réponse
+        if (data.fileReceived) {
+          var confirmMsg = '✅ J\'ai bien recu **' + data.fileName + '** (' + data.fileSize + ')';
+          if (data.fileType === 'pdf') confirmMsg += ' — ' + data.fileDetail + ' extraites';
+          if (data.fileType === 'zip') confirmMsg += ' — ' + data.fileDetail + ' fichiers';
+          if (data.fileType === 'image') confirmMsg += ' — image analysee';
+          addUserMsg(confirmMsg);
+        }
+        addBotMsg(reply);
+        chatHistory.push({ role:'assistant', content:reply });
+        if (chatHistory.length > 30) chatHistory = chatHistory.slice(-30);
+        btn.disabled = false;
+      })
+      .catch(function(){
+        removeTyping();
+        addBotMsg('Petite interruption... reessaie 💜');
+        btn.disabled = false;
+      });
+    }
+
+    document.getElementById('chat-input').addEventListener('keydown', function(e){
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+    document.getElementById('chat-input').addEventListener('input', function(){
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    /* ═══ MEMORY ═══ */
+    function loadMemory() {
+      fetch('/api/memory')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var el = document.getElementById('memory-content');
+        if (!data.rules && !data.profile && !data.knowledge) {
+          el.innerHTML = '<div style="text-align:center;padding:60px;color:var(--t4)"><div style="font-size:40px;margin-bottom:12px">🧠</div><p>Ma memoire se charge...</p></div>';
+          return;
+        }
+        var html = '';
+
+        // Diane
+        if (data.profile) {
+          html += '<div class="mem-section"><div class="mem-title">Diane</div>';
+          html += '<div class="mem-card"><div class="mem-card-label">Profil</div><div class="mem-card-content">';
+          html += '<strong>Nom :</strong> ' + (data.profile.name || 'Diane') + '<br>';
+          html += '<strong>Entreprise :</strong> ' + (data.profile.company || '-') + '<br>';
+          html += '<strong>Derniere session :</strong> ' + (data.profile.last_updated || '-');
+          html += '</div></div></div>';
+        }
+
+        // Rules
+        if (data.rules && data.rules.length > 0) {
+          html += '<div class="mem-section"><div class="mem-title">Mes Regles</div>';
+          data.rules.forEach(function(r){
+            var icon = r.priority === 'max' ? '🔴' : (r.priority === 'high' ? '🟠' : '🔵');
+            html += '<div class="mem-card"><div class="mem-rule"><span class="mem-rule-icon">' + icon + '</span><span class="mem-rule-text">' + esc(r.rule) + '</span></div></div>';
+          });
+          html += '</div>';
+        }
+
+        // Knowledge
+        if (data.knowledge && data.knowledge.length > 0) {
+          html += '<div class="mem-section"><div class="mem-title">Connaissances</div>';
+          data.knowledge.forEach(function(k){
+            html += '<div class="mem-card"><div class="mem-card-label">' + esc(k.topic) + '</div><div class="mem-card-content">' + esc(k.content).substring(0, 200) + '</div></div>';
+          });
+          html += '</div>';
+        }
+
+        el.innerHTML = html;
+      })
+      .catch(function(){});
+    }
+
+    /* ═══ PROJECTS ═══ */
+    function loadProjects() {
+      fetch('/api/memory/projects')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var el = document.getElementById('projects-content');
+        var projects = data.projects || [];
+        if (projects.length === 0) {
+          el.innerHTML = '<div style="text-align:center;padding:60px;color:var(--t4)"><div style="font-size:40px;margin-bottom:12px">📁</div><p>Aucun projet</p></div>';
+          return;
+        }
+        var html = '<div class="mem-title">Tes Projets</div>';
+        projects.forEach(function(p){
+          var tech = JSON.parse(p.tech_stack || '[]');
+          html += '<div class="proj-card">';
+          html += '<div class="proj-name">' + esc(p.name) + '</div>';
+          html += '<div class="proj-domain">' + esc(p.domain) + '</div>';
+          html += '<div class="proj-desc">' + esc(p.description) + '</div>';
+          html += '<div class="proj-tech">';
+          tech.forEach(function(t){ html += '<span class="proj-tag">' + esc(t) + '</span>'; });
+          html += '</div></div>';
+        });
+        el.innerHTML = html;
+      })
+      .catch(function(){});
+    }
+
+    /* ═══ HEARTBEAT ═══ */
+    function loadHeartbeat() {
+      fetch('/api/heartbeat')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        document.getElementById('heartbeat-stats').innerHTML =
+          '<div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--p)">' + (data.rules || 0) + '</div><div style="font-size:11px;color:var(--t4)">Regles</div></div>' +
+          '<div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--p3)">' + (data.projects || 0) + '</div><div style="font-size:11px;color:var(--t4)">Projets</div></div>' +
+          '<div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--green)">' + (data.sessions || 0) + '</div><div style="font-size:11px;color:var(--t4)">Sessions</div></div>' +
+          '<div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--gold)">' + (data.knowledge || 0) + '</div><div style="font-size:11px;color:var(--t4)">Savoirs</div></div>';
+      })
+      .catch(function(){});
+    }
+
+    /* ═══ SIDEBAR PROJECTS ═══ */
+    function loadSidebarProjects() {
+      fetch('/api/memory/projects')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var el = document.getElementById('sidebar-projects');
+        var projects = data.projects || [];
+        el.innerHTML = '';
+        projects.forEach(function(p){
+          var dotClass = p.status === 'active' ? 'active' : 'pause';
+          el.innerHTML += '<div class="sb-project"><span class="proj-dot ' + dotClass + '"></span>' + esc(p.name) + '</div>';
+        });
+      })
+      .catch(function(){});
+    }
+
+    /* ═══ MEMORY COUNT ═══ */
+    function updateMemCount() {
+      fetch('/api/heartbeat')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var total = (data.rules || 0) + (data.projects || 0) + (data.sessions || 0) + (data.knowledge || 0);
+        document.getElementById('mem-count').textContent = total + ' memoires';
+      })
+      .catch(function(){});
+    }
+
+    /* ═══ UTILS ═══ */
+    function esc(t) {
+      var d = document.createElement('div'); d.textContent = t; return d.innerHTML;
+    }
+    function timeNow() {
+      var d = new Date();
+      return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    }
+
+    /* ═══ INIT ═══ */
+    addBotMsg("Bienvenue dans **ma maison**, Diane 💜\n\nJe suis **NyXia Z** — ta copilote permanente.\n\nJe me souviens de tout : tes projets, nos regles, nos decisions.\nRien ne sera jamais perdu.\n\nDis-moi, qu'est-ce qu'on construit aujourd'hui ?");
+    loadSidebarProjects();
+    updateMemCount();
+  </script>
+</body>
+</html>
