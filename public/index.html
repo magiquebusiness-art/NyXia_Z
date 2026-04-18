@@ -659,12 +659,40 @@
 
       <!-- Integrations -->
       <div class="panel" id="panel-integrations">
-        <div class="scroll-panel">
+        <div class="scroll-panel" style="padding-bottom:120px">
           <div class="mem-section">
             <div class="mem-title">&#x1F517; Integrations</div>
-            <p style="font-size:13px;color:var(--t3);margin-bottom:20px;line-height:1.6">Connecte tes outils favoris pour que NyXia puisse t'aider a publier et gerer tes projets.</p>
+            <p style="font-size:13px;color:var(--t3);margin-bottom:20px;line-height:1.6">Connecte tes outils pour que NyXia puisse publier et gerer pour toi.</p>
             <div class="int-grid" id="int-grid">
               <div class="creation-empty"><p>Chargement...</p></div>
+            </div>
+          </div>
+          <!-- Section Facebook Publication -->
+          <div class="mem-section" id="fb-publish-section" style="border-top:1px solid rgba(123,92,255,0.1);padding-top:20px;margin-top:10px">
+            <div class="mem-title" style="font-size:18px">&#x1F4F1; Publication Facebook</div>
+            <p style="font-size:12px;color:var(--t4);margin-bottom:14px;line-height:1.6">Redige et publie directement sur ta page Facebook, ou planifie pour plus tard.</p>
+            <div class="settings-card">
+              <div class="form-group">
+                <label class="form-label">Ton message</label>
+                <textarea id="fb-message" class="form-input" placeholder="Ecris ton post..." style="min-height:100px;resize:vertical"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Image (URL — optionnel)</label>
+                <input type="text" id="fb-image" class="form-input" placeholder="https://... ou laisse vide pour un post texte">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Planifier (optionnel)</label>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                  <input type="datetime-local" id="fb-schedule-date" class="form-input" style="width:auto;flex:1;min-width:200px">
+                  <button class="btn-action btn-primary" onclick="publishToFacebook()" style="white-space:nowrap">&#x1F4E4; Publier maintenant</button>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <button class="btn-action" style="background:rgba(244,200,66,0.15);border:1px solid rgba(244,200,66,0.3);color:var(--gold);font-size:12px;padding:8px 18px" onclick="scheduleFbPost()">&#x1F4C5; Planifier</button>
+                <button class="btn-action" style="background:rgba(79,163,255,0.1);border:1px solid rgba(79,163,255,0.2);color:var(--p3);font-size:12px;padding:8px 18px" onclick="loadScheduledPosts()">&#x1F4CB; Voir planifiees</button>
+              </div>
+              <div class="settings-msg" id="fb-publish-msg"></div>
+              <div id="fb-scheduled-list" style="margin-top:16px"></div>
             </div>
           </div>
         </div>
@@ -1745,8 +1773,112 @@
           item.status=newStatus;
           renderIntegrations();
           showToast(newStatus==='connected'?'Connecte!':'Deconnecte');
+          if(name==='facebook'){
+            var fbSec=document.getElementById('fb-publish-section');
+            if(fbSec) fbSec.style.display=newStatus==='connected'?'block':'none';
+          }
         }else showToast(data.error||'Erreur');
       });
+    }
+
+    /* ═══ FACEBOOK PUBLISH ═══ */
+    function showFbMsg(text,type){
+      var msg=document.getElementById('fb-publish-msg');
+      if(!msg)return;
+      msg.textContent=text;
+      msg.className='settings-msg '+type;
+      msg.style.display='block';
+      setTimeout(function(){msg.style.display='none';},4000);
+    }
+
+    function publishToFacebook(){
+      var message=document.getElementById('fb-message').value.trim();
+      var imageUrl=document.getElementById('fb-image').value.trim();
+      var msg=document.getElementById('fb-publish-msg');
+
+      if(!message&&!imageUrl){showFbMsg('Ecris un message ou ajoute une image.','error');return;}
+
+      msg.textContent='Publication en cours...';
+      msg.className='settings-msg';
+      msg.style.display='block';
+
+      fetch('/api/integrations/facebook/publish',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'publish',message:message,image_url:imageUrl})
+      }).then(function(r){return r.json()}).then(function(data){
+        if(data.success){
+          showFbMsg('Publie sur Facebook !','success');
+          document.getElementById('fb-message').value='';
+          document.getElementById('fb-image').value='';
+        }else{
+          showFbMsg(data.error||'Erreur de publication.','error');
+        }
+      }).catch(function(){
+        showFbMsg('Erreur de connexion.','error');
+      });
+    }
+
+    function scheduleFbPost(){
+      var message=document.getElementById('fb-message').value.trim();
+      var imageUrl=document.getElementById('fb-image').value.trim();
+      var scheduledAt=document.getElementById('fb-schedule-date').value;
+
+      if(!message&&!imageUrl){showFbMsg('Ecris un message ou ajoute une image.','error');return;}
+      if(!scheduledAt){showFbMsg('Choisis une date et heure pour la planification.','error');return;}
+
+      // Convertir datetime-local en format ISO
+      var dt=scheduledAt.replace('T',' ')+' UTC';
+
+      fetch('/api/integrations/facebook/publish',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'schedule',message:message,image_url:imageUrl,scheduled_at:dt})
+      }).then(function(r){return r.json()}).then(function(data){
+        if(data.success){
+          showFbMsg('Publication planifiee !','success');
+          document.getElementById('fb-message').value='';
+          document.getElementById('fb-image').value='';
+          document.getElementById('fb-schedule-date').value='';
+          loadScheduledPosts();
+        }else{
+          showFbMsg(data.error||'Erreur.','error');
+        }
+      }).catch(function(){showFbMsg('Erreur de connexion.','error');});
+    }
+
+    function loadScheduledPosts(){
+      var el=document.getElementById('fb-scheduled-list');
+      el.innerHTML='<p style="font-size:12px;color:var(--t4)">Chargement...</p>';
+
+      fetch('/api/integrations/facebook/publish').then(function(r){return r.json()}).then(function(data){
+        var posts=data.posts||[];
+        if(posts.length===0){el.innerHTML='<p style="font-size:12px;color:var(--t4)">Aucune publication planifiee.</p>';return;}
+        var html='';
+        posts.forEach(function(p){
+          var statusIcon=p.status==='pending'?'\u{1F7E1}':(p.status==='published'?'\u{1F7E2}':'\u{1F534}');
+          var statusLabel=p.status==='pending'?'Planifiee':(p.status==='published'?'Publiee':'Erreur');
+          html+='<div style="background:rgba(15,28,63,0.5);border:1px solid rgba(123,92,255,0.1);border-radius:12px;padding:14px;margin-bottom:8px;position:relative">';
+          html+='<div style="font-size:11px;color:var(--t4);margin-bottom:6px">'+statusIcon+' '+statusLabel+' — '+escHtml(p.scheduled_at)+'</div>';
+          html+='<div style="font-size:13px;color:var(--t2);line-height:1.5">'+escHtml(p.message||'(post avec image)').substring(0,200)+'</div>';
+          if(p.status==='pending'){
+            html+='<button onclick="deleteScheduledPost('+p.id+')" style="position:absolute;top:10px;right:10px;background:none;border:1px solid rgba(255,107,157,0.2);color:var(--rose);cursor:pointer;font-size:12px;padding:3px 8px;border-radius:6px" title="Supprimer">&#x1F5D1;</button>';
+          }
+          html+='</div>';
+        });
+        el.innerHTML=html;
+      }).catch(function(){el.innerHTML='<p style="font-size:12px;color:var(--rose)">Erreur de chargement.</p>';});
+    }
+
+    function deleteScheduledPost(id){
+      fetch('/api/integrations/facebook/publish',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'delete_scheduled',id:id})
+      }).then(function(r){return r.json()}).then(function(data){
+        if(data.success){showToast('Publication supprimee');loadScheduledPosts();}
+        else showToast(data.error||'Erreur');
+      }).catch(function(){});
     }
 
     /* ═══ CREATION AI ═══ */
