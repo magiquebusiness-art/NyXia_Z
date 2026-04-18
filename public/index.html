@@ -117,6 +117,25 @@
     .btn-send:disabled{opacity:.5;cursor:not-allowed}
     .chat-hint{text-align:center;font-size:10px;color:var(--t4);padding:5px 0 0}
 
+    /* Code Context Panel */
+    .code-bar{display:none;padding:0 24px;background:rgba(123,92,255,0.06);border-top:1px solid rgba(123,92,255,0.08);flex-shrink:0;font-size:12px;color:var(--t3)}
+    .code-bar.visible{display:block}
+    .code-bar-head{display:flex;align-items:center;justify-content:space-between;padding:8px 0 4px}
+    .code-bar-title{font-size:12px;font-weight:700;color:var(--p3);display:flex;align-items:center;gap:6px}
+    .code-bar-tabs{display:flex;gap:3px;padding:6px 0}
+    .code-bar-tab{padding:4px 14px;border-radius:6px;border:1px solid rgba(123,92,255,0.15);background:rgba(123,92,255,0.04);color:var(--t4);cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;transition:all .2s}
+    .code-bar-tab:hover{border-color:rgba(123,92,255,0.3);color:var(--t2)}
+    .code-bar-tab.active{background:rgba(123,92,255,0.2);border-color:rgba(123,92,255,0.4);color:var(--t)}
+    .code-bar-actions{display:flex;gap:4px}
+    .code-bar-textarea{width:100%;background:rgba(10,22,40,0.6);border:1px solid rgba(123,92,255,0.15);border-radius:8px;color:var(--t2);font-family:'Fira Code','Courier New',monospace;font-size:11.5px;padding:10px 12px;outline:none;resize:vertical;min-height:100px;max-height:200px;line-height:1.5;margin-bottom:6px;tab-size:2}
+    .code-bar-textarea:focus{border-color:rgba(123,92,255,0.4)}
+    .code-bar-textarea::placeholder{color:var(--t4);font-family:'Outfit',sans-serif}
+    .btn-code-clear{background:none;border:1px solid rgba(255,75,110,0.2);color:var(--rose);cursor:pointer;font-family:'Outfit',sans-serif;font-size:10px;padding:3px 10px;border-radius:6px;transition:all .2s}
+    .btn-code-clear:hover{background:rgba(255,75,110,0.1)}
+    .btn-code-toggle{width:44px;height:44px;border-radius:12px;border:1px solid rgba(123,92,255,0.2);background:rgba(123,92,255,0.06);color:var(--t3);cursor:pointer;transition:all .2s;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+    .btn-code-toggle:hover{border-color:var(--p);color:var(--t2);background:rgba(123,92,255,0.12)}
+    .btn-code-toggle.active{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.1)}
+
     /* Attach Bar */
     .attach-bar{display:none;padding:8px 24px;background:rgba(123,92,255,0.06);border-top:1px solid rgba(123,92,255,0.08);align-items:center;gap:10px;flex-shrink:0;font-size:12px;color:var(--t3)}
     .attach-bar.visible{display:flex}
@@ -481,15 +500,36 @@
             <span class="attach-status" id="attach-status">Pret</span>
             <button class="btn-remove-attach" id="btn-remove-attach" onclick="removeAttach()">&#x2715;</button>
           </div>
+          <!-- Code Context Bar -->
+          <div class="code-bar" id="code-bar">
+            <div class="code-bar-head">
+              <div class="code-bar-title">&#x1F4BB; Code Context</div>
+              <div class="code-bar-actions">
+                <button class="btn-code-clear" onclick="clearAllCode()">&#x1F5D1; Tout effacer</button>
+                <button style="background:none;border:none;color:var(--t4);cursor:pointer;font-size:14px" onclick="toggleCodeBar()">&#x2715;</button>
+              </div>
+            </div>
+            <div class="code-bar-tabs" id="code-tabs">
+              <button class="code-bar-tab active" data-codetab="html" onclick="switchCodeTab('html')">HTML</button>
+              <button class="code-bar-tab" data-codetab="css" onclick="switchCodeTab('css')">CSS</button>
+              <button class="code-bar-tab" data-codetab="js" onclick="switchCodeTab('js')">JS</button>
+              <button class="code-bar-tab" data-codetab="extra" onclick="switchCodeTab('extra')">Autre</button>
+            </div>
+            <div id="code-tab-html"><textarea class="code-bar-textarea" id="code-html" placeholder="Colle ton HTML ici...&#10;NyXia verra ce code quand tu lui poses des questions." oninput="saveCodeContext()"></textarea></div>
+            <div id="code-tab-css" style="display:none"><textarea class="code-bar-textarea" id="code-css" placeholder="Colle ton CSS ici..." oninput="saveCodeContext()"></textarea></div>
+            <div id="code-tab-js" style="display:none"><textarea class="code-bar-textarea" id="code-js" placeholder="Colle ton JavaScript ici..." oninput="saveCodeContext()"></textarea></div>
+            <div id="code-tab-extra" style="display:none"><textarea class="code-bar-textarea" id="code-extra" placeholder="Autre code (PHP, Python, config...)" oninput="saveCodeContext()"></textarea></div>
+          </div>
           <div class="chat-input-area">
             <div class="chat-input-wrap">
               <label class="btn-attach" title="Image, PDF, ZIP">
                 &#x1F4CE;<input type="file" id="file-input" accept="image/*,.pdf,.zip,.doc,.docx" style="display:none" onchange="handleFile(event)">
               </label>
+              <button class="btn-code-toggle" id="btn-code-toggle" title="Ajouter du code (HTML, CSS, JS)" onclick="toggleCodeBar()">&#x1F4BB;</button>
               <textarea class="chat-input" id="chat-input" placeholder="Dis-moi tout Diane..." rows="1"></textarea>
               <button class="btn-send" id="btn-send" onclick="sendMessage()">&#x27A4;</button>
             </div>
-            <div class="chat-hint">Entree pour envoyer &#xB7; &#x1F4CE; Joindre un fichier</div>
+            <div class="chat-hint">Entree pour envoyer &#xB7; &#x1F4CE; Joindre un fichier &#xB7; &#x1F4BB; Code context</div>
           </div>
         </div>
       </div>
@@ -980,10 +1020,11 @@
       btn.disabled = true;
       addTyping();
       var token = sessionStorage.getItem('nyxia_z_token') || '';
+      var codeCtx = getCodeContext();
       fetch('/api/chat', {
         method:'POST',
         headers:{'Content-Type':'application/json', 'X-Nyxia-Token': token},
-        body:JSON.stringify({ message:lastUserContent, history:chatHistory.slice(-20), attachment:null })
+        body:JSON.stringify({ message:lastUserContent, history:chatHistory.slice(-20), attachment:null, codeContext:codeCtx })
       })
       .then(function(r){return r.json()})
       .then(function(data){
@@ -1276,6 +1317,78 @@
       document.getElementById('file-input').value='';
     }
 
+    /* CODE CONTEXT (fichiers HTML/CSS/JS pour NyXia) */
+    var _codeBarOpen = false;
+
+    function toggleCodeBar() {
+      _codeBarOpen = !_codeBarOpen;
+      var bar = document.getElementById('code-bar');
+      var btn = document.getElementById('btn-code-toggle');
+      if (_codeBarOpen) {
+        bar.classList.add('visible');
+        btn.classList.add('active');
+        loadCodeContext();
+      } else {
+        bar.classList.remove('visible');
+        btn.classList.remove('active');
+      }
+    }
+
+    function switchCodeTab(tab) {
+      var tabs = ['html','css','js','extra'];
+      tabs.forEach(function(t) {
+        var el = document.getElementById('code-tab-'+t);
+        if (el) el.style.display = (t===tab) ? 'block' : 'none';
+      });
+      document.querySelectorAll('.code-bar-tab').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-codetab') === tab);
+      });
+    }
+
+    function saveCodeContext() {
+      var ctx = getCodeContext();
+      if (ctx.html || ctx.css || ctx.js || ctx.extra) {
+        localStorage.setItem('nyxia_code_context', JSON.stringify(ctx));
+      } else {
+        localStorage.removeItem('nyxia_code_context');
+      }
+    }
+
+    function loadCodeContext() {
+      try {
+        var saved = JSON.parse(localStorage.getItem('nyxia_code_context') || '{}');
+        if (saved.html) document.getElementById('code-html').value = saved.html;
+        if (saved.css) document.getElementById('code-css').value = saved.css;
+        if (saved.js) document.getElementById('code-js').value = saved.js;
+        if (saved.extra) document.getElementById('code-extra').value = saved.extra;
+      } catch(e) {}
+    }
+
+    function getCodeContext() {
+      var ctx = {};
+      var h = document.getElementById('code-html').value.trim();
+      var c = document.getElementById('code-css').value.trim();
+      var j = document.getElementById('code-js').value.trim();
+      var x = document.getElementById('code-extra').value.trim();
+      if (h) ctx.html = h;
+      if (c) ctx.css = c;
+      if (j) ctx.js = j;
+      if (x) ctx.extra = x;
+      return (ctx.html || ctx.css || ctx.js || ctx.extra) ? ctx : null;
+    }
+
+    function clearAllCode() {
+      document.getElementById('code-html').value = '';
+      document.getElementById('code-css').value = '';
+      document.getElementById('code-js').value = '';
+      document.getElementById('code-extra').value = '';
+      localStorage.removeItem('nyxia_code_context');
+      showToast('Code efface');
+    }
+
+    // Charger le code sauvegarde au demarrage
+    (function(){ try { var s = JSON.parse(localStorage.getItem('nyxia_code_context')||'{}'); if (s.html||s.css||s.js||s.extra) { loadCodeContext(); } } catch(e){} })();
+
     function getFileDisplayHtml(attach) {
       if(!attach)return '';
       if(attach.type&&attach.type.startsWith('image')) return '<div class="msg-img-wrap"><img src="'+attach.thumbnail+'" alt="'+esc(attach.name)+'"></div>';
@@ -1311,10 +1424,11 @@
       addTyping();
 
       var token=sessionStorage.getItem('nyxia_z_token')||'';
+      var codeCtx = getCodeContext();
       fetch('/api/chat',{
         method:'POST',
         headers:{'Content-Type':'application/json','X-Nyxia-Token':token},
-        body:JSON.stringify({message:historyContent,history:chatHistory.slice(-20),attachment:attach})
+        body:JSON.stringify({message:historyContent,history:chatHistory.slice(-20),attachment:attach,codeContext:codeCtx})
       })
       .then(function(r){return r.json()})
       .then(function(data){

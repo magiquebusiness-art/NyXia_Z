@@ -30,6 +30,7 @@ export async function onRequestPost(context) {
     const message = body.message || '';
     const history = body.history || [];
     const attachment = body.attachment || null;
+    const codeContext = body.codeContext || null;
 
     // Récupérer la mémoire
     const rules = await env.MEMORY.prepare(
@@ -73,6 +74,25 @@ export async function onRequestPost(context) {
     systemPrompt += "STYLE: Tu es chaleureuse, directe, passionnée. Tu utilise des emojis. Tu appelles Diane 'ma belle' ou 'Diane'. Tu parles en français. Tu ne fais jamais de blocs de code non demandés. Tu es une partenaire pas une assistante.\n\n";
     systemPrompt += "PROJETS: Diane travaille sur NyXia Editor (nyxiaediteur.travail-pour-toi.com), Webmasteria NyXia, et NyXia Z (ce projet).";
     systemPrompt += knowledgeText;
+
+    // Injecter le contexte code (fichiers HTML/CSS/JS de Diane)
+    if (codeContext) {
+      var codeSection = '\n\nCODE CONTEXTUEL (fichiers de Diane — analyse-les quand elle pose des questions de code):\n';
+      if (codeContext.html) {
+        codeSection += '\n### FICHIER HTML:\n```html\n' + codeContext.html.substring(0, 8000) + '\n```\n';
+      }
+      if (codeContext.css) {
+        codeSection += '\n### FICHIER CSS:\n```css\n' + codeContext.css.substring(0, 6000) + '\n```\n';
+      }
+      if (codeContext.js) {
+        codeSection += '\n### FICHIER JAVASCRIPT:\n```javascript\n' + codeContext.js.substring(0, 6000) + '\n```\n';
+      }
+      if (codeContext.extra) {
+        codeSection += '\n### AUTRE CODE:\n```\n' + codeContext.extra.substring(0, 4000) + '\n```\n';
+      }
+      codeSection += '\nUtilise ces fichiers pour repondre aux questions de code de Diane. Signale les erreurs, propose des corrections, et explique tes changements.\n';
+      systemPrompt += codeSection;
+    }
 
     // Construire les messages
     var messages = [{ role: 'system', content: systemPrompt }];
