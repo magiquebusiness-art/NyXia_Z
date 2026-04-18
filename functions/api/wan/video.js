@@ -11,16 +11,6 @@ export async function onRequestPost(context) {
     const resolution = body.resolution || '720p';
     const duration = body.duration || 5;
     const mode = body.mode || 't2v';
-    const orientation = body.orientation || 'landscape'; // landscape, portrait, square
-
-    // Map orientation + resolution to NVIDIA resolution format
-    // NVIDIA expects: "720p", "1080p", "1280x720", "1920x1080", etc.
-    var nvidiaResolution = resolution; // default: "720p" or "1080p"
-    if (orientation === 'portrait') {
-      nvidiaResolution = resolution === '1080p' ? '1080x1920' : '720x1280';
-    } else if (orientation === 'square') {
-      nvidiaResolution = resolution === '1080p' ? '1080x1080' : '720x720';
-    }
     if (!prompt) return new Response(JSON.stringify({ success: false, error: 'Prompt requis.' }), { headers: { 'Content-Type': 'application/json' } });
 
     const WAN_KEY = env.WAN_KEY || '';
@@ -39,7 +29,7 @@ export async function onRequestPost(context) {
       body: JSON.stringify({
         model: model,
         prompt: prompt,
-        resolution: nvidiaResolution,
+        resolution: resolution,
         duration: duration,
         mode: mode,
         image_base64: body.image_base64 || null
