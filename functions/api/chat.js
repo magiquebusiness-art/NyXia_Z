@@ -171,7 +171,7 @@ export async function onRequestPost(context) {
       body: JSON.stringify({
         model: 'z-ai/glm-5v-turbo',
         messages: messages,
-        max_tokens: 2048,
+        max_tokens: 16000,
         temperature: 0.8
       })
     });
