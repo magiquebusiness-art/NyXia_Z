@@ -79,16 +79,16 @@ export async function onRequestPost(context) {
     if (codeContext) {
       var codeSection = '\n\nCODE CONTEXTUEL (fichiers de Diane — analyse-les quand elle pose des questions de code):\n';
       if (codeContext.html) {
-        codeSection += '\n### FICHIER HTML:\n```html\n' + codeContext.html.substring(0, 8000) + '\n```\n';
+        codeSection += '\n### FICHIER HTML:\n```html\n' + codeContext.html.substring(0, 20000) + '\n```\n';
       }
       if (codeContext.css) {
-        codeSection += '\n### FICHIER CSS:\n```css\n' + codeContext.css.substring(0, 6000) + '\n```\n';
+        codeSection += '\n### FICHIER CSS:\n```css\n' + codeContext.css.substring(0, 15000) + '\n```\n';
       }
       if (codeContext.js) {
-        codeSection += '\n### FICHIER JAVASCRIPT:\n```javascript\n' + codeContext.js.substring(0, 6000) + '\n```\n';
+        codeSection += '\n### FICHIER JAVASCRIPT:\n```javascript\n' + codeContext.js.substring(0, 15000) + '\n```\n';
       }
       if (codeContext.extra) {
-        codeSection += '\n### AUTRE CODE:\n```\n' + codeContext.extra.substring(0, 4000) + '\n```\n';
+        codeSection += '\n### AUTRE CODE:\n```\n' + codeContext.extra.substring(0, 10000) + '\n```\n';
       }
       codeSection += '\nUtilise ces fichiers pour repondre aux questions de code de Diane. Signale les erreurs, propose des corrections, et explique tes changements.\n';
       systemPrompt += codeSection;
