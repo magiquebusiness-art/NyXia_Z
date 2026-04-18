@@ -1523,7 +1523,7 @@
       result.classList.add('visible');
       result.scrollIntoView({behavior:'smooth',block:'start'});
     }
-    function clearVBankHistory(){if(!vbankHistory.length)return;if(confirm('Effacer l\\'historique des videos?')){vbankHistory=[];localStorage.removeItem('nyxia_z_vbank_history');renderVBankHistory();}}
+    function clearVBankHistory(){if(!vbankHistory.length)return;if(confirm("Effacer l'historique des videos?")){vbankHistory=[];localStorage.removeItem('nyxia_z_vbank_history');renderVBankHistory();}}
 
     document.getElementById('chat-input').addEventListener('keydown',function(e){
       if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}
