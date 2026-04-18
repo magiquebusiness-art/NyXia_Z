@@ -659,40 +659,12 @@
 
       <!-- Integrations -->
       <div class="panel" id="panel-integrations">
-        <div class="scroll-panel" style="padding-bottom:120px">
+        <div class="scroll-panel">
           <div class="mem-section">
             <div class="mem-title">&#x1F517; Integrations</div>
             <p style="font-size:13px;color:var(--t3);margin-bottom:20px;line-height:1.6">Connecte tes outils pour que NyXia puisse publier et gerer pour toi.</p>
             <div class="int-grid" id="int-grid">
               <div class="creation-empty"><p>Chargement...</p></div>
-            </div>
-          </div>
-          <!-- Section Facebook Publication -->
-          <div class="mem-section" id="fb-publish-section" style="border-top:1px solid rgba(123,92,255,0.1);padding-top:20px;margin-top:10px">
-            <div class="mem-title" style="font-size:18px">&#x1F4F1; Publication Facebook</div>
-            <p style="font-size:12px;color:var(--t4);margin-bottom:14px;line-height:1.6">Redige et publie directement sur ta page Facebook, ou planifie pour plus tard.</p>
-            <div class="settings-card">
-              <div class="form-group">
-                <label class="form-label">Ton message</label>
-                <textarea id="fb-message" class="form-input" placeholder="Ecris ton post..." style="min-height:100px;resize:vertical"></textarea>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Image (URL — optionnel)</label>
-                <input type="text" id="fb-image" class="form-input" placeholder="https://... ou laisse vide pour un post texte">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Planifier (optionnel)</label>
-                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                  <input type="datetime-local" id="fb-schedule-date" class="form-input" style="width:auto;flex:1;min-width:200px">
-                  <button class="btn-action btn-primary" onclick="publishToFacebook()" style="white-space:nowrap">&#x1F4E4; Publier maintenant</button>
-                </div>
-              </div>
-              <div style="display:flex;gap:8px;margin-top:6px">
-                <button class="btn-action" style="background:rgba(244,200,66,0.15);border:1px solid rgba(244,200,66,0.3);color:var(--gold);font-size:12px;padding:8px 18px" onclick="scheduleFbPost()">&#x1F4C5; Planifier</button>
-                <button class="btn-action" style="background:rgba(79,163,255,0.1);border:1px solid rgba(79,163,255,0.2);color:var(--p3);font-size:12px;padding:8px 18px" onclick="loadScheduledPosts()">&#x1F4CB; Voir planifiees</button>
-              </div>
-              <div class="settings-msg" id="fb-publish-msg"></div>
-              <div id="fb-scheduled-list" style="margin-top:16px"></div>
             </div>
           </div>
         </div>
