@@ -301,34 +301,115 @@
     @media(max-width:768px){aside{width:180px}.h-brand{width:180px}}
     @media(max-width:600px){aside{display:none}.h-brand{width:auto;border:none}}
 
-    /* ===== EDITOR STYLES ===== */
-    .image-element img, .video-element video, .video-element iframe { max-width: 100%; border-radius: var(--r); display: block; }
-        .video-element iframe { pointer-events: none; }
-        .audio-element audio { width: 100%; }
-        .faq-item { margin-bottom: 10px; border: 1px solid var(--nx-border); border-radius: var(--r); overflow: hidden; }
-        .faq-question { padding: 15px; background: rgba(26, 29, 53, 0.6); cursor: pointer; font-weight: 600; }
-        .faq-answer { padding: 15px; background: rgba(11, 13, 23, 0.6); display: none; }
-        .faq-answer.open { display: block; }
-        .countdown-element { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
-        .countdown-block { background: rgba(26, 29, 53, 0.6); padding: 15px; border-radius: var(--r); text-align: center; min-width: 80px; }
-        .countdown-number { font-size: 1.5rem; font-weight: 700; color: var(--nx-primary); }
-        .countdown-label { font-size: 0.8rem; color: var(--nx-text-dim); }
-        .shadow-none { box-shadow: none !important; }
-        .shadow-soft { box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; }
-        .shadow-medium { box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important; }
-        .shadow-intense { box-shadow: 0 15px 40px rgba(0,0,0,0.3) !important; }
-        .shadow-inner-soft { box-shadow: inset 0 2px 10px rgba(0,0,0,0.1) !important; }
-        .shadow-inner-medium { box-shadow: inset 0 4px 15px rgba(0,0,0,0.2) !important; }
-        .shadow-inner-intense { box-shadow: inset 0 6px 20px rgba(0,0,0,0.3) !important; }
-        .shadow-float { box-shadow: 0 10px 30px rgba(123,92,255,0.3) !important; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .menu-element nav ul { list-style: none; display: flex; gap: 20px; padding: 0; margin: 0; }
-        .menu-element nav ul li { position: relative; }
-        .menu-element nav ul li a { text-decoration: none; color: var(--nx-text); font-weight: 500; transition: color 0.2s; outline: none; }
-        .menu-element nav ul li a:hover { color: var(--nx-primary); }
-        .menu-element nav ul li ul { display: none; position: absolute; top: 100%; left: 0; background: var(--nx-surface); flex-direction: column; gap: 10px; padding: 10px; border-radius: var(--r); border: 1px solid var(--nx-border); min-width: 150px; }
-        .menu-element nav ul li:hover ul { display: flex; }
-        @media (max-width: 1024px) { .editor-container { flex-direction: column; } .sidebar, .properties-panel { width: 100%; height: auto; max-height: 300px; } .workspace { padding: 20px; } }
+    /* ===== EDITOR STYLES (scoped to .panel-editor) ===== */
+    .panel-editor { overflow:hidden; }
+    .panel-editor .ed-container { display:flex; flex:1; min-height:0; width:100%; }
+    .panel-editor .ed-sidebar { width:240px; background:rgba(19,21,42,0.95); backdrop-filter:blur(15px); border-right:1px solid rgba(123,92,255,0.15); display:flex; flex-direction:column; padding:16px; overflow-y:auto; z-index:100; flex-shrink:0; }
+    .panel-editor .ed-logo-area { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+    .panel-editor .ed-user-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#7B5CFF,#9B7BFF); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:13px; }
+    .panel-editor .ed-gradient-text { background:linear-gradient(135deg,#a78bfa,#7B5CFF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:700; font-size:16px; }
+    .panel-editor .ed-tabs-header { display:flex; gap:2px; margin-bottom:12px; border-bottom:1px solid rgba(123,92,255,0.15); padding-bottom:8px; }
+    .panel-editor .ed-tab-btn { flex:1; padding:5px 3px; background:transparent; border:none; color:var(--t3); cursor:pointer; font-weight:600; border-radius:5px; transition:all .2s; font-size:10px; font-family:'Outfit',sans-serif; }
+    .panel-editor .ed-tab-btn.active { background:rgba(123,92,255,0.2); color:#fff; }
+    .panel-editor .ed-tab-content { display:none; }
+    .panel-editor .ed-tab-content.active { display:block; }
+    .panel-editor .ed-tool-item { padding:10px; background:rgba(26,29,53,0.6); border:1px solid rgba(123,92,255,0.15); border-radius:7px; margin-bottom:6px; cursor:grab; transition:all .2s; user-select:none; font-size:12px; color:var(--t2); }
+    .panel-editor .ed-tool-item:hover { border-color:#7B5CFF; transform:translateX(4px); }
+    .panel-editor .ed-workspace { flex:1; background:rgba(11,13,23,0.8); padding:30px; overflow-y:auto; position:relative; }
+    .panel-editor .canvas-area { min-height:100%; background:var(--bg); border-radius:14px; padding:20px; box-shadow:0 0 30px rgba(0,0,0,0.5); transition:min-height .3s; position:relative; }
+    .panel-editor .ed-props { width:280px; background:rgba(19,21,42,0.95); backdrop-filter:blur(15px); border-left:1px solid rgba(123,92,255,0.15); padding:16px; overflow-y:auto; z-index:100; flex-shrink:0; }
+    .panel-editor .ed-props h3 { margin-bottom:16px; color:#fff; font-family:'Cormorant Garamond',serif; font-size:16px; }
+    .panel-editor .prop-group { margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:12px; }
+    .panel-editor .prop-group:last-child { border-bottom:none; }
+    .panel-editor .prop-group label { display:block; margin-bottom:6px; font-size:11px; color:var(--t3); font-weight:600; text-transform:uppercase; }
+    .panel-editor .ed-input, .panel-editor .ed-textarea, .panel-editor .ed-select { width:100%; background:rgba(26,29,53,0.6); border:1px solid rgba(123,92,255,0.15); border-radius:8px; color:var(--t2); padding:7px 9px; font-family:'Outfit',sans-serif; font-size:12px; margin-bottom:6px; }
+    .panel-editor .ed-input:focus, .panel-editor .ed-textarea:focus, .panel-editor .ed-select:focus { outline:none; border-color:#7B5CFF; }
+    .panel-editor .ed-color-row { display:flex; gap:8px; align-items:center; margin-bottom:6px; }
+    .panel-editor .ed-color-row input[type="color"] { width:36px; height:32px; border:none; border-radius:4px; cursor:pointer; background:none; }
+    .panel-editor .ed-settings-btn { position:fixed; bottom:24px; right:24px; width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,#7B5CFF,#9B7BFF); border:none; color:#fff; font-size:18px; cursor:pointer; box-shadow:0 4px 20px rgba(123,92,255,0.4); z-index:1000; display:flex; align-items:center; justify-content:center; transition:transform .3s; }
+    .panel-editor .ed-settings-btn:hover { transform:rotate(90deg) scale(1.1); }
+    .panel-editor .action-bar { display:flex; align-items:center; justify-content:space-between; padding:7px 14px; background:rgba(19,21,42,0.97); border-bottom:1px solid rgba(123,92,255,0.15); backdrop-filter:blur(15px); flex-shrink:0; gap:8px; z-index:200; }
+    .panel-editor .action-bar-left { display:flex; align-items:center; gap:8px; }
+    .panel-editor .action-bar-left img { width:26px; height:26px; border-radius:50%; border:1.5px solid rgba(123,92,255,0.5); }
+    .panel-editor .action-bar-title { font-size:14px; font-weight:700; background:linear-gradient(135deg,#a78bfa,#4FA3FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .panel-editor .action-bar-center { flex:1; display:flex; align-items:center; gap:8px; justify-content:center; }
+    .panel-editor .action-bar-center input { background:rgba(26,29,53,0.6); border:1px solid rgba(123,92,255,0.15); border-radius:7px; color:var(--t2); padding:5px 10px; font-family:'Outfit',sans-serif; font-size:12px; width:220px; outline:none; }
+    .panel-editor .action-bar-center input:focus { border-color:#7B5CFF; }
+    .panel-editor .action-bar-right { display:flex; gap:6px; flex-wrap:wrap; }
+    .panel-editor .ab-btn { padding:5px 14px; border-radius:50px; border:1px solid rgba(123,92,255,0.15); background:rgba(123,92,255,0.08); color:var(--t2); font-family:'Outfit',sans-serif; font-size:11px; font-weight:600; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:4px; white-space:nowrap; }
+    .panel-editor .ab-btn:hover { border-color:#7B5CFF; color:#fff; background:rgba(123,92,255,0.15); }
+    .panel-editor .ab-btn.primary { background:linear-gradient(135deg,#7B5CFF,#9B7BFF); border-color:transparent; color:#fff; box-shadow:0 0 14px rgba(123,92,255,0.35); }
+    .panel-editor .ab-btn.primary:hover { box-shadow:0 0 24px rgba(123,92,255,0.6); }
+    .panel-editor .ab-btn.green { background:rgba(0,230,118,0.15); border-color:rgba(0,230,118,0.3); color:#00E676; }
+    .panel-editor .ab-btn.green:hover { background:rgba(0,230,118,0.25); }
+    .panel-editor .drafts-list { max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
+    .panel-editor .draft-item { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(26,29,53,0.6); border:1px solid rgba(123,92,255,0.15); border-radius:8px; cursor:pointer; transition:all .2s; }
+    .panel-editor .draft-item:hover { border-color:#7B5CFF; background:rgba(123,92,255,0.08); }
+    .panel-editor .draft-info { flex:1; }
+    .panel-editor .draft-name { font-size:13px; font-weight:600; color:#fff; margin-bottom:2px; }
+    .panel-editor .draft-date { font-size:10px; color:var(--t3); }
+    .panel-editor .draft-actions { display:flex; gap:5px; }
+    .panel-editor .draft-btn { padding:4px 8px; border-radius:5px; border:none; font-size:10px; cursor:pointer; font-family:'Outfit',sans-serif; font-weight:600; }
+    .panel-editor .draft-btn.load { background:rgba(123,92,255,0.2); color:#a78bfa; }
+    .panel-editor .draft-btn.delete { background:rgba(255,75,110,0.1); color:#ff8fab; }
+    .panel-editor .draft-btn.publish { background:rgba(0,230,118,0.15); color:#00E676; }
+    .panel-editor .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:2000; display:none; align-items:center; justify-content:center; }
+    .panel-editor .modal { background:var(--surface); border:1px solid rgba(123,92,255,0.15); border-radius:18px; padding:24px; width:90%; max-width:560px; max-height:85vh; overflow-y:auto; }
+    .panel-editor .modal h2 { margin-bottom:16px; color:#fff; font-family:'Cormorant Garamond',serif; }
+    .panel-editor .modal-content { display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
+    .panel-editor .modal-content label { display:block; margin-bottom:4px; font-size:11px; color:var(--t3); font-weight:600; }
+    .panel-editor .ed-btn-primary { padding:10px 20px; background:linear-gradient(135deg,#7B5CFF,#9B7BFF); border:none; border-radius:50px; color:#fff; font-weight:700; cursor:pointer; width:100%; margin-top:8px; font-family:'Outfit',sans-serif; }
+    .panel-editor .ed-btn-secondary { padding:6px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(123,92,255,0.15); border-radius:5px; color:var(--t2); font-weight:600; cursor:pointer; font-size:11px; font-family:'Outfit',sans-serif; }
+    .panel-editor .ed-btn-secondary:hover { background:rgba(255,255,255,0.1); }
+    .panel-editor .ed-btn-group { display:flex; gap:4px; margin-bottom:6px; }
+    .panel-editor .ed-btn-group .ed-btn-secondary { flex:1; }
+    .canvas-element { position:relative; margin-bottom:12px; padding:8px; border:1px dashed transparent; transition:all .2s; background:transparent; }
+    .canvas-element:hover { border-color:rgba(123,92,255,0.3); }
+    .canvas-element.selected { border-color:#00E676; box-shadow:0 0 0 2px rgba(0,230,118,0.2); background:rgba(0,230,118,0.02); }
+    .element-controls { position:absolute; top:-32px; right:0; display:none; gap:4px; background:var(--surface); padding:3px; border-radius:5px; border:1px solid rgba(123,92,255,0.15); z-index:50; }
+    .canvas-element.selected .element-controls { display:flex; }
+    .ctrl-btn { width:22px; height:22px; border-radius:4px; background:rgba(255,255,255,0.1); border:none; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; }
+    .ctrl-btn:hover { background:#7B5CFF; }
+    .ctrl-btn.delete { background:rgba(255,75,110,0.2); color:#ff8fab; }
+    .ctrl-btn.delete:hover { background:#ff4b6e; }
+    .section-element,.row-element,.col-container { min-height:70px; background:rgba(26,29,53,0.2); border:1px dashed rgba(123,92,255,0.15); border-radius:14px; padding:12px; margin-bottom:12px; transition:all .3s; }
+    .section-element.selected,.row-element.selected,.col-container.selected { background:rgba(26,29,53,0.4); border-color:#00E676; }
+    .columns-wrapper { display:flex; gap:12px; width:100%; }
+    .col-element { flex:1; min-height:80px; background:rgba(123,92,255,0.05); border:1px dashed rgba(123,92,255,0.2); border-radius:14px; padding:8px; }
+    .col-element.selected { border-color:#00E676; border-style:dashed; }
+    .title-element,.text-element,.content-box { outline:none; min-height:1em; }
+    .title-element:focus,.text-element:focus,.content-box:focus { background:rgba(255,255,255,0.02); }
+    .text-toolbar { position:absolute; background:var(--surface); border:1px solid rgba(123,92,255,0.15); border-radius:7px; padding:4px; display:none; gap:4px; box-shadow:0 5px 20px rgba(0,0,0,0.5); z-index:200; transform:translateY(-100%); margin-top:-8px; }
+    .text-toolbar button { background:transparent; border:none; color:var(--t2); padding:4px 7px; border-radius:4px; cursor:pointer; font-size:13px; }
+    .text-toolbar button:hover,.text-toolbar button.active { background:#7B5CFF; color:#fff; }
+    .button-element { display:block; padding:10px 22px; background:#7B5CFF; color:#fff; border-radius:50px; text-decoration:none; font-weight:600; border:none; cursor:pointer; text-align:center; box-sizing:border-box; font-family:'Outfit',sans-serif; }
+    .image-element img,.video-element video,.video-element iframe { max-width:100%; border-radius:14px; display:block; }
+    .video-element iframe { pointer-events:none; }
+    .audio-element audio { width:100%; }
+    .faq-item { margin-bottom:8px; border:1px solid rgba(123,92,255,0.15); border-radius:14px; overflow:hidden; }
+    .faq-question { padding:12px; background:rgba(26,29,53,0.6); cursor:pointer; font-weight:600; }
+    .faq-answer { padding:12px; background:rgba(11,13,23,0.6); display:none; }
+    .faq-answer.open { display:block; }
+    .countdown-element { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .countdown-block { background:rgba(26,29,53,0.6); padding:12px; border-radius:14px; text-align:center; min-width:70px; }
+    .countdown-number { font-size:1.3rem; font-weight:700; color:#7B5CFF; }
+    .countdown-label { font-size:0.75rem; color:var(--t3); }
+    .shadow-none { box-shadow:none !important; }
+    .shadow-soft { box-shadow:0 4px 15px rgba(0,0,0,0.1) !important; }
+    .shadow-medium { box-shadow:0 8px 25px rgba(0,0,0,0.2) !important; }
+    .shadow-intense { box-shadow:0 15px 40px rgba(0,0,0,0.3) !important; }
+    .shadow-inner-soft { box-shadow:inset 0 2px 10px rgba(0,0,0,0.1) !important; }
+    .shadow-inner-medium { box-shadow:inset 0 4px 15px rgba(0,0,0,0.2) !important; }
+    .shadow-inner-intense { box-shadow:inset 0 6px 20px rgba(0,0,0,0.3) !important; }
+    .shadow-float { box-shadow:0 10px 30px rgba(123,92,255,0.3) !important; animation:edFloat 3s ease-in-out infinite; }
+    @keyframes edFloat { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+    .menu-element nav ul { list-style:none; display:flex; gap:16px; padding:0; margin:0; }
+    .menu-element nav ul li { position:relative; }
+    .menu-element nav ul li a { text-decoration:none; color:var(--t2); font-weight:500; transition:color .2s; outline:none; }
+    .menu-element nav ul li a:hover { color:#7B5CFF; }
+    .menu-element nav ul li ul { display:none; position:absolute; top:100%; left:0; background:var(--surface); flex-direction:column; gap:8px; padding:8px; border-radius:14px; border:1px solid rgba(123,92,255,0.15); min-width:140px; }
+    .menu-element nav ul li:hover ul { display:flex; }
+    @media(max-width:1024px){.panel-editor .ed-container{flex-direction:column}.panel-editor .ed-sidebar,.panel-editor .ed-props{width:100%;height:auto;max-height:250px}.panel-editor .ed-workspace{padding:16px}}
     /* ===== END EDITOR STYLES ===== */
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -601,7 +682,7 @@
         <div id="drafts-list" class="drafts-list">
           <p style="color:var(--nx-text-dim);text-align:center;padding:30px 0">Chargement...</p>
         </div>
-        <button class="btn-primary" onclick="document.getElementById('drafts-modal').style.display='none'" style="margin-top:15px">Fermer</button>
+        <button class="ed-btn-primary" onclick="document.getElementById('drafts-modal').style.display='none'" style="margin-top:15px">Fermer</button>
       </div>
     </div>
 
@@ -612,57 +693,57 @@
         <p style="margin:16px 0;color:var(--nx-text)">Ta page est en ligne :</p>
         <a id="publish-url" href="#" target="_blank" style="display:inline-block;padding:12px 24px;background:rgba(123,92,255,0.15);border:1px solid rgba(123,92,255,0.3);border-radius:50px;color:#a78bfa;text-decoration:none;font-weight:600;font-size:14px;word-break:break-all;margin-bottom:16px">—</a>
         <br>
-        <button class="btn-primary" onclick="document.getElementById('publish-modal').style.display='none'" style="margin-top:10px">Fermer</button>
+        <button class="ed-btn-primary" onclick="document.getElementById('publish-modal').style.display='none'" style="margin-top:10px">Fermer</button>
       </div>
     </div>
 
-    <div class="editor-container">
-        <aside class="sidebar">
-            <div class="logo-area">
-                <div class="user-avatar">N</div>
-                <span class="gradient-text" style="font-weight:700; font-size:18px;">Nyxia Editor</span>
+    <div class="ed-container">
+        <aside class="ed-sidebar">
+            <div class="ed-logo-area">
+                <div class="ed-user-avatar">N</div>
+                <span class="ed-gradient-text" style="font-weight:700; font-size:18px;">Nyxia Editor</span>
             </div>
-            <div class="tabs-header">
-                <button class="tab-btn active" data-tab="structure">Structure</button>
-                <button class="tab-btn" data-tab="contenu">Contenu</button>
-                <button class="tab-btn" data-tab="forms">Forms</button>
-                <button class="tab-btn" data-tab="avance">Avancé</button>
+            <div class="ed-tabs-header">
+                <button class="ed-tab-btn active" data-tab="structure">Structure</button>
+                <button class="ed-tab-btn" data-tab="contenu">Contenu</button>
+                <button class="ed-tab-btn" data-tab="forms">Forms</button>
+                <button class="ed-tab-btn" data-tab="avance">Avancé</button>
             </div>
-            <div class="tab-content active" id="structure">
-                <div class="tool-item" draggable="true" data-type="section">Section</div>
-                <div class="tool-item" draggable="true" data-type="row">Rangée</div>
-                <div class="tool-item" draggable="true" data-type="col2">2 Colonnes</div>
-                <div class="tool-item" draggable="true" data-type="col3">3 Colonnes</div>
-                <div class="tool-item" draggable="true" data-type="col4">4 Colonnes</div>
+            <div class="ed-tab-content active" id="structure">
+                <div class="ed-tool-item" draggable="true" data-type="section">Section</div>
+                <div class="ed-tool-item" draggable="true" data-type="row">Rangée</div>
+                <div class="ed-tool-item" draggable="true" data-type="col2">2 Colonnes</div>
+                <div class="ed-tool-item" draggable="true" data-type="col3">3 Colonnes</div>
+                <div class="ed-tool-item" draggable="true" data-type="col4">4 Colonnes</div>
             </div>
-            <div class="tab-content" id="contenu">
-                <div class="tool-item" draggable="true" data-type="title">Titre</div>
-                <div class="tool-item" draggable="true" data-type="text">Texte</div>
-                <div class="tool-item" draggable="true" data-type="list">Liste à puces</div>
-                <div class="tool-item" draggable="true" data-type="content-box">Boîte de contenu</div>
-                <div class="tool-item" draggable="true" data-type="image">Image</div>
-                <div class="tool-item" draggable="true" data-type="video">Vidéo</div>
-                <div class="tool-item" draggable="true" data-type="audio">Audio</div>
-                <div class="tool-item" draggable="true" data-type="button">Bouton</div>
+            <div class="ed-tab-content" id="contenu">
+                <div class="ed-tool-item" draggable="true" data-type="title">Titre</div>
+                <div class="ed-tool-item" draggable="true" data-type="text">Texte</div>
+                <div class="ed-tool-item" draggable="true" data-type="list">Liste à puces</div>
+                <div class="ed-tool-item" draggable="true" data-type="content-box">Boîte de contenu</div>
+                <div class="ed-tool-item" draggable="true" data-type="image">Image</div>
+                <div class="ed-tool-item" draggable="true" data-type="video">Vidéo</div>
+                <div class="ed-tool-item" draggable="true" data-type="audio">Audio</div>
+                <div class="ed-tool-item" draggable="true" data-type="button">Bouton</div>
             </div>
-            <div class="tab-content" id="forms">
-                <div class="tool-item" draggable="true" data-type="form-field">Champ texte</div>
-                <div class="tool-item" draggable="true" data-type="checkbox">Case à cocher</div>
-                <div class="tool-item" draggable="true" data-type="calendar">Calendrier</div>
-                <div class="tool-item" draggable="true" data-type="submit">Bouton Envoie</div>
+            <div class="ed-tab-content" id="forms">
+                <div class="ed-tool-item" draggable="true" data-type="form-field">Champ texte</div>
+                <div class="ed-tool-item" draggable="true" data-type="checkbox">Case à cocher</div>
+                <div class="ed-tool-item" draggable="true" data-type="calendar">Calendrier</div>
+                <div class="ed-tool-item" draggable="true" data-type="submit">Bouton Envoie</div>
             </div>
-            <div class="tab-content" id="avance">
-                <div class="tool-item" draggable="true" data-type="countdown">Compte à rebours</div>
-                <div class="tool-item" draggable="true" data-type="menu">Menu</div>
-                <div class="tool-item" draggable="true" data-type="hr">Ligne horizontale</div>
-                <div class="tool-item" draggable="true" data-type="html-code">Code HTML</div>
-                <div class="tool-item" draggable="true" data-type="faq">FAQ</div>
+            <div class="ed-tab-content" id="avance">
+                <div class="ed-tool-item" draggable="true" data-type="countdown">Compte à rebours</div>
+                <div class="ed-tool-item" draggable="true" data-type="menu">Menu</div>
+                <div class="ed-tool-item" draggable="true" data-type="hr">Ligne horizontale</div>
+                <div class="ed-tool-item" draggable="true" data-type="html-code">Code HTML</div>
+                <div class="ed-tool-item" draggable="true" data-type="faq">FAQ</div>
             </div>
         </aside>
-        <main class="workspace" id="workspace">
+        <main class="ed-workspace" id="workspace">
             <div class="canvas-area" id="canvas"></div>
         </main>
-        <aside class="properties-panel" id="properties">
+        <aside class="ed-props" id="properties">
             <h3>Propriétés</h3>
             <div id="prop-content"><p>Sélectionnez un élément pour modifier ses propriétés.</p></div>
         </aside>
@@ -676,24 +757,24 @@
         <button onclick="formatDoc('hiliteColor', '#FFFF00')" title="Surligner"><i class="fas fa-highlighter"></i></button>
         <input type="color" onchange="formatDoc('foreColor', this.value)" title="Couleur du texte" style="width:20px; height:20px; border:none; background:none; cursor:pointer;">
     </div>
-    <button class="settings-btn" id="settings-btn"><i class="fas fa-cog"></i></button>
+    <button class="ed-settings-btn" id="settings-btn"><i class="fas fa-cog"></i></button>
     <div class="modal-overlay" id="settings-modal">
         <div class="modal">
             <h2>Paramètres Globaux & SEO</h2>
             <div class="modal-content">
                 <label>Couleur de fond globale</label><input type="color" id="global-bg-color" value="#0B0D17">
-                <label>Image de fond globale</label><input type="file" id="global-bg-image" accept="image/*" class="input-field"><button class="btn-secondary" onclick="clearGlobalBgImage()">Retirer l'image</button>
+                <label>Image de fond globale</label><input type="file" id="global-bg-image" accept="image/*" class="ed-input"><button class="ed-btn-secondary" onclick="clearGlobalBgImage()">Retirer l'image</button>
                 <label>Langue du site</label><select id="site-lang"><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option></select>
-                <label>Titre SEO</label><input type="text" id="seo-title" class="input-field">
-                <label>Description SEO</label><textarea id="seo-desc" class="textarea-field"></textarea>
-                <label>Mots-clés</label><input type="text" id="seo-keywords" class="input-field">
-                <label>Auteur</label><input type="text" id="seo-author" class="input-field">
-                <label>Image réseaux sociaux</label><input type="file" id="seo-image" class="input-field">
+                <label>Titre SEO</label><input type="text" id="seo-title" class="ed-input">
+                <label>Description SEO</label><textarea id="seo-desc" class="ed-textarea"></textarea>
+                <label>Mots-clés</label><input type="text" id="seo-keywords" class="ed-input">
+                <label>Auteur</label><input type="text" id="seo-author" class="ed-input">
+                <label>Image réseaux sociaux</label><input type="file" id="seo-image" class="ed-input">
                 <label><input type="checkbox" id="seo-hide"> Masquer aux moteurs de recherche</label>
-                <label>Code d'en-tête (Header)</label><textarea id="header-code" class="textarea-field"></textarea>
-                <label>Code de pied de page (Footer)</label><textarea id="footer-code" class="textarea-field"></textarea>
+                <label>Code d'en-tête (Header)</label><textarea id="header-code" class="ed-textarea"></textarea>
+                <label>Code de pied de page (Footer)</label><textarea id="footer-code" class="ed-textarea"></textarea>
             </div>
-            <button class="btn-primary" onclick="document.getElementById('settings-modal').style.display='none'">Fermer</button>
+            <button class="ed-btn-primary" onclick="document.getElementById('settings-modal').style.display='none'">Fermer</button>
         </div>
     </div>
       </div>
@@ -1842,28 +1923,28 @@
         document.addEventListener('click', (e) => {
             const toolbar = document.getElementById('text-toolbar');
             if (!e.target.closest('.title-element') && !e.target.closest('.text-element') && !e.target.closest('.content-box') && !e.target.closest('.faq-question') && !e.target.closest('.faq-answer') && !e.target.closest('.text-toolbar')) toolbar.style.display = 'none';
-            if (!e.target.closest('.canvas-element') && !e.target.closest('.properties-panel') && !e.target.closest('.ed-sidebar') && !e.target.closest('.element-controls') && !e.target.closest('.text-toolbar')) deselectAll();
+            if (!e.target.closest('.canvas-element') && !e.target.closest('.ed-props') && !e.target.closest('.ed-sidebar') && !e.target.closest('.element-controls') && !e.target.closest('.text-toolbar')) deselectAll();
         });
     }
 
 let selectedElement = null;
 
         function initTabs() {
-            const tabs = document.querySelectorAll('.tab-btn');
-            const contents = document.querySelectorAll('.tab-content');
+            const tabs = document.querySelectorAll('#panel-editor .ed-tab-btn');
+            const contents = document.querySelectorAll('#panel-editor .ed-tab-content');
             tabs.forEach(tab => { tab.addEventListener('click', () => { tabs.forEach(t => t.classList.remove('active')); contents.forEach(c => c.classList.remove('active')); tab.classList.add('active'); document.getElementById(tab.dataset.tab).classList.add('active'); }); });
         }
 
         function initDragAndDrop() {
-            const tools = document.querySelectorAll('.tool-item');
+            const tools = document.querySelectorAll('#panel-editor .ed-tool-item');
             const canvas = document.getElementById('canvas');
             tools.forEach(tool => { tool.addEventListener('dragstart', (e) => { e.dataTransfer.setData('type', tool.dataset.type); }); });
-            canvas.addEventListener('dragover', (e) => { e.preventDefault(); canvas.style.borderColor = 'var(--nx-primary)'; });
+            canvas.addEventListener('dragover', (e) => { e.preventDefault(); canvas.style.borderColor = '#7B5CFF'; });
             canvas.addEventListener('dragleave', () => { canvas.style.borderColor = 'transparent'; });
             canvas.addEventListener('drop', (e) => { e.preventDefault(); canvas.style.borderColor = 'transparent'; createElement(e.dataTransfer.getData('type'), canvas); });
-            document.addEventListener('dragover', (e) => { const target = e.target.closest('.section-element, .row-element, .col-element'); if (target) { e.preventDefault(); target.style.borderColor = 'var(--nx-green)'; } });
-            document.addEventListener('dragleave', (e) => { const target = e.target.closest('.section-element, .row-element, .col-element'); if (target) target.style.borderColor = 'var(--nx-border)'; });
-            document.addEventListener('drop', (e) => { const target = e.target.closest('.section-element, .row-element, .col-element'); if (target) { e.preventDefault(); e.stopPropagation(); target.style.borderColor = 'var(--nx-border)'; createElement(e.dataTransfer.getData('type'), target); } });
+            document.addEventListener('dragover', (e) => { const target = e.target.closest('.section-element, .row-element, .col-element'); if (target) { e.preventDefault(); target.style.borderColor = '#00E676'; } });
+            document.addEventListener('dragleave', (e) => { const target = e.target.closest('.section-element, .row-element, .col-element'); if (target) target.style.borderColor = 'rgba(123,92,255,0.15)'; });
+            document.addEventListener('drop', (e) => { const target = e.target.closest('.section-element, .row-element, .col-element'); if (target) { e.preventDefault(); e.stopPropagation(); target.style.borderColor = 'rgba(123,92,255,0.15)'; createElement(e.dataTransfer.getData('type'), target); } });
         }
 
         function createElement(type, container) {
@@ -1903,10 +1984,10 @@ let selectedElement = null;
                 case 'video': el.classList.add('video-element'); el.innerHTML = `<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen style="width:100%; height:315px;"></iframe>`; break;
                 case 'audio': el.classList.add('audio-element'); el.innerHTML = `<audio controls style="width:100%;"><source src="" type="audio/mpeg"></audio>`; break;
                 case 'button': el.innerHTML = `<button class="button-element" id="btn-${el.id}">Bouton</button>`; break;
-                case 'form-field': el.innerHTML = `<label style="display:block; margin-bottom:5px;">Label du champ</label><input type="text" class="input-field" placeholder="Votre texte">`; break;
+                case 'form-field': el.innerHTML = `<label style="display:block; margin-bottom:5px;">Label du champ</label><input type="text" class="ed-input" placeholder="Votre texte">`; break;
                 case 'checkbox': el.innerHTML = `<label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"><span>Texte de la case à cocher</span></label>`; break;
-                case 'calendar': el.innerHTML = `<input type="date" class="input-field" style="width:100%;">`; break;
-                case 'submit': el.innerHTML = `<button class="btn-primary button-element" style="width:100%;" id="btn-${el.id}">Envoie</button>`; break;
+                case 'calendar': el.innerHTML = `<input type="date" class="ed-input" style="width:100%;">`; break;
+                case 'submit': el.innerHTML = `<button class="ed-btn-primary button-element" style="width:100%;" id="btn-${el.id}">Envoie</button>`; break;
                 case 'countdown': el.classList.add('countdown-element'); el.innerHTML = `<div class="countdown-block"><div class="countdown-number">00</div><div class="countdown-label">Jours</div></div><div class="countdown-block"><div class="countdown-number">00</div><div class="countdown-label">Heures</div></div><div class="countdown-block"><div class="countdown-number">00</div><div class="countdown-label">Minutes</div></div><div class="countdown-block"><div class="countdown-number">00</div><div class="countdown-label">Secondes</div></div>`; break;
                 case 'menu': el.classList.add('menu-element'); el.innerHTML = `<nav><ul><li><a href="#" contenteditable="true">Accueil</a></li><li><a href="#" contenteditable="true">Services</a></li><li><a href="#" contenteditable="true">Contact</a></li></ul></nav>`; break;
                 case 'hr': el.innerHTML = `<hr style="border:0; border-top:1px solid var(--nx-border); margin:20px 0;">`; break;
@@ -1965,52 +2046,52 @@ let selectedElement = null;
             const id = el.id; 
             let html = '';
 
-            html += `<div class="prop-group"><label>Effets & Ombres</label><select class="select-field" onchange="applyShadow('${id}', this.value)"><option value="shadow-none">Aucun</option><option value="shadow-soft">Ombre douce</option><option value="shadow-medium">Ombre moyenne</option><option value="shadow-intense">Ombre intense</option><option value="shadow-inner-soft">Intérieure douce</option><option value="shadow-inner-medium">Intérieure moyenne</option><option value="shadow-inner-intense">Intérieure intense</option><option value="shadow-float">Flottement lumineux</option></select><label style="margin-top:10px;">Couleur de l'ombre</label><div class="color-row"><input type="color" id="shadow-color-${id}" value="#000000" oninput="applyCustomShadow('${id}')"><input type="text" class="input-field" id="shadow-color-text-${id}" value="rgba(0,0,0,0.2)" onchange="applyCustomShadow('${id}')"></div><label style="margin-top:10px;">Flou (px)</label><input type="range" min="0" max="50" value="10" class="input-field" id="shadow-blur-${id}" oninput="applyCustomShadow('${id}')"><label style="margin-top:10px;">Décalage (px)</label><input type="range" min="-20" max="20" value="5" class="input-field" id="shadow-offset-${id}" oninput="applyCustomShadow('${id}')"></div>`;
+            html += `<div class="prop-group"><label>Effets & Ombres</label><select class="ed-select" onchange="applyShadow('${id}', this.value)"><option value="shadow-none">Aucun</option><option value="shadow-soft">Ombre douce</option><option value="shadow-medium">Ombre moyenne</option><option value="shadow-intense">Ombre intense</option><option value="shadow-inner-soft">Intérieure douce</option><option value="shadow-inner-medium">Intérieure moyenne</option><option value="shadow-inner-intense">Intérieure intense</option><option value="shadow-float">Flottement lumineux</option></select><label style="margin-top:10px;">Couleur de l'ombre</label><div class="ed-color-row"><input type="color" id="shadow-color-${id}" value="#000000" oninput="applyCustomShadow('${id}')"><input type="text" class="ed-input" id="shadow-color-text-${id}" value="rgba(0,0,0,0.2)" onchange="applyCustomShadow('${id}')"></div><label style="margin-top:10px;">Flou (px)</label><input type="range" min="0" max="50" value="10" class="ed-input" id="shadow-blur-${id}" oninput="applyCustomShadow('${id}')"><label style="margin-top:10px;">Décalage (px)</label><input type="range" min="-20" max="20" value="5" class="ed-input" id="shadow-offset-${id}" oninput="applyCustomShadow('${id}')"></div>`;
 
             if (type === 'single-col') {
-                html += `<div class="prop-group"><label>Fond de la colonne</label><div class="color-row"><input type="color" oninput="document.getElementById('${id}').style.backgroundColor = this.value"><input type="text" class="input-field" placeholder="#0B0D17" onchange="document.getElementById('${id}').style.backgroundColor = this.value"><button class="btn-secondary" onclick="document.getElementById('${id}').style.backgroundColor = 'transparent'">Transparent</button></div></div>`;
+                html += `<div class="prop-group"><label>Fond de la colonne</label><div class="ed-color-row"><input type="color" oninput="document.getElementById('${id}').style.backgroundColor = this.value"><input type="text" class="ed-input" placeholder="#0B0D17" onchange="document.getElementById('${id}').style.backgroundColor = this.value"><button class="ed-btn-secondary" onclick="document.getElementById('${id}').style.backgroundColor = 'transparent'">Transparent</button></div></div>`;
             }
 
             if (['title', 'text', 'content-box', 'list'].includes(type)) {
-                html += `<div class="prop-group"><label>Police</label><select class="select-field" onchange="document.getElementById('${id}').style.fontFamily = this.value"><option value="'Outfit', sans-serif">Outfit</option><option value="'Cormorant Garamond', serif">Cormorant Garamond</option><option value="'Playfair Display', serif">Playfair Display</option><option value="'Montserrat', sans-serif">Montserrat</option><option value="'Poppins', sans-serif">Poppins</option><option value="'Lora', serif">Lora</option><option value="'Dancing Script', cursive">Dancing Script</option></select><label style="margin-top:10px;">Alignement</label><div class="btn-group"><button class="btn-secondary" onclick="alignElement('${id}', 'left')">Gauche</button><button class="btn-secondary" onclick="alignElement('${id}', 'center')">Centre</button><button class="btn-secondary" onclick="alignElement('${id}', 'right')">Droite</button></div><label style="margin-top:10px;">Couleur du texte</label><div class="color-row"><input type="color" oninput="document.getElementById('${id}').style.color = this.value"><input type="text" class="input-field" placeholder="#FFFFFF" onchange="document.getElementById('${id}').style.color = this.value"></div></div>`;
+                html += `<div class="prop-group"><label>Police</label><select class="ed-select" onchange="document.getElementById('${id}').style.fontFamily = this.value"><option value="'Outfit', sans-serif">Outfit</option><option value="'Cormorant Garamond', serif">Cormorant Garamond</option><option value="'Playfair Display', serif">Playfair Display</option><option value="'Montserrat', sans-serif">Montserrat</option><option value="'Poppins', sans-serif">Poppins</option><option value="'Lora', serif">Lora</option><option value="'Dancing Script', cursive">Dancing Script</option></select><label style="margin-top:10px;">Alignement</label><div class="ed-btn-group"><button class="ed-btn-secondary" onclick="alignElement('${id}', 'left')">Gauche</button><button class="ed-btn-secondary" onclick="alignElement('${id}', 'center')">Centre</button><button class="ed-btn-secondary" onclick="alignElement('${id}', 'right')">Droite</button></div><label style="margin-top:10px;">Couleur du texte</label><div class="ed-color-row"><input type="color" oninput="document.getElementById('${id}').style.color = this.value"><input type="text" class="ed-input" placeholder="#FFFFFF" onchange="document.getElementById('${id}').style.color = this.value"></div></div>`;
             }
-            if (type === 'list') { html += `<div class="prop-group"><label>Style des puces</label><select class="select-field" onchange="document.getElementById('${id}').querySelector('ul').style.listStyleType = this.value"><option value="disc">Disque</option><option value="circle">Cercle</option><option value="square">Carré</option><option value="none">Aucun</option></select></div>`; }
+            if (type === 'list') { html += `<div class="prop-group"><label>Style des puces</label><select class="ed-select" onchange="document.getElementById('${id}').querySelector('ul').style.listStyleType = this.value"><option value="disc">Disque</option><option value="circle">Cercle</option><option value="square">Carré</option><option value="none">Aucun</option></select></div>`; }
 
             if (['section', 'row', 'col2', 'col3', 'col4', 'content-box'].includes(type)) {
-                html += `<div class="prop-group"><label>Fond (Couleur)</label><div class="color-row"><input type="color" oninput="document.getElementById('${id}').style.backgroundColor = this.value"><input type="text" class="input-field" placeholder="#0B0D17" onchange="document.getElementById('${id}').style.backgroundColor = this.value"><button class="btn-secondary" onclick="document.getElementById('${id}').style.backgroundColor = 'transparent'">Transparent</button></div><label style="margin-top:10px;">Bordure</label><div class="color-row"><input type="color" id="border-color-picker" value="#7B5CFF" oninput="updateBorder('${id}', this.value, 'color')"><input type="number" placeholder="Épaisseur (px)" value="1" min="0" class="input-field" style="width:80px;" oninput="updateBorder('${id}', this.value, 'width')"></div><input type="text" class="input-field" placeholder="ex: 1px solid rgba(...)" onchange="document.getElementById('${id}').style.border = this.value"></div>`;
+                html += `<div class="prop-group"><label>Fond (Couleur)</label><div class="ed-color-row"><input type="color" oninput="document.getElementById('${id}').style.backgroundColor = this.value"><input type="text" class="ed-input" placeholder="#0B0D17" onchange="document.getElementById('${id}').style.backgroundColor = this.value"><button class="ed-btn-secondary" onclick="document.getElementById('${id}').style.backgroundColor = 'transparent'">Transparent</button></div><label style="margin-top:10px;">Bordure</label><div class="ed-color-row"><input type="color" id="border-color-picker" value="#7B5CFF" oninput="updateBorder('${id}', this.value, 'color')"><input type="number" placeholder="Épaisseur (px)" value="1" min="0" class="ed-input" style="width:80px;" oninput="updateBorder('${id}', this.value, 'width')"></div><input type="text" class="ed-input" placeholder="ex: 1px solid rgba(...)" onchange="document.getElementById('${id}').style.border = this.value"></div>`;
             }
-            if (type === 'section') { html += `<div class="prop-group"><label>Image de fond</label><input type="file" accept="image/*" class="input-field" onchange="uploadBgImage('${id}', this)"><button class="btn-secondary" onclick="document.getElementById('${id}').style.backgroundImage = 'none'">Retirer l'image</button></div>`; }
+            if (type === 'section') { html += `<div class="prop-group"><label>Image de fond</label><input type="file" accept="image/*" class="ed-input" onchange="uploadBgImage('${id}', this)"><button class="ed-btn-secondary" onclick="document.getElementById('${id}').style.backgroundImage = 'none'">Retirer l'image</button></div>`; }
 
             if (['image', 'video', 'audio'].includes(type)) {
                 let currentSrc = '';
                 if(type === 'image' && el.querySelector('img')) currentSrc = el.querySelector('img').src;
                 if(type === 'video' && el.querySelector('iframe')) currentSrc = el.querySelector('iframe').src;
-                html += `<div class="prop-group"><label>Source</label><input type="text" class="input-field" placeholder="URL..." value="${currentSrc}" oninput="updateMediaSource('${id}', '${type}', this.value)"><label style="margin-top:10px;">Uploader</label><input type="file" accept="${type === 'image' ? 'image/*' : (type === 'video' ? 'video/*' : 'audio/*')}" class="input-field" onchange="uploadMedia('${id}', '${type}', this)"></div><div class="prop-group"><label>Largeur (%)</label><input type="range" min="10" max="100" value="100" class="input-field" oninput="updateMediaWidth('${id}', '${type}', this.value)">${type === 'video' ? '<label style="margin-top:5px;">Hauteur (px)</label><input type="number" value="315" class="input-field" oninput="updateMediaHeight(\''+id+'\', this.value)">' : ''}<label style="margin-top:10px;">Alignement</label><div class="btn-group"><button class="btn-secondary" onclick="updateMediaAlign('${id}', '${type}', 'left')">Gauche</button><button class="btn-secondary" onclick="updateMediaAlign('${id}', '${type}', 'center')">Centre</button><button class="btn-secondary" onclick="updateMediaAlign('${id}', '${type}', 'right')">Droite</button></div></div>`;
+                html += `<div class="prop-group"><label>Source</label><input type="text" class="ed-input" placeholder="URL..." value="${currentSrc}" oninput="updateMediaSource('${id}', '${type}', this.value)"><label style="margin-top:10px;">Uploader</label><input type="file" accept="${type === 'image' ? 'image/*' : (type === 'video' ? 'video/*' : 'audio/*')}" class="ed-input" onchange="uploadMedia('${id}', '${type}', this)"></div><div class="prop-group"><label>Largeur (%)</label><input type="range" min="10" max="100" value="100" class="ed-input" oninput="updateMediaWidth('${id}', '${type}', this.value)">${type === 'video' ? '<label style="margin-top:5px;">Hauteur (px)</label><input type="number" value="315" class="ed-input" oninput="updateMediaHeight(\''+id+'\', this.value)">' : ''}<label style="margin-top:10px;">Alignement</label><div class="ed-btn-group"><button class="ed-btn-secondary" onclick="updateMediaAlign('${id}', '${type}', 'left')">Gauche</button><button class="ed-btn-secondary" onclick="updateMediaAlign('${id}', '${type}', 'center')">Centre</button><button class="ed-btn-secondary" onclick="updateMediaAlign('${id}', '${type}', 'right')">Droite</button></div></div>`;
             }
 
             // CORRECTION BOUTONS : Utilise alignButton au lieu de alignElement
             if (['button', 'submit'].includes(type)) {
                 const btn = el.querySelector('button');
                 html += `<div class="prop-group">
-                    <label>Texte du bouton</label><input type="text" class="input-field" value="${btn ? btn.innerText : ''}" oninput="document.getElementById('btn-${id}').innerText = this.value">
-                    <label style="margin-top:10px;">Couleur de fond</label><div class="color-row"><input type="color" value="#7B5CFF" oninput="document.getElementById('btn-${id}').style.background = this.value"></div>
-                    <label style="margin-top:10px;">Largeur (%)</label><input type="range" min="10" max="100" value="100" class="input-field" oninput="document.getElementById('btn-${id}').style.width = this.value + '%'">
-                    <label style="margin-top:5px;">Hauteur (Padding)</label><input type="range" min="5" max="50" value="12" class="input-field" oninput="document.getElementById('btn-${id}').style.padding = this.value + 'px 24px'">
-                    <label style="margin-top:5px;">Arrondi (px)</label><input type="range" min="0" max="50" value="50" class="input-field" oninput="document.getElementById('btn-${id}').style.borderRadius = this.value + 'px'">
-                    <label style="margin-top:10px;">Alignement du bouton</label><div class="btn-group"><button class="btn-secondary" onclick="alignButton('${id}', 'left')">Gauche</button><button class="btn-secondary" onclick="alignButton('${id}', 'center')">Centre</button><button class="btn-secondary" onclick="alignButton('${id}', 'right')">Droite</button></div></div>`;
+                    <label>Texte du bouton</label><input type="text" class="ed-input" value="${btn ? btn.innerText : ''}" oninput="document.getElementById('btn-${id}').innerText = this.value">
+                    <label style="margin-top:10px;">Couleur de fond</label><div class="ed-color-row"><input type="color" value="#7B5CFF" oninput="document.getElementById('btn-${id}').style.background = this.value"></div>
+                    <label style="margin-top:10px;">Largeur (%)</label><input type="range" min="10" max="100" value="100" class="ed-input" oninput="document.getElementById('btn-${id}').style.width = this.value + '%'">
+                    <label style="margin-top:5px;">Hauteur (Padding)</label><input type="range" min="5" max="50" value="12" class="ed-input" oninput="document.getElementById('btn-${id}').style.padding = this.value + 'px 24px'">
+                    <label style="margin-top:5px;">Arrondi (px)</label><input type="range" min="0" max="50" value="50" class="ed-input" oninput="document.getElementById('btn-${id}').style.borderRadius = this.value + 'px'">
+                    <label style="margin-top:10px;">Alignement du bouton</label><div class="ed-btn-group"><button class="ed-btn-secondary" onclick="alignButton('${id}', 'left')">Gauche</button><button class="ed-btn-secondary" onclick="alignButton('${id}', 'center')">Centre</button><button class="ed-btn-secondary" onclick="alignButton('${id}', 'right')">Droite</button></div></div>`;
             }
 
             if (['form-field', 'checkbox', 'calendar', 'submit'].includes(type)) {
-                html += `<div class="prop-group"><label>Largeur (%)</label><input type="range" min="10" max="100" value="100" class="input-field" oninput="document.getElementById('${id}').style.width = this.value + '%'"><label style="margin-top:10px;">Alignement</label><div class="btn-group"><button class="btn-secondary" onclick="alignElement('${id}', 'left')">Gauche</button><button class="btn-secondary" onclick="alignElement('${id}', 'center')">Centre</button><button class="btn-secondary" onclick="alignElement('${id}', 'right')">Droite</button></div></div>`;
+                html += `<div class="prop-group"><label>Largeur (%)</label><input type="range" min="10" max="100" value="100" class="ed-input" oninput="document.getElementById('${id}').style.width = this.value + '%'"><label style="margin-top:10px;">Alignement</label><div class="ed-btn-group"><button class="ed-btn-secondary" onclick="alignElement('${id}', 'left')">Gauche</button><button class="ed-btn-secondary" onclick="alignElement('${id}', 'center')">Centre</button><button class="ed-btn-secondary" onclick="alignElement('${id}', 'right')">Droite</button></div></div>`;
             }
-            if (type === 'form-field') { const labelEl = el.querySelector('label'); html += `<div class="prop-group"><label>Label du champ</label><input type="text" class="input-field" value="${labelEl.innerText}" oninput="document.querySelector('#${id} label').innerText = this.value"><label style="margin-top:10px;">Type de champ</label><select class="select-field" onchange="document.querySelector('#${id} input').type = this.value"><option value="text">Texte</option><option value="email">Email</option><option value="tel">Téléphone</option><option value="number">Nombre</option></select><label style="margin-top:10px;">Couleur de fond du champ</label><div class="color-row"><input type="color" value="#13152A" oninput="document.querySelector('#${id} input').style.background = this.value"></div></div>`; }
-            if (type === 'checkbox') { html += `<div class="prop-group"><label>Texte de la case</label><input type="text" class="input-field" value="${el.querySelector('span').innerText}" oninput="document.querySelector('#${id} span').innerText = this.value"></div>`; }
+            if (type === 'form-field') { const labelEl = el.querySelector('label'); html += `<div class="prop-group"><label>Label du champ</label><input type="text" class="ed-input" value="${labelEl.innerText}" oninput="document.querySelector('#${id} label').innerText = this.value"><label style="margin-top:10px;">Type de champ</label><select class="ed-select" onchange="document.querySelector('#${id} input').type = this.value"><option value="text">Texte</option><option value="email">Email</option><option value="tel">Téléphone</option><option value="number">Nombre</option></select><label style="margin-top:10px;">Couleur de fond du champ</label><div class="ed-color-row"><input type="color" value="#13152A" oninput="document.querySelector('#${id} input').style.background = this.value"></div></div>`; }
+            if (type === 'checkbox') { html += `<div class="prop-group"><label>Texte de la case</label><input type="text" class="ed-input" value="${el.querySelector('span').innerText}" oninput="document.querySelector('#${id} span').innerText = this.value"></div>`; }
 
-            if (type === 'countdown') { html += `<div class="prop-group"><label>Couleur des blocs (Fond)</label><div class="color-row"><input type="color" value="#1A1D35" oninput="updateCountdownBlocks('${id}', 'bg', this.value)"></div><label style="margin-top:10px;">Couleur du texte (Jours, Heures...)</label><div class="color-row"><input type="color" value="#6B7094" oninput="updateCountdownBlocks('${id}', 'text', this.value)"></div><label style="margin-top:10px;">Couleur des chiffres</label><div class="color-row"><input type="color" value="#7B5CFF" oninput="updateCountdownBlocks('${id}', 'num', this.value)"></div></div>`; }
-            if (type === 'menu') { html += `<div class="prop-group"><label>Gestion du menu</label><p style="font-size:11px; color:var(--nx-text-dim); margin-bottom:10px;">Cliquez directement sur les textes des liens dans l'éditeur pour les modifier.</p><button class="btn-secondary" style="width:100%; margin-bottom:10px;" onclick="addMenuItem('${id}')">+ Ajouter un lien</button><label>Alignement du menu</label><div class="btn-group"><button class="btn-secondary" onclick="document.querySelector('#${id} nav ul').style.justifyContent='flex-start'">Gauche</button><button class="btn-secondary" onclick="document.querySelector('#${id} nav ul').style.justifyContent='center'">Centre</button><button class="btn-secondary" onclick="document.querySelector('#${id} nav ul').style.justifyContent='flex-end'">Droite</button></div></div>`; }
-            if (type === 'hr') { html += `<div class="prop-group"><label>Couleur de la ligne</label><div class="color-row"><input type="color" value="#7B5CFF" oninput="document.querySelector('#${id} hr').style.borderColor = this.value"></div></div>`; }
-            if (type === 'html-code') { html += `<div class="prop-group"><label>Code HTML / Embed</label><textarea class="textarea-field" rows="10" placeholder="Collez votre code ici" oninput="renderHtmlCodeSafe('${id}', this.value)"></textarea></div>`; }
-            if (type === 'faq') { html += `<div class="prop-group"><label>Gestion de la FAQ</label><button class="btn-secondary" style="width:100%; margin-bottom:10px;" onclick="addFaqItem('${id}')">+ Ajouter une question</button><p style="font-size:11px; color:var(--nx-text-dim);">Cliquez sur les questions/réponses dans l'éditeur pour modifier le texte directement.</p><label style="margin-top:10px;">Couleur Fond Question</label><div class="color-row"><input type="color" value="#1A1D35" oninput="updateFaqColors('${id}', 'q-bg', this.value)"></div><label style="margin-top:10px;">Couleur Fond Réponse</label><div class="color-row"><input type="color" value="#0B0D17" oninput="updateFaqColors('${id}', 'a-bg', this.value)"></div></div>`; }
+            if (type === 'countdown') { html += `<div class="prop-group"><label>Couleur des blocs (Fond)</label><div class="ed-color-row"><input type="color" value="#1A1D35" oninput="updateCountdownBlocks('${id}', 'bg', this.value)"></div><label style="margin-top:10px;">Couleur du texte (Jours, Heures...)</label><div class="ed-color-row"><input type="color" value="#6B7094" oninput="updateCountdownBlocks('${id}', 'text', this.value)"></div><label style="margin-top:10px;">Couleur des chiffres</label><div class="ed-color-row"><input type="color" value="#7B5CFF" oninput="updateCountdownBlocks('${id}', 'num', this.value)"></div></div>`; }
+            if (type === 'menu') { html += `<div class="prop-group"><label>Gestion du menu</label><p style="font-size:11px; color:var(--nx-text-dim); margin-bottom:10px;">Cliquez directement sur les textes des liens dans l'éditeur pour les modifier.</p><button class="ed-btn-secondary" style="width:100%; margin-bottom:10px;" onclick="addMenuItem('${id}')">+ Ajouter un lien</button><label>Alignement du menu</label><div class="ed-btn-group"><button class="ed-btn-secondary" onclick="document.querySelector('#${id} nav ul').style.justifyContent='flex-start'">Gauche</button><button class="ed-btn-secondary" onclick="document.querySelector('#${id} nav ul').style.justifyContent='center'">Centre</button><button class="ed-btn-secondary" onclick="document.querySelector('#${id} nav ul').style.justifyContent='flex-end'">Droite</button></div></div>`; }
+            if (type === 'hr') { html += `<div class="prop-group"><label>Couleur de la ligne</label><div class="ed-color-row"><input type="color" value="#7B5CFF" oninput="document.querySelector('#${id} hr').style.borderColor = this.value"></div></div>`; }
+            if (type === 'html-code') { html += `<div class="prop-group"><label>Code HTML / Embed</label><textarea class="ed-textarea" rows="10" placeholder="Collez votre code ici" oninput="renderHtmlCodeSafe('${id}', this.value)"></textarea></div>`; }
+            if (type === 'faq') { html += `<div class="prop-group"><label>Gestion de la FAQ</label><button class="ed-btn-secondary" style="width:100%; margin-bottom:10px;" onclick="addFaqItem('${id}')">+ Ajouter une question</button><p style="font-size:11px; color:var(--nx-text-dim);">Cliquez sur les questions/réponses dans l'éditeur pour modifier le texte directement.</p><label style="margin-top:10px;">Couleur Fond Question</label><div class="ed-color-row"><input type="color" value="#1A1D35" oninput="updateFaqColors('${id}', 'q-bg', this.value)"></div><label style="margin-top:10px;">Couleur Fond Réponse</label><div class="ed-color-row"><input type="color" value="#0B0D17" oninput="updateFaqColors('${id}', 'a-bg', this.value)"></div></div>`; }
 
             panel.innerHTML = html;
         }
