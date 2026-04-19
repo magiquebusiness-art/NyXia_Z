@@ -24,6 +24,8 @@ export async function onRequestPost(context) {
     var payload;
     if (mode === 'i2v' && img_url) {
       // Image -> Video: utilise "resolution" au format "720P" et "img_url"
+      var resMap = { '1280*720': '720P', '1920*1080': '1080P', '720*1280': '720P', '1080*1920': '1080P', '720*720': '720P', '1080*1080': '1080P' };
+      var resolution = resMap[size] || '720P';
       payload = {
         model: model,
         input: {
@@ -31,7 +33,7 @@ export async function onRequestPost(context) {
           img_url: img_url
         },
         parameters: {
-          resolution: size,
+          resolution: resolution,
           prompt_extend: true,
           watermark: false,
           duration: duration

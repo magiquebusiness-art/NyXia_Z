@@ -699,6 +699,21 @@
           </div>
           <div id="creation-video" class="creation-section">
             <div class="creation-search">
+              <div style="display:flex;gap:6px;margin-bottom:12px">
+                <button id="vid-mode-t2v" class="btn-create" style="flex:1;padding:8px 16px;font-size:12px;border-radius:10px" onclick="switchVidMode('t2v')">&#x1F4DD; Texte &#x2192; Video</button>
+                <button id="vid-mode-i2v" class="btn-create" style="flex:1;padding:8px 16px;font-size:12px;border-radius:10px;background:rgba(11,13,23,0.6);border:1px solid rgba(123,92,255,0.15);color:var(--t3)" onclick="switchVidMode('i2v')">&#x1F5BC; Image &#x2192; Video</button>
+              </div>
+              <div id="vid-i2v-upload" style="display:none;margin-bottom:12px">
+                <div style="border:2px dashed rgba(123,92,255,0.25);border-radius:12px;padding:20px;text-align:center;cursor:pointer;color:var(--t3);font-size:13px" onclick="document.getElementById('vid-img-upload').click()">
+                  <div style="font-size:28px;margin-bottom:6px">&#x1F5BC;</div>
+                  Clique ou glisse une image ici
+                </div>
+                <input type="file" id="vid-img-upload" accept="image/*" style="display:none" onchange="handleVidImgUpload(event)">
+                <div id="vid-i2v-preview" style="display:none;margin-top:8px;position:relative">
+                  <img id="vid-i2v-thumb" style="width:100%;max-height:200px;object-fit:contain;border-radius:10px;display:block">
+                  <button onclick="clearVidImg()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px">&#x2716;</button>
+                </div>
+              </div>
               <div class="creation-search-row">
                 <div class="creation-input-wrap"><span>&#x1F3AC;</span><input class="creation-input" id="vid-prompt" placeholder="Decris ta scene video..."></div>
                 <button class="btn-create" id="btn-vid-gen" onclick="genWanVideo()">&#x1F3AC; Generer</button>
@@ -1960,6 +1975,44 @@
     function clearImgHistory(){if(!imgHistory.length)return;if(confirm('Effacer l\'historique des images?')){imgHistory=[];localStorage.removeItem('nyxia_z_img_history');renderImgHistory();}}
 
     var videoFormat='16:9';
+    var vidMode='t2v';
+    var vidImgBase64=null;
+
+    function switchVidMode(mode){
+      vidMode=mode;
+      var t2v=document.getElementById('vid-mode-t2v');
+      var i2v=document.getElementById('vid-mode-i2v');
+      var upload=document.getElementById('vid-i2v-upload');
+      var modelSelect=document.getElementById('vid-model');
+      if(mode==='t2v'){
+        t2v.style.background='';t2v.style.color='';t2v.style.border='';
+        i2v.style.background='rgba(11,13,23,0.6)';i2v.style.border='1px solid rgba(123,92,255,0.15)';i2v.style.color='var(--t3)';
+        upload.style.display='none';
+        modelSelect.innerHTML='<option value="wan2.7-t2v">NyXia 2.7</option><option value="wan2.6-t2v">NyXia 2.6</option><option value="wan2.5-t2v-preview">NyXia 2.5</option>';
+      }else{
+        i2v.style.background='';i2v.style.color='';i2v.style.border='';
+        t2v.style.background='rgba(11,13,23,0.6)';t2v.style.border='1px solid rgba(123,92,255,0.15)';t2v.style.color='var(--t3)';
+        upload.style.display='block';
+        modelSelect.innerHTML='<option value="wan2.6-i2v-flash">NyXia I2V Flash</option>';
+      }
+    }
+
+    function handleVidImgUpload(e){
+      var file=e.target.files[0];if(!file)return;
+      var reader=new FileReader();
+      reader.onload=function(ev){
+        vidImgBase64=ev.target.result;
+        document.getElementById('vid-i2v-thumb').src=vidImgBase64;
+        document.getElementById('vid-i2v-preview').style.display='block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearVidImg(){
+      vidImgBase64=null;
+      document.getElementById('vid-i2v-preview').style.display='none';
+      document.getElementById('vid-img-upload').value='';
+    }
     function setVideoFormat(btn,fmt){
       videoFormat=fmt;
       document.querySelectorAll('.vid-format').forEach(function(b){b.style.background='transparent';b.style.color='var(--t3)';b.classList.remove('active');});
@@ -1978,6 +2031,7 @@
     function genWanVideo(){
       var prompt=document.getElementById('vid-prompt').value.trim();
       if(!prompt){showToast('Decris ta scene');return}
+      if(vidMode==='i2v'&&!vidImgBase64){showToast('Ajoute une image pour le mode Image vers Video');return}
       var model=document.getElementById('vid-model').value;
       var res=document.getElementById('vid-res').value;
       var dur=document.getElementById('vid-dur').value;
@@ -1988,7 +2042,9 @@
       result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0 30px"><div class="creation-spinner" style="position:relative;width:80px;height:80px"></div><div id="vid-progress-pct" style="margin-top:16px;font-size:22px;font-weight:700;color:var(--p3)">0%</div><div style="margin-top:8px;font-size:13px;color:var(--t3)">NyXia AI genere ta video...</div></div>';
       var vidPct=0;var vidPctInt=setInterval(function(){vidPct=Math.min(vidPct+Math.random()*8,85);var el=document.getElementById('vid-progress-pct');if(el)el.textContent=Math.round(vidPct)+'%';},2000);
       var token=sessionStorage.getItem('nyxia_z_token')||'';
-      fetch('/api/wan/video',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({prompt:prompt,model:model,size:size,duration:parseInt(dur),mode:'t2v'})}).then(function(r){return r.json()}).then(function(data){
+      var payload={prompt:prompt,model:model,size:size,duration:parseInt(dur),mode:vidMode};
+      if(vidMode==='i2v'&&vidImgBase64){payload.img_url=vidImgBase64;}
+      fetch('/api/wan/video',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify(payload)}).then(function(r){return r.json()}).then(function(data){
         btn.disabled=false;btn.innerHTML='&#x1F3AC; Generer';
         if(!data.success){showToast(data.error||'Erreur');result.classList.remove('visible');clearInterval(vidPctInt);return;}
         showToast('Tache soumise! La generation prend 1-5 min.');
