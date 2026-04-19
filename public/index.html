@@ -928,6 +928,8 @@
     var _currentAttach = null;
     var _lastTtsUtterance = null;
     var _activeTtsBtn = null;
+    var _activeTtsAudio = null;
+    var _activeTtsAudio = null;
 
     function formatBotText(text) {
       return esc(text).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
@@ -1150,7 +1152,7 @@
     function toolTts(btn) {
       // Si deja en lecture, arreter
       if (_activeTtsBtn === btn) {
-        speechSynthesis.cancel();
+        if (_activeTtsAudio) { _activeTtsAudio.pause(); _activeTtsAudio = null; }
         _activeTtsBtn.classList.remove('tts-active');
         _activeTtsBtn.innerHTML = '&#x1F50A; Ecouter';
         _activeTtsBtn = null;
@@ -1158,89 +1160,62 @@
       }
       // Arreter la precedente
       if (_activeTtsBtn) {
-        speechSynthesis.cancel();
+        if (_activeTtsAudio) { _activeTtsAudio.pause(); _activeTtsAudio = null; }
         _activeTtsBtn.classList.remove('tts-active');
         _activeTtsBtn.innerHTML = '&#x1F50A; Ecouter';
       }
 
       var bubble = btn.closest('.msg').querySelector('.msg-bubble');
       var raw = bubble.getAttribute('data-raw') || bubble.textContent;
-      // Nettoyer le markdown
-      var clean = raw.replace(/\*\*/g,'').replace(/\n/g,'. ');
 
-      var utterance = new SpeechSynthesisUtterance(clean);
-      utterance.lang = 'fr-FR';
-      utterance.rate = 1.0;
-      utterance.pitch = 1.05;
-      // Voix francaise : prioriser les voix naturelles feminines
-      if (!_cachedVoices.length) _loadVoices();
-      if (_nyxiaVoice) utterance.voice = _nyxiaVoice;
-
+      // Bouton en chargement
       _activeTtsBtn = btn;
       btn.classList.add('tts-active');
-      btn.innerHTML = '&#x23F9; Arreter';
+      btn.innerHTML = '&#x23F3;';
 
-      utterance.onend = function() {
+      // Appel API TTS — DeniseNeural (Edge TTS gratuit)
+      fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: raw })
+      })
+      .then(function(res) {
+        if (!res.ok) throw new Error('Erreur TTS');
+        return res.blob();
+      })
+      .then(function(blob) {
+        var audio = new Audio(URL.createObjectURL(blob));
+        _activeTtsAudio = audio;
+        btn.innerHTML = '&#x23F9; Arreter';
+
+        audio.onended = function() {
+          btn.classList.remove('tts-active');
+          btn.innerHTML = '&#x1F50A; Ecouter';
+          _activeTtsBtn = null;
+          _activeTtsAudio = null;
+          URL.revokeObjectURL(audio.src);
+        };
+        audio.onerror = function() {
+          btn.classList.remove('tts-active');
+          btn.innerHTML = '&#x1F50A; Ecouter';
+          _activeTtsBtn = null;
+          _activeTtsAudio = null;
+          showToast('Erreur de lecture audio');
+        };
+        audio.play();
+      })
+      .catch(function() {
         btn.classList.remove('tts-active');
         btn.innerHTML = '&#x1F50A; Ecouter';
         _activeTtsBtn = null;
-      };
-
-      speechSynthesis.speak(utterance);
+        showToast('Erreur de synthese vocale');
+      });
     }
 
-    // Precharger les voix et garder une reference
-    var _cachedVoices = [];
-    function _loadVoices() {
-      _cachedVoices = speechSynthesis.getVoices();
-      _nyxiaVoice = _getBestFrenchVoice(_cachedVoices);
-    }
-    var _nyxiaVoice = null;
-    function _getBestFrenchVoice(voices) {
-      // On utilise TOUTES les voix (locales + Google/network)
-      // Les voix Google sont prioritaires car plus naturelles et jeunes
-
-      // Priorite 1 : Voix Google francaises (Chrome/Edge) — naturelles, jeunes, fiables
-      var googleNames = ['Google français','Google fr','Google français (France)'];
-      for (var i = 0; i < googleNames.length; i++) {
-        var v = voices.find(function(voice){ return voice.name === googleNames[i]; });
-        if (v) return v;
-      }
-
-      // Priorite 2 : Toute voix Google fr (variantes selon navigateur/OS)
-      var anyGoogle = voices.find(function(v){ return v.name && v.name.indexOf('Google') !== -1 && v.lang && v.lang.startsWith('fr'); });
-      if (anyGoogle) return anyGoogle;
-
-      // Priorite 3 : Voix Microsoft feminines (Windows 10/11)
-      var msNames = ['Microsoft Pauline Online (Natural) - French (France)','Microsoft Pauline','Microsoft Virginie','Microsoft Hortense'];
-      for (var i = 0; i < msNames.length; i++) {
-        var v = voices.find(function(voice){ return voice.name === msNames[i]; });
-        if (v) return v;
-      }
-
-      // Priorite 4 : Voix macOS feminines
-      var macNames = ['Amélie','Denise','Fiona','Virginie'];
-      for (var i = 0; i < macNames.length; i++) {
-        var v = voices.find(function(voice){ return voice.name === macNames[i]; });
-        if (v) return v;
-      }
-
-      // Priorite 5 : Toute voix fr-FR avec "female" ou "femme" dans le nom
-      var femaleFr = voices.find(function(v){ return v.lang === 'fr-FR' && /female|femme|woman/i.test(v.name); });
-      if (femaleFr) return femaleFr;
-
-      // Priorite 6 : Toute voix fr-FR locale
-      var exactFr = voices.find(function(v){ return v.lang === 'fr-FR'; });
-      if (exactFr) return exactFr;
-
-      // Priorite 7 : Toute voix fr-
-      var anyFr = voices.find(function(v){ return v.lang && v.lang.startsWith('fr'); });
-      return anyFr || null;
-    }
-    _loadVoices();
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = _loadVoices;
-    }
+    // ─────────────────────────────────────────
+    // VOIX : DeniseNeural via Edge TTS (API)
+    // Plus de dependance au navigateur — voix identique partout
+    // ─────────────────────────────────────────
 
     /* FILE ATTACHMENTS */
     function formatSize(bytes) {
