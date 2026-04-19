@@ -883,7 +883,6 @@
     })();
 
     function doLogout() {
-      if (_nxTtsWs) { try { _nxTtsWs.close(); } catch(e){} _nxTtsWs = null; }
       if (_activeTtsAudio) { _activeTtsAudio.pause(); _activeTtsAudio = null; }
       sessionStorage.removeItem('nyxia_z_token');
       window.location.href = '/login.html';
@@ -1150,23 +1149,18 @@
       setTimeout(function(){ w.print(); }, 500);
     }
 
-    /* ═══════ EDGE TTS CLIENT-SIDE (DeniseNeural) ═══════ */
-    var _nxTtsWs = null;
+    /* ═══════ TTS — Céline (Amazon Polly via StreamElements) ═══════ */
 
     function toolTts(btn) {
-      // Si deja en lecture, arreter
       if (_activeTtsBtn === btn) {
         if (_activeTtsAudio) { _activeTtsAudio.pause(); _activeTtsAudio = null; }
-        if (_nxTtsWs) { try { _nxTtsWs.close(); } catch(e){} _nxTtsWs = null; }
         _activeTtsBtn.classList.remove('tts-active');
         _activeTtsBtn.innerHTML = '&#x1F50A; Ecouter';
         _activeTtsBtn = null;
         return;
       }
-      // Arreter la precedente
       if (_activeTtsBtn) {
         if (_activeTtsAudio) { _activeTtsAudio.pause(); _activeTtsAudio = null; }
-        if (_nxTtsWs) { try { _nxTtsWs.close(); } catch(e){} _nxTtsWs = null; }
         _activeTtsBtn.classList.remove('tts-active');
         _activeTtsBtn.innerHTML = '&#x1F50A; Ecouter';
       }
@@ -1178,88 +1172,41 @@
       btn.classList.add('tts-active');
       btn.innerHTML = '&#x23F3;';
 
-      // Nettoyer le texte
-      var clean = raw
-        .replace(/\*\*/g, '').replace(/#{1,6}\s/g, '')
-        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-        .replace(/```[\s\S]*?```/g, '').replace(/`([^`]*)`/g, '$1')
-        .replace(/\n{2,}/g, '. ').replace(/\n/g, '. ')
-        .replace(/\s{2,}/g, ' ').trim();
-
-      if (clean.length > 5000) clean = clean.substring(0, 5000);
-
-      // WebSocket direct vers Edge TTS
-      var connId = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/x/g, function() { return Math.floor(Math.random()*16).toString(16); });
-      var wsUrl = 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=' + connId;
-
-      var audioChunks = [];
-      var timeoutId = setTimeout(function() {
-        if (_nxTtsWs) { try { _nxTtsWs.close(); } catch(e){} _nxTtsWs = null; }
-        resetTtsBtn(btn, 'Erreur de synthese vocale');
-      }, 15000);
-
-      try {
-        var ws = new WebSocket(wsUrl);
-        ws.binaryType = 'arraybuffer';
-        _nxTtsWs = ws;
-
-        ws.onopen = function() {
-          // Config
-          ws.send("Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n{\"context\":{\"synthesis\":{\"audio\":{\"metadataoptions\":{\"sentenceBoundaryEnabled\":\"false\",\"wordBoundaryEnabled\":\"true\"},\"outputFormat\":\"audio-24khz-48kbitrate-mono-mp3\"}}}}\r\n");
-          // SSML
-          var ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='fr-FR'><voice name='fr-FR-DeniseNeural'><prosody pitch='+0Hz' rate='+20%' volume='+0%'>" + clean.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + "</prosody></voice></speak>";
-          ws.send("X-RequestId:" + connId + "\r\nContent-Type:application/ssml+xml\r\nPath:ssml\r\n\r\n" + ssml + "\r\n");
+      fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: raw })
+      })
+      .then(function(res) {
+        if (!res.ok) throw new Error('Erreur TTS');
+        return res.blob();
+      })
+      .then(function(blob) {
+        var audio = new Audio(URL.createObjectURL(blob));
+        _activeTtsAudio = audio;
+        btn.innerHTML = '&#x23F9; Arreter';
+        audio.onended = function() {
+          btn.classList.remove('tts-active');
+          btn.innerHTML = '&#x1F50A; Ecouter';
+          _activeTtsBtn = null;
+          _activeTtsAudio = null;
+          URL.revokeObjectURL(audio.src);
         };
-
-        ws.onmessage = function(event) {
-          if (typeof event.data === 'string') {
-            if (event.data.indexOf('Path:turn.end') !== -1) {
-              clearTimeout(timeoutId);
-              ws.close();
-              _nxTtsWs = null;
-              if (audioChunks.length === 0) { resetTtsBtn(btn); return; }
-              var total = 0;
-              for (var i = 0; i < audioChunks.length; i++) total += audioChunks[i].length;
-              var combined = new Uint8Array(total);
-              var offset = 0;
-              for (var i = 0; i < audioChunks.length; i++) { combined.set(audioChunks[i], offset); offset += audioChunks[i].length; }
-              var blob = new Blob([combined], { type: 'audio/mpeg' });
-              var audio = new Audio(URL.createObjectURL(blob));
-              _activeTtsAudio = audio;
-              btn.innerHTML = '&#x23F9; Arreter';
-              audio.onended = function() { resetTtsBtn(btn); URL.revokeObjectURL(audio.src); };
-              audio.onerror = function() { resetTtsBtn(btn, 'Erreur de lecture audio'); };
-              audio.play();
-            }
-          } else if (event.data instanceof ArrayBuffer) {
-            if (event.data.byteLength > 2) {
-              audioChunks.push(new Uint8Array(event.data, 2));
-            }
-          }
+        audio.onerror = function() {
+          btn.classList.remove('tts-active');
+          btn.innerHTML = '&#x1F50A; Ecouter';
+          _activeTtsBtn = null;
+          _activeTtsAudio = null;
+          showToast('Erreur de lecture audio');
         };
-
-        ws.onerror = function() {
-          clearTimeout(timeoutId);
-          _nxTtsWs = null;
-          resetTtsBtn(btn, 'Erreur de synthese vocale');
-        };
-
-        ws.onclose = function() {
-          clearTimeout(timeoutId);
-          _nxTtsWs = null;
-        };
-      } catch(e) {
-        clearTimeout(timeoutId);
-        resetTtsBtn(btn, 'Erreur de synthese vocale');
-      }
-    }
-
-    function resetTtsBtn(btn, toastMsg) {
-      btn.classList.remove('tts-active');
-      btn.innerHTML = '&#x1F50A; Ecouter';
-      _activeTtsBtn = null;
-      _activeTtsAudio = null;
-      if (toastMsg) showToast(toastMsg);
+        audio.play();
+      })
+      .catch(function() {
+        btn.classList.remove('tts-active');
+        btn.innerHTML = '&#x1F50A; Ecouter';
+        _activeTtsBtn = null;
+        showToast('Erreur de synthese vocale');
+      });
     }
 
     /* FILE ATTACHMENTS */
