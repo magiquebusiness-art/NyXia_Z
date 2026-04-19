@@ -1455,68 +1455,64 @@
         }
         // Detection de generation d'image depuis le chat
         var imgMatch=reply.match(/\[NYXIA_IMAGE:\s*([\s\S]+?)\]/);
+        console.log('[NYXIA-CHAT] Reply length:', reply.length, 'Image match:', !!imgMatch, 'Contains NYXIA_IMAGE:', reply.indexOf('[NYXIA_IMAGE:')>=0);
         if(imgMatch){
+          console.log('[NYXIA-CHAT] Image detectee dans la reponse, prompt:', imgMatch[1].substring(0,80)+'...');
           var imgPrompt=imgMatch[1].trim();
           var replyClean=reply.replace(/\[NYXIA_IMAGE:\s*[\s\S]+?\]/,'').trim();
-          var botDiv=addBotMsg(replyClean);
-          // Message loading dans le chat
+          // Afficher le texte de NyXia (sans le tag)
+          addBotMsg(replyClean);
+          // Afficher un loader
           var loadDiv=document.createElement('div');
           loadDiv.className='msg bot';
           loadDiv.id='chat-img-loading';
           loadDiv.innerHTML='<img src="/Logo.png" class="msg-avatar" alt="Z"><div><div class="msg-bubble" style="display:flex;align-items:center;gap:10px;padding:16px 20px"><div class="creation-spinner" style="width:28px;height:28px;border-width:2px;flex-shrink:0"></div><span style="color:var(--t3);font-size:13px">Je genere ton image ma belle...</span></div></div>';
-          document.getElementById('chat-messages').appendChild(loadDiv);
-          document.getElementById('chat-messages').scrollTop=document.getElementById('chat-messages').scrollHeight;
-          // Appel API image
+          var msgs=document.getElementById('chat-messages');
+          msgs.appendChild(loadDiv);
+          msgs.scrollTop=msgs.scrollHeight;
+          // Appel API image WAN
           var token2=sessionStorage.getItem('nyxia_z_token')||'';
           fetch('/api/wan/image',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token2},body:JSON.stringify({prompt:imgPrompt,model:'wan2.7-image-pro',size:'2K',n:1})})
           .then(function(r){return r.json()})
           .then(function(imgData){
+            console.log('[NYXIA-CHAT] Reponse API image:', JSON.stringify(imgData).substring(0,200));
             var loader=document.getElementById('chat-img-loading');
             if(loader) loader.remove();
             if(!imgData.success){
-              var errDiv=addBotMsg('Oups, erreur de generation: '+(imgData.error||'reesaie 💜'));
+              addBotMsg('Oups, erreur de generation: '+(imgData.error||'reesaie 💜'));
               chatHistory.push({role:'assistant',content:'[IMAGE_ERROR]'});
+              if(chatHistory.length>30) chatHistory=chatHistory.slice(-30);
               btn.disabled=false;
               return;
             }
             var imgUrls=imgData.images||[];
             if(imgUrls.length){
               var imgsHtml='<div class="msg-img-wrap" style="max-width:360px">';
-              imgUrls.forEach(function(url){
-                imgsHtml+='<img src="'+esc(url)+'" alt="Image IA" style="cursor:pointer" onclick="window.open(this.src,\'_blank\')">';
-              });
-              imgsHtml+='<div style="padding:8px 12px;display:flex;gap:6px;flex-wrap:wrap">';
-              imgsHtml+='<a href="'+esc(imgUrls[0])+'" download="nyxia-image-'+Date.now()+'.png" target="_blank" class="creation-btn-sm accent" style="text-decoration:none;font-size:11px;padding:4px 12px;border-radius:50px;background:linear-gradient(135deg,var(--p),var(--p2));border:none;color:#fff;cursor:pointer;font-weight:600">⬇ Telecharger</a>';
-              imgsHtml+='</div></div>';
-              var imgMsgDiv=addBotMsg('',imgsHtml);
-              // Mettre le texte au-dessus de l'image
-              var bubble=imgMsgDiv.querySelector('.msg-bubble');
-              if(bubble) bubble.remove();
-              var imgWrap=imgMsgDiv.querySelector('div');
-              if(replyClean&&imgWrap){
-                var txtDiv=document.createElement('div');
-                txtDiv.className='msg-bubble';
-                txtDiv.setAttribute('data-raw',replyClean.replace(/"/g,'&quot;'));
-                txtDiv.innerHTML=formatBotText(replyClean);
-                imgWrap.parentNode.insertBefore(txtDiv,imgWrap);
+              for(var ii=0;ii<imgUrls.length;ii++){
+                imgsHtml+='<img src="'+esc(imgUrls[ii])+'" alt="Image IA" style="cursor:pointer" onclick="window.open(this.src,\'_blank\')">';
               }
+              imgsHtml+='<div style="padding:8px 12px;display:flex;gap:6px;flex-wrap:wrap">';
+              imgsHtml+='<a href="'+esc(imgUrls[0])+'" download="nyxia-image-'+Date.now()+'.png" target="_blank" style="text-decoration:none;font-size:11px;padding:4px 12px;border-radius:50px;background:linear-gradient(135deg,var(--p),var(--p2));border:none;color:#fff;cursor:pointer;font-weight:600">⬇ Telecharger</a>';
+              imgsHtml+='</div></div>';
+              addBotMsg(imgsHtml);
             }
             chatHistory.push({role:'assistant',content:replyClean+' [IMAGE_GENEREE: '+imgPrompt.substring(0,50)+']'});
             if(chatHistory.length>30) chatHistory=chatHistory.slice(-30);
             btn.disabled=false;
           })
-          .catch(function(){
+          .catch(function(err){
+            console.error('[NYXIA-CHAT] Erreur generation image:', err);
             var loader=document.getElementById('chat-img-loading');
             if(loader) loader.remove();
             addBotMsg('Erreur de connexion pour l\'image... reessaie 💜');
             btn.disabled=false;
           });
-          return;
+        } else {
+          addBotMsg(reply);
+          chatHistory.push({role:'assistant',content:reply});
+          if(chatHistory.length>30) chatHistory=chatHistory.slice(-30);
+          btn.disabled=false;
         }
-        addBotMsg(reply);
-        chatHistory.push({role:'assistant',content:reply});
-        if(chatHistory.length>30) chatHistory=chatHistory.slice(-30);
-        btn.disabled=false;
       })
       .catch(function(){
         removeTyping();
