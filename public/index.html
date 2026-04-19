@@ -1928,7 +1928,8 @@
         currentImgUrls=data.images||[];
         var width=currentImgUrls.length===1?'100%':'49.5%';
         result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta"><span class="creation-badge">NyXia AI</span><span>'+escHtml(prompt).substring(0,50)+'</span></div><div class="creation-result-actions"><button class="creation-btn-sm" onclick="genWanImage()">&#x1F504;</button><button class="creation-btn-sm accent" onclick="dlCurrentImages()">&#x2B07; Telecharger</button></div></div><div class="creation-result-imgs">'+currentImgUrls.map(function(url){return '<img src="'+url+'" alt="Image IA" onclick="window.open(this.src,\'_blank\')">';}).join('')+'</div></div>';
-
+        result.classList.add('visible');
+        result.scrollIntoView({behavior:'smooth',block:'nearest'});
         imgHistory.unshift({prompt:prompt,images:currentImgUrls,model:model,size:size});
         if(imgHistory.length>30)imgHistory=imgHistory.slice(0,30);
         try{localStorage.setItem('nyxia_z_img_history',JSON.stringify(imgHistory));}catch(e){}
@@ -1954,7 +1955,7 @@
       var width=currentImgUrls.length===1?'100%':'49.5%';
       result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta"><span class="creation-badge">NyXia AI</span><span>'+escHtml(item.prompt).substring(0,50)+'</span></div><div class="creation-result-actions"><button class="creation-btn-sm accent" onclick="dlCurrentImages()">&#x2B07; Telecharger</button></div></div><div class="creation-result-imgs">'+currentImgUrls.map(function(url){return '<img src="'+url+'" alt="Image IA" onclick="window.open(this.src,\'_blank\')">';}).join('')+'</div></div>';
       result.classList.add('visible');
-
+      result.scrollIntoView({behavior:'smooth',block:'nearest'});
     }
     function clearImgHistory(){if(!imgHistory.length)return;if(confirm('Effacer l\'historique des images?')){imgHistory=[];localStorage.removeItem('nyxia_z_img_history');renderImgHistory();}}
 
