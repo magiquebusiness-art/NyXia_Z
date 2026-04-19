@@ -1916,16 +1916,18 @@
       var size=document.getElementById('img-size').value;
       var count=parseInt(document.getElementById('img-count').value);
       var btn=document.getElementById('btn-img-gen');btn.disabled=true;btn.innerHTML='<span class="creation-spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></span>Generation...';
-      document.getElementById('img-result').classList.remove('visible');
+      var result=document.getElementById('img-result');
+      result.classList.add('visible');
+      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 0"><div class="creation-spinner"></div><div class="creation-progress-pct" id="img-progress-pct" style="font-size:14px;color:var(--t3);margin-top:10px">0%</div></div>';
+      var imgPct=0;var imgPctInt=setInterval(function(){imgPct=Math.min(imgPct+Math.random()*15,90);var el=document.getElementById('img-progress-pct');if(el)el.textContent=Math.round(imgPct)+'%';},800);
       var token=sessionStorage.getItem('nyxia_z_token')||'';
       fetch('/api/wan/image',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({prompt:prompt,model:model,size:size,n:count})}).then(function(r){return r.json()}).then(function(data){
+        clearInterval(imgPctInt);
         btn.disabled=false;btn.innerHTML='&#x1F5BC; Generer';
-        if(!data.success){showToast(data.error||'Erreur');return;}
+        if(!data.success){showToast(data.error||'Erreur');result.classList.remove('visible');return;}
         currentImgUrls=data.images||[];
-        var result=document.getElementById('img-result');
         var width=currentImgUrls.length===1?'100%':'49.5%';
         result.innerHTML='<div class="creation-result-card"><div class="creation-result-bar"><div class="creation-result-meta"><span class="creation-badge">NyXia AI</span><span>'+escHtml(prompt).substring(0,50)+'</span></div><div class="creation-result-actions"><button class="creation-btn-sm" onclick="genWanImage()">&#x1F504;</button><button class="creation-btn-sm accent" onclick="dlCurrentImages()">&#x2B07; Telecharger</button></div></div><div class="creation-result-imgs">'+currentImgUrls.map(function(url){return '<img src="'+url+'" alt="Image IA" onclick="window.open(this.src,\'_blank\')">';}).join('')+'</div></div>';
-        result.classList.add('visible');
 
         imgHistory.unshift({prompt:prompt,images:currentImgUrls,model:model,size:size});
         if(imgHistory.length>30)imgHistory=imgHistory.slice(0,30);
@@ -1980,40 +1982,50 @@
       var dur=document.getElementById('vid-dur').value;
       var size=getVideoSize(videoFormat,res);
       var btn=document.getElementById('btn-vid-gen');btn.disabled=true;btn.innerHTML='<span class="creation-spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></span>Envoi...';
-      document.getElementById('vid-result').classList.remove('visible');
+      var result=document.getElementById('vid-result');
+      result.classList.add('visible');
+      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 0"><div class="creation-spinner"></div><div class="creation-progress-pct" id="vid-progress-pct" style="font-size:14px;color:var(--t3);margin-top:10px">0%</div></div>';
+      var vidPct=0;var vidPctInt=setInterval(function(){vidPct=Math.min(vidPct+Math.random()*8,85);var el=document.getElementById('vid-progress-pct');if(el)el.textContent=Math.round(vidPct)+'%';},2000);
       var token=sessionStorage.getItem('nyxia_z_token')||'';
       fetch('/api/wan/video',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({prompt:prompt,model:model,size:size,duration:parseInt(dur),mode:'t2v'})}).then(function(r){return r.json()}).then(function(data){
         btn.disabled=false;btn.innerHTML='&#x1F3AC; Generer';
-        if(!data.success){showToast(data.error||'Erreur');return;}
+        if(!data.success){showToast(data.error||'Erreur');result.classList.remove('visible');clearInterval(vidPctInt);return;}
         showToast('Tache soumise! La generation prend 1-5 min.');
         vidHistory.unshift({id:data.taskId,prompt:prompt,model:model,status:'pending',date:new Date().toISOString(),videoUrl:null});
         if(vidHistory.length>30)vidHistory=vidHistory.slice(0,30);
         try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
         renderVidHistory();
-        pollVidTask(data.taskId);
+        pollVidTask(data.taskId,vidPctInt);
       }).catch(function(){btn.disabled=false;btn.innerHTML='&#x1F3AC; Generer';showToast('Erreur de connexion');});
     }
 
-    function pollVidTask(taskId){
+    function pollVidTask(taskId,pctInt){
       if(vidPollIntervals[taskId])return;
       vidPollIntervals[taskId]=setInterval(function(){
         var token=sessionStorage.getItem('nyxia_z_token')||'';
         fetch('/api/wan/video-status',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({taskId:taskId})}).then(function(r){return r.json()}).then(function(data){
           if(!data.success)return;
           var idx=vidHistory.findIndex(function(v){return v.id===taskId;});
-          if(idx===-1){clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];return;}
+          if(idx===-1){clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];if(pctInt)clearInterval(pctInt);return;}
           if(data.status==='SUCCEEDED'&&data.videoUrl){
-            vidHistory[idx].status='done';
-            vidHistory[idx].videoUrl=data.videoUrl;
-            showToast('Video generee avec succes!');
-            clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
+            if(pctInt)clearInterval(pctInt);
+            var pctEl=document.getElementById('vid-progress-pct');if(pctEl)pctEl.textContent='100%';
+            setTimeout(function(){
+              vidHistory[idx].status='done';
+              vidHistory[idx].videoUrl=data.videoUrl;
+              showToast('Video generee avec succes!');
+              clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
+              try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
+              renderVidHistory();
+            },500);
           }else if(data.status==='FAILED'){
+            if(pctInt)clearInterval(pctInt);
             vidHistory[idx].status='failed';
             showToast('Echec de la generation video');
             clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
+            try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
+            renderVidHistory();
           }
-          try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
-          renderVidHistory();
         }).catch(function(){});
       },8000);
     }
