@@ -10,7 +10,7 @@ export async function onRequestPost(context) {
     const body = await request.json();
     const prompt = body.prompt || '';
     const model = body.model || 'wan2.6-t2v';
-    const size = body.size || '1280*720';
+    let size = body.size || '1280*720';
     const duration = body.duration || 5;
     const format = body.format || '16:9';
     const mode = body.mode || 't2v';
