@@ -17,8 +17,8 @@ export async function onRequestPost(context) {
 
     if (!prompt) return new Response(JSON.stringify({ success: false, error: 'Prompt requis.' }), { headers: { 'Content-Type': 'application/json' } });
 
-    const DASHSCOPE_KEY = env.DASHSCOPE_KEY || '';
-    if (!DASHSCOPE_KEY) return new Response(JSON.stringify({ success: false, error: 'Cle API non configuree.' }), { headers: { 'Content-Type': 'application/json' } });
+    const WAN_KEY = env.WAN_KEY || '';
+    if (!WAN_KEY) return new Response(JSON.stringify({ success: false, error: 'Cle API non configuree.' }), { headers: { 'Content-Type': 'application/json' } });
 
     // Construire le payload selon le mode (T2V ou I2V)
     var payload;
@@ -58,7 +58,7 @@ export async function onRequestPost(context) {
     var apiResponse = await fetch('https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + DASHSCOPE_KEY,
+        'Authorization': 'Bearer ' + WAN_KEY,
         'Content-Type': 'application/json',
         'X-DashScope-Async': 'enable'
       },
