@@ -1,7 +1,7 @@
 /**
  * NYXIA Z — WAN VIDEO via DashScope
  * Route: POST /api/wan-video
- * Attend: { prompt, model, resolution, duration, mode, image_base64 }
+ * Attend: { prompt, model, resolution, duration, format, mode, image_base64 }
  */
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -11,6 +11,7 @@ export async function onRequestPost(context) {
     const model = body.model || 'wan2.6-t2v';
     const resolution = body.resolution || '720p';
     const duration = body.duration || 5;
+    const format = body.format || '16:9';
     const mode = body.mode || 't2v';
     const imageBase64 = body.image_base64 || null;
 
@@ -19,10 +20,18 @@ export async function onRequestPost(context) {
     const WAN_KEY = env.WAN_KEY || '';
     if (!WAN_KEY) return new Response(JSON.stringify({ success: false, error: 'Cle API non configuree.' }), { headers: { 'Content-Type': 'application/json' } });
 
-    // Convertir resolution (720p/1080p/480p) en format DashScope
-    var sizeMap = { '480p': '856*480', '720p': '1280*720', '1080p': '1920*1080' };
+    // Convertir resolution + format en dimensions DashScope
+    var isVertical = (format === '9:16');
+    var sizeMap, resMap;
+    if (isVertical) {
+      // Format 9:16 (portrait)
+      sizeMap = { '480p': '480*856', '720p': '720*1280', '1080p': '1080*1920' };
+    } else {
+      // Format 16:9 (paysage)
+      sizeMap = { '480p': '856*480', '720p': '1280*720', '1080p': '1920*1080' };
+    }
     var size = sizeMap[resolution] || '1280*720';
-    var resMap = { '480p': '480P', '720p': '720P', '1080p': '1080P' };
+    resMap = { '480p': '480P', '720p': '720P', '1080p': '1080P' };
 
     var payload;
     if (mode === 'i2v' && imageBase64) {
@@ -39,7 +48,7 @@ export async function onRequestPost(context) {
       };
     }
 
-    console.log('[WAN-VIDEO] Soumission:', model, mode, resolution, duration);
+    console.log('[WAN-VIDEO] Soumission:', model, mode, resolution, format, 'size:', size, 'duration:', duration);
 
     var apiResponse = await fetch('https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis', {
       method: 'POST',

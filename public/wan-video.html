@@ -738,6 +738,13 @@
           </select>
         </div>
         <div class="option-group">
+          <span class="option-label">Format</span>
+          <select class="option-select" id="opt-format">
+            <option value="16:9">16:9 (paysage)</option>
+            <option value="9:16">9:16 (portrait)</option>
+          </select>
+        </div>
+        <div class="option-group">
           <span class="option-label">Résolution</span>
           <select class="option-select" id="opt-resolution">
             <option value="720p">720p</option>
@@ -750,6 +757,9 @@
           <select class="option-select" id="opt-duration">
             <option value="5">5 secondes</option>
             <option value="10">10 secondes</option>
+            <option value="15">15 secondes</option>
+            <option value="20">20 secondes</option>
+            <option value="30">30 secondes</option>
           </select>
         </div>
       </div>
@@ -985,6 +995,7 @@
       var model      = document.getElementById('opt-model').value
       var resolution = document.getElementById('opt-resolution').value
       var duration   = document.getElementById('opt-duration').value
+      var format     = document.getElementById('opt-format').value
 
       setLoading(true)
       updateProgress(0, 1)
@@ -994,6 +1005,7 @@
         model: model,
         resolution: resolution,
         duration: parseInt(duration),
+        format: format,
         mode: currentTab
       }
 

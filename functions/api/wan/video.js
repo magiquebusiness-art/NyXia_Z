@@ -12,6 +12,7 @@ export async function onRequestPost(context) {
     const model = body.model || 'wan2.6-t2v';
     const size = body.size || '1280*720';
     const duration = body.duration || 5;
+    const format = body.format || '16:9';
     const mode = body.mode || 't2v';
     const img_url = body.img_url || null;
 
@@ -19,6 +20,14 @@ export async function onRequestPost(context) {
 
     const WAN_KEY = env.WAN_KEY || '';
     if (!WAN_KEY) return new Response(JSON.stringify({ success: false, error: 'Cle API non configuree.' }), { headers: { 'Content-Type': 'application/json' } });
+
+    // Convertir format en dimensions si necessaire
+    var isVertical = (format === '9:16');
+    if (isVertical) {
+      // Retourner les dimensions pour format vertical
+      var sizeMap = { '1280*720': '720*1280', '1920*1080': '1080*1920', '856*480': '480*856' };
+      size = sizeMap[size] || size;
+    }
 
     // Construire le payload selon le mode (T2V ou I2V)
     var payload;

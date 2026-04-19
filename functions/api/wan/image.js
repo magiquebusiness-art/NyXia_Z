@@ -12,11 +12,27 @@ export async function onRequestPost(context) {
     const model = body.model || 'wan2.7-image-pro';
     const size = body.size || '2K';
     const n = Math.min(body.n || 1, 4);
+    const format = body.format || '1:1';
 
     if (!prompt) return new Response(JSON.stringify({ success: false, error: 'Prompt requis.' }), { headers: { 'Content-Type': 'application/json' } });
 
     const WAN_KEY = env.WAN_KEY || '';
     if (!WAN_KEY) return new Response(JSON.stringify({ success: false, error: 'Cle API non configuree.' }), { headers: { 'Content-Type': 'application/json' } });
+
+    // Mapper format + taille en dimensions DashScope
+    var actualSize = size;
+    if (format && format !== '1:1') {
+      var sizeFormatMap = {
+        '1:1':  { '1K': '1024*1024', '2K': '2048*2048', '4K': '4096*4096' },
+        '4:5':  { '1K': '816*1024',  '2K': '1536*1920', '4K': '3072*3840' },
+        '9:16': { '1K': '576*1024',  '2K': '1080*1920', '4K': '2160*3840' },
+        '16:9': { '1K': '1024*576',  '2K': '1920*1080', '4K': '3840*2160' }
+      };
+      var fmtMap = sizeFormatMap[format];
+      if (fmtMap && fmtMap[size]) {
+        actualSize = fmtMap[size];
+      }
+    }
 
     // Payload DashScope pour image
     var payload = {
@@ -32,7 +48,7 @@ export async function onRequestPost(context) {
         ]
       },
       parameters: {
-        size: size,
+        size: actualSize,
         n: n,
         watermark: false
       }
@@ -43,7 +59,7 @@ export async function onRequestPost(context) {
       payload.parameters.thinking_mode = true;
     }
 
-    console.log('[WAN-IMAGE] Generation:', model, size, 'n:', n);
+    console.log('[WAN-IMAGE] Generation:', model, 'size:', actualSize, 'format:', format, 'n:', n);
 
     var apiResponse = await fetch('https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation', {
       method: 'POST',
