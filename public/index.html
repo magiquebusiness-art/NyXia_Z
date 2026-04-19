@@ -1933,8 +1933,10 @@
       var btn=document.getElementById('btn-img-gen');btn.disabled=true;btn.innerHTML='<span class="creation-spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></span>Generation...';
       var result=document.getElementById('img-result');
       result.classList.add('visible');
-      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0 30px"><div class="creation-spinner" style="position:relative;width:80px;height:80px"></div><div id="img-progress-pct" style="margin-top:16px;font-size:22px;font-weight:700;color:var(--p3)">0%</div><div style="margin-top:8px;font-size:13px;color:var(--t3)">NyXia AI genere ton image...</div></div>';
-      var imgPct=0;var imgPctInt=setInterval(function(){imgPct=Math.min(imgPct+Math.random()*12,90);var el=document.getElementById('img-progress-pct');if(el)el.textContent=Math.round(imgPct)+'%';},800);
+      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0 30px"><div class="creation-spinner" style="position:relative;width:80px;height:80px"></div><div id="img-progress-pct" style="margin-top:16px;font-size:22px;font-weight:700;color:var(--p3)">0%</div><div id="img-progress-step" style="margin-top:8px;font-size:13px;color:var(--t3)">NyXia AI genere ton image...</div></div>';
+      var imgPct=0;var imgSteps=['Envoi du prompt a NyXia AI...','Analyse et preparation de la scene...','Generation de l\'image...','Finalisation et render...'];
+      var imgStepIdx=0;
+      var imgPctInt=setInterval(function(){imgPct=Math.min(imgPct+Math.random()*12,90);var el=document.getElementById('img-progress-pct');if(el)el.textContent=Math.round(imgPct)+'%';if(imgPct>25&&imgStepIdx<1)imgStepIdx=1;if(imgPct>50&&imgStepIdx<2)imgStepIdx=2;if(imgPct>80&&imgStepIdx<3)imgStepIdx=3;var stepEl=document.getElementById('img-progress-step');if(stepEl)stepEl.textContent=imgSteps[imgStepIdx];},800);
       var token=sessionStorage.getItem('nyxia_z_token')||'';
       fetch('/api/wan/image',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({prompt:prompt,model:model,size:size,n:count})}).then(function(r){return r.json()}).then(function(data){
         clearInterval(imgPctInt);
@@ -2039,8 +2041,10 @@
       var btn=document.getElementById('btn-vid-gen');btn.disabled=true;btn.innerHTML='<span class="creation-spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></span>Envoi...';
       var result=document.getElementById('vid-result');
       result.classList.add('visible');
-      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0 30px"><div class="creation-spinner" style="position:relative;width:80px;height:80px"></div><div id="vid-progress-pct" style="margin-top:16px;font-size:22px;font-weight:700;color:var(--p3)">0%</div><div style="margin-top:8px;font-size:13px;color:var(--t3)">NyXia AI genere ta video...</div></div>';
-      var vidPct=0;var vidPctInt=setInterval(function(){vidPct=Math.min(vidPct+Math.random()*8,85);var el=document.getElementById('vid-progress-pct');if(el)el.textContent=Math.round(vidPct)+'%';},2000);
+      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0 30px"><div class="creation-spinner" style="position:relative;width:80px;height:80px"></div><div id="vid-progress-pct" style="margin-top:16px;font-size:22px;font-weight:700;color:var(--p3)">0%</div><div id="vid-progress-step" style="margin-top:8px;font-size:13px;color:var(--t3)">NyXia AI genere ta video...</div></div>';
+      var vidPct=0;var vidSteps=['Envoi du prompt a NyXia AI...','Analyse et preparation de la scene...','Generation des frames video...','Finalisation et encodage...'];
+      var vidStepIdx=0;
+      var vidPctInt=setInterval(function(){vidPct=Math.min(vidPct+Math.random()*8,85);var el=document.getElementById('vid-progress-pct');if(el)el.textContent=Math.round(vidPct)+'%';if(vidPct>25&&vidStepIdx<1)vidStepIdx=1;if(vidPct>50&&vidStepIdx<2)vidStepIdx=2;if(vidPct>75&&vidStepIdx<3)vidStepIdx=3;var stepEl=document.getElementById('vid-progress-step');if(stepEl)stepEl.textContent=vidSteps[vidStepIdx];},2000);
       var token=sessionStorage.getItem('nyxia_z_token')||'';
       var payload={prompt:prompt,model:model,size:size,duration:parseInt(dur),mode:vidMode};
       if(vidMode==='i2v'&&vidImgBase64){payload.img_url=vidImgBase64;}
