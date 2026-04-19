@@ -2092,7 +2092,18 @@
       grid.innerHTML=vidHistory.map(function(item){
         var isPending=item.status==='pending';
         var isDone=item.status==='done'&&item.videoUrl;
-        return '<div class="creation-hist-item" '+(isDone?'onclick="playVid(\''+item.videoUrl+'\')"':'')+'><div style="width:100%;height:120px;background:rgba(10,22,40,0.6);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--t4)">'+(isPending?'&#x23F3;':(isDone?'&#x25B6;':'&#x274C;'))+'</div><div class="creation-hist-info"><div class="creation-hist-query">'+escHtml(item.prompt)+'</div><div class="creation-hist-type">'+(isPending?'En cours...':(isDone?'&#x2705; Terminee':'Echouee'))+'</div></div></div>';
+        var isFailed=item.status==='failed';
+        var badgeHtml=isDone?'<div style="position:absolute;top:8px;right:8px;background:rgba(34,197,94,0.9);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;display:flex;align-items:center;gap:4px">&#x2705; Pret</div>':'';
+        var thumbHtml='';
+        if(isDone){
+          thumbHtml='<video src="'+item.videoUrl+'" muted preload="metadata" style="width:100%;height:120px;object-fit:cover;display:block" onloadeddata="this.currentTime=1"></video>';
+        }else if(isPending){
+          thumbHtml='<div style="width:100%;height:120px;background:rgba(10,22,40,0.6);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--t4)">&#x23F3;</div>';
+        }else{
+          thumbHtml='<div style="width:100%;height:120px;background:rgba(10,22,40,0.6);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--t4)">&#x274C;</div>';
+        }
+        var infoHtml='<div class="creation-hist-info"><div class="creation-hist-query">'+escHtml(item.prompt)+'</div><div class="creation-hist-type">'+(isPending?'&#x23F3; En cours...':(isDone?'&#x1F3AC; Terminee':(isFailed?'&#x274C; Echouee':'')))+'</div></div>';
+        return '<div class="creation-hist-item" style="position:relative" '+(isDone?'onclick="playVid(\''+item.videoUrl+'\')"':'')+'>'+badgeHtml+thumbHtml+infoHtml+'</div>';
       }).join('');
       vidHistory.forEach(function(item){
         if(item.status==='pending'&&!vidPollIntervals[item.id]){pollVidTask(item.id);}
