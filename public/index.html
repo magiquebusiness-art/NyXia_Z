@@ -1918,7 +1918,7 @@
       var btn=document.getElementById('btn-img-gen');btn.disabled=true;btn.innerHTML='<span class="creation-spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></span>Generation...';
       var result=document.getElementById('img-result');
       result.classList.add('visible');
-      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0 30px"><div class="creation-spinner" style="position:relative;width:80px;height:80px"></div><div id="img-progress-pct" style="margin-top:16px;font-size:22px;font-weight:700;color:var(--p3)">0%</div><div style="margin-top:8px;font-size:13px;color:var(--t3)">Generation de votre image...</div></div>';
+      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0 30px"><div class="creation-spinner" style="position:relative;width:80px;height:80px"></div><div id="img-progress-pct" style="margin-top:16px;font-size:22px;font-weight:700;color:var(--p3)">0%</div><div style="margin-top:8px;font-size:13px;color:var(--t3)">NyXia AI genere ton image...</div></div>';
       var imgPct=0;var imgPctInt=setInterval(function(){imgPct=Math.min(imgPct+Math.random()*12,90);var el=document.getElementById('img-progress-pct');if(el)el.textContent=Math.round(imgPct)+'%';},800);
       var token=sessionStorage.getItem('nyxia_z_token')||'';
       fetch('/api/wan/image',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({prompt:prompt,model:model,size:size,n:count})}).then(function(r){return r.json()}).then(function(data){
@@ -1984,7 +1984,7 @@
       var btn=document.getElementById('btn-vid-gen');btn.disabled=true;btn.innerHTML='<span class="creation-spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></span>Envoi...';
       var result=document.getElementById('vid-result');
       result.classList.add('visible');
-      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0 30px"><div class="creation-spinner" style="position:relative;width:80px;height:80px"></div><div id="vid-progress-pct" style="margin-top:16px;font-size:22px;font-weight:700;color:var(--p3)">0%</div><div style="margin-top:8px;font-size:13px;color:var(--t3)">Creation de votre video...</div></div>';
+      result.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0 30px"><div class="creation-spinner" style="position:relative;width:80px;height:80px"></div><div id="vid-progress-pct" style="margin-top:16px;font-size:22px;font-weight:700;color:var(--p3)">0%</div><div style="margin-top:8px;font-size:13px;color:var(--t3)">NyXia AI genere ta video...</div></div>';
       var vidPct=0;var vidPctInt=setInterval(function(){vidPct=Math.min(vidPct+Math.random()*8,85);var el=document.getElementById('vid-progress-pct');if(el)el.textContent=Math.round(vidPct)+'%';},2000);
       var token=sessionStorage.getItem('nyxia_z_token')||'';
       fetch('/api/wan/video',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({prompt:prompt,model:model,size:size,duration:parseInt(dur),mode:'t2v'})}).then(function(r){return r.json()}).then(function(data){
