@@ -15,10 +15,9 @@ export async function onRequestPost(context) {
     const mode = body.mode || 't2v';
     const img_url = body.img_url || null;
 
-    if (!prompt && mode !== 't2v') return new Response(JSON.stringify({ success: false, error: 'Prompt requis.' }), { headers: { 'Content-Type': 'application/json' } });
-    if (mode === 't2v' && !prompt) return new Response(JSON.stringify({ success: false, error: 'Prompt requis.' }), { headers: { 'Content-Type': 'application/json' } });
+    if (!prompt) return new Response(JSON.stringify({ success: false, error: 'Prompt requis.' }), { headers: { 'Content-Type': 'application/json' } });
 
-    const DASHSCOPE_KEY = env.DASHSCOPE_KEY || env.WAN_KEY || '';
+    const DASHSCOPE_KEY = env.DASHSCOPE_KEY || '';
     if (!DASHSCOPE_KEY) return new Response(JSON.stringify({ success: false, error: 'Cle API non configuree.' }), { headers: { 'Content-Type': 'application/json' } });
 
     // Construire le payload selon le mode (T2V ou I2V)

@@ -9,13 +9,13 @@ export async function onRequestPost(context) {
   try {
     const body = await request.json();
     const prompt = body.prompt || '';
-    const model = body.model || 'wan2.7-image';
+    const model = body.model || 'wan2.7-image-pro';
     const size = body.size || '2K';
     const n = Math.min(body.n || 1, 4);
 
     if (!prompt) return new Response(JSON.stringify({ success: false, error: 'Prompt requis.' }), { headers: { 'Content-Type': 'application/json' } });
 
-    const DASHSCOPE_KEY = env.DASHSCOPE_KEY || env.WAN_KEY || '';
+    const DASHSCOPE_KEY = env.DASHSCOPE_KEY || '';
     if (!DASHSCOPE_KEY) return new Response(JSON.stringify({ success: false, error: 'Cle API non configuree.' }), { headers: { 'Content-Type': 'application/json' } });
 
     // Payload DashScope pour image

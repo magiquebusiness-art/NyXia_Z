@@ -10,7 +10,7 @@ export async function onRequestPost(context) {
     const taskId = body.taskId || '';
     if (!taskId) return new Response(JSON.stringify({ success: false, error: 'TaskId requis.' }), { headers: { 'Content-Type': 'application/json' } });
 
-    const DASHSCOPE_KEY = env.DASHSCOPE_KEY || env.WAN_KEY || '';
+    const DASHSCOPE_KEY = env.DASHSCOPE_KEY || '';
     if (!DASHSCOPE_KEY) return new Response(JSON.stringify({ success: false, error: 'Cle API non configuree.' }), { headers: { 'Content-Type': 'application/json' } });
 
     // Appel DashScope polling
