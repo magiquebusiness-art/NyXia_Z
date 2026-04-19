@@ -1985,32 +1985,30 @@
       fetch('/api/wan/video',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({prompt:prompt,model:model,size:size,duration:parseInt(dur),mode:'t2v'})}).then(function(r){return r.json()}).then(function(data){
         btn.disabled=false;btn.innerHTML='&#x1F3AC; Generer';
         if(!data.success){showToast(data.error||'Erreur');return;}
-        showToast('Tache soumise! Generation en cours...');
-        var taskId=data.taskId;
-        vidHistory.unshift({id:taskId,prompt:prompt,model:model,status:'PENDING',date:new Date().toISOString(),videoUrl:null,format:videoFormat});
+        showToast('Tache soumise! La generation prend 1-5 min.');
+        vidHistory.unshift({id:data.taskId,prompt:prompt,model:model,status:'pending',date:new Date().toISOString(),videoUrl:null});
         if(vidHistory.length>30)vidHistory=vidHistory.slice(0,30);
         try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
         renderVidHistory();
-        startVidPolling(taskId);
+        pollVidTask(data.taskId);
       }).catch(function(){btn.disabled=false;btn.innerHTML='&#x1F3AC; Generer';showToast('Erreur de connexion');});
     }
 
-    function startVidPolling(taskId){
+    function pollVidTask(taskId){
       if(vidPollIntervals[taskId])return;
-      showToast('Generation en cours (1-5 min)...');
       vidPollIntervals[taskId]=setInterval(function(){
         var token=sessionStorage.getItem('nyxia_z_token')||'';
         fetch('/api/wan/video-status',{method:'POST',headers:{'Content-Type':'application/json','X-Nyxia-Token':token},body:JSON.stringify({taskId:taskId})}).then(function(r){return r.json()}).then(function(data){
           if(!data.success)return;
           var idx=vidHistory.findIndex(function(v){return v.id===taskId;});
           if(idx===-1){clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];return;}
-          vidHistory[idx].status=data.status;
-          if(data.videoUrl){
+          if(data.status==='SUCCEEDED'&&data.videoUrl){
+            vidHistory[idx].status='done';
             vidHistory[idx].videoUrl=data.videoUrl;
             showToast('Video generee avec succes!');
             clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
-          }
-          if(data.status==='FAILED'){
+          }else if(data.status==='FAILED'){
+            vidHistory[idx].status='failed';
             showToast('Echec de la generation video');
             clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
           }
@@ -2024,20 +2022,13 @@
       var grid=document.getElementById('vid-history');
       document.getElementById('vid-count').textContent=vidHistory.length;
       if(!vidHistory.length){grid.innerHTML='<div class="creation-empty"><p>Aucune video IA pour le moment</p></div>';return;}
-      grid.innerHTML=vidHistory.map(function(item,i){
-        var isPending=item.status==='PENDING'||item.status==='RUNNING';
-        var isDone=(item.status==='SUCCEEDED'||item.status==='done')&&item.videoUrl;
-        var isFailed=item.status==='FAILED';
-        var fmtLabel=item.format||'16:9';
-        var statusText=isPending?'En cours...':(isDone?'Terminee':(isFailed?'Echouee':'Inconnu'));
-        var statusIcon=isPending?'&#x23F3;':(isDone?'&#x25B6;':(isFailed?'&#x274C;':'&#x2753;'));
-        return '<div class="creation-hist-item" '+(isDone?'onclick="playVid(\''+item.videoUrl+'\')"':'')+'><div style="width:100%;height:120px;background:rgba(10,22,40,0.6);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--t4)">'+statusIcon+'</div><div class="creation-hist-info"><div class="creation-hist-query">'+escHtml(item.prompt)+'</div><div class="creation-hist-type">'+fmtLabel+' &middot; '+statusText+'</div></div></div>';
+      grid.innerHTML=vidHistory.map(function(item){
+        var isPending=item.status==='pending';
+        var isDone=item.status==='done'&&item.videoUrl;
+        return '<div class="creation-hist-item" '+(isDone?'onclick="playVid(\''+item.videoUrl+'\')"':'')+'><div style="width:100%;height:120px;background:rgba(10,22,40,0.6);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--t4)">'+(isPending?'&#x23F3;':(isDone?'&#x25B6;':'&#x274C;'))+'</div><div class="creation-hist-info"><div class="creation-hist-query">'+escHtml(item.prompt)+'</div><div class="creation-hist-type">'+(isPending?'En cours...':(isDone?'&#x2705; Terminee':'Echouee'))+'</div></div></div>';
       }).join('');
-      // Relancer le polling pour les taches en cours
       vidHistory.forEach(function(item){
-        if((item.status==='PENDING'||item.status==='RUNNING')&&!vidPollIntervals[item.id]){
-          startVidPolling(item.id);
-        }
+        if(item.status==='pending'&&!vidPollIntervals[item.id]){pollVidTask(item.id);}
       });
     }
     function playVid(url){
