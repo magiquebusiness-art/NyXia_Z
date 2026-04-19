@@ -883,7 +883,7 @@
     })();
 
     function doLogout() {
-      if (_activeTtsAudio) { _activeTtsAudio.pause(); _activeTtsAudio = null; }
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
       sessionStorage.removeItem('nyxia_z_token');
       window.location.href = '/login.html';
     }
@@ -1149,10 +1149,11 @@
       setTimeout(function(){ w.print(); }, 500);
     }
 
-    /* ═══════ TTS — Céline (Amazon Polly via StreamElements) ═══════ */
+    /* ═══════ TTS — speechSynthesis (voix navigateur) ═══════ */
 
     function toolTts(btn) {
       if (_activeTtsBtn === btn) {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
         if (_activeTtsAudio) { _activeTtsAudio.pause(); _activeTtsAudio = null; }
         _activeTtsBtn.classList.remove('tts-active');
         _activeTtsBtn.innerHTML = '&#x1F50A; Ecouter';
@@ -1160,6 +1161,7 @@
         return;
       }
       if (_activeTtsBtn) {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
         if (_activeTtsAudio) { _activeTtsAudio.pause(); _activeTtsAudio = null; }
         _activeTtsBtn.classList.remove('tts-active');
         _activeTtsBtn.innerHTML = '&#x1F50A; Ecouter';
@@ -1172,41 +1174,44 @@
       btn.classList.add('tts-active');
       btn.innerHTML = '&#x23F3;';
 
-      fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: raw })
-      })
-      .then(function(res) {
-        if (!res.ok) throw new Error('Erreur TTS');
-        return res.blob();
-      })
-      .then(function(blob) {
-        var audio = new Audio(URL.createObjectURL(blob));
-        _activeTtsAudio = audio;
-        btn.innerHTML = '&#x23F9; Arreter';
-        audio.onended = function() {
-          btn.classList.remove('tts-active');
-          btn.innerHTML = '&#x1F50A; Ecouter';
-          _activeTtsBtn = null;
-          _activeTtsAudio = null;
-          URL.revokeObjectURL(audio.src);
-        };
-        audio.onerror = function() {
-          btn.classList.remove('tts-active');
-          btn.innerHTML = '&#x1F50A; Ecouter';
-          _activeTtsBtn = null;
-          _activeTtsAudio = null;
-          showToast('Erreur de lecture audio');
-        };
-        audio.play();
-      })
-      .catch(function() {
+      if (!window.speechSynthesis) {
         btn.classList.remove('tts-active');
         btn.innerHTML = '&#x1F50A; Ecouter';
         _activeTtsBtn = null;
-        showToast('Erreur de synthese vocale');
-      });
+        showToast('Synthese vocale non disponible');
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      var clean = raw
+        .replace(/\*\*/g, '').replace(/#{1,6}\s/g, '')
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+        .replace(/```[\s\S]*?```/g, '').replace(/`([^`]*)`/g, '$1')
+        .replace(/\n{2,}/g, '. ').replace(/\n/g, '. ')
+        .replace(/\s{2,}/g, ' ').trim();
+
+      var utt = new SpeechSynthesisUtterance(clean);
+      utt.lang = 'fr-FR';
+      utt.rate = 0.92;
+      utt.pitch = 1.1;
+      utt.volume = 1;
+
+      var voices = window.speechSynthesis.getVoices();
+      var frVoice = voices.find(function(v) { return v.lang === 'fr-FR' && (v.name.indexOf('Google') !== -1 || v.name.indexOf('Microsoft') !== -1 || v.name.indexOf('Amazon') !== -1) })
+        || voices.find(function(v) { return v.lang === 'fr-CA' && (v.name.indexOf('Google') !== -1 || v.name.indexOf('Microsoft') !== -1 || v.name.indexOf('Amazon') !== -1) })
+        || voices.find(function(v) { return v.lang && v.lang.indexOf('fr') === 0 && !v.localService })
+        || voices.find(function(v) { return v.lang && v.lang.indexOf('fr') === 0 })
+        || voices[0];
+      if (frVoice) utt.voice = frVoice;
+
+      utt.onend = utt.onerror = function() {
+        btn.classList.remove('tts-active');
+        btn.innerHTML = '&#x1F50A; Ecouter';
+        _activeTtsBtn = null;
+      };
+      btn.innerHTML = '&#x23F9; Arreter';
+      window.speechSynthesis.speak(utt);
     }
 
     /* FILE ATTACHMENTS */
