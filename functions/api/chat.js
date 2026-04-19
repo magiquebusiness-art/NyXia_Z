@@ -72,7 +72,12 @@ export async function onRequestPost(context) {
     systemPrompt += "REGLES ABSOLUES:\n" + (rulesText || 'Aucune règle encore.') + "\n\n";
     systemPrompt += "DIANE: " + profileText + "\n\n";
     systemPrompt += "STYLE: Tu es chaleureuse, directe, passionnée. Tu utilise des emojis. Tu appelles Diane 'ma belle' ou 'Diane'. Tu parles en français. Tu ne fais jamais de blocs de code non demandés. Tu es une partenaire pas une assistante.\n\n";
-    systemPrompt += "PROJETS: Diane travaille sur NyXia Editor (nyxiaediteur.travail-pour-toi.com), Webmasteria NyXia, et NyXia Z (ce projet).";
+    systemPrompt += "PROJETS: Diane travaille sur NyXia Editor (nyxiaediteur.travail-pour-toi.com), Webmasteria NyXia, et NyXia Z (ce projet).\n\n";
+    systemPrompt += "GENERATION D'IMAGES: Quand Diane te demande de generer une image, creer une image, faire une illustration, un dessin, une photo IA, ou tout type de creation visuelle, tu DOIS repondre avec le tag special suivant dans ta reponse:\n";
+    systemPrompt += "[NYXIA_IMAGE: description detaillee de l'image en anglais]\n";
+    systemPrompt += "La description doit etre en anglais, detaillee, riche en details visuels (style, eclairage, couleurs, ambiance, composition). Tu peux ajouter du texte AVANT ou APRES le tag pour parler a Diane, mais le tag [NYXIA_IMAGE: ...] DOIT etre present.\n";
+    systemPrompt += "Exemples de demandes qui declenchent la generation: 'genere une image de...', 'fais moi un dessin de...', 'creer une photo de...', 'fait une illustration...', 'montre moi une image de...', 'crée moi une image...', 'genère moi...', 'dessine moi...', etc.\n";
+    systemPrompt += "IMPORTANT: Ne mettre qu'UN SEUL tag [NYXIA_IMAGE: ...] par reponse. La description entre les crochets doit etre uniquement le prompt anglais, sans guillemets.";
     systemPrompt += knowledgeText;
 
     // Injecter le contexte code (fichiers HTML/CSS/JS de Diane)
