@@ -755,11 +755,9 @@
         <div class="option-group">
           <span class="option-label">Durée</span>
           <select class="option-select" id="opt-duration">
-            <option value="5">5 secondes</option>
+            <option value="5" selected>5 secondes</option>
             <option value="10">10 secondes</option>
-            <option value="15">15 secondes</option>
-            <option value="20">20 secondes</option>
-            <option value="30">30 secondes</option>
+            <option value="15">15 secondes (max)</option>
           </select>
         </div>
       </div>
@@ -994,7 +992,7 @@
 
       var model      = document.getElementById('opt-model').value
       var resolution = document.getElementById('opt-resolution').value
-      var duration   = document.getElementById('opt-duration').value
+      var duration   = Math.min(parseInt(document.getElementById('opt-duration').value), 15)
       var format     = document.getElementById('opt-format').value
 
       setLoading(true)
