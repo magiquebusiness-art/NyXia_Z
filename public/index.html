@@ -2066,22 +2066,20 @@
           if(idx===-1){clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];if(pctInt)clearInterval(pctInt);return;}
           if(data.status==='SUCCEEDED'&&data.videoUrl){
             if(pctInt)clearInterval(pctInt);
-            var pctEl=document.getElementById('vid-progress-pct');if(pctEl)pctEl.textContent='100%';
-            setTimeout(function(){
-              vidHistory[idx].status='done';
-              vidHistory[idx].videoUrl=data.videoUrl;
-              showToast('Video generee avec succes!');
-              clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
-              try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
-              renderVidHistory();
-            },500);
+            clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
+            vidHistory[idx].status='done';
+            vidHistory[idx].videoUrl=data.videoUrl;
+            try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
+            playVid(data.videoUrl);
+            renderVidHistory();
+            showToast('Video generee avec succes!');
           }else if(data.status==='FAILED'){
             if(pctInt)clearInterval(pctInt);
-            vidHistory[idx].status='failed';
-            showToast('Echec de la generation video');
             clearInterval(vidPollIntervals[taskId]);delete vidPollIntervals[taskId];
+            vidHistory[idx].status='failed';
             try{localStorage.setItem('nyxia_z_vid_history',JSON.stringify(vidHistory));}catch(e){}
             renderVidHistory();
+            showToast('Echec de la generation video');
           }
         }).catch(function(){});
       },8000);
