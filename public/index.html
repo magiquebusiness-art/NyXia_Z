@@ -468,8 +468,9 @@
         <div class="sb-item" onclick="showPanel('settings')"><span class="sb-icon">&#x2699;</span> Parametres</div>
         <div class="sb-item" onclick="showPanel('knowledge')"><span class="sb-icon">&#x1F4D6;</span> Base de Connaissance</div>
         <div class="sb-item" onclick="showPanel('integrations')"><span class="sb-icon">&#x1F517;</span> Integrations</div>
-        <div class="sb-item" onclick="window.location.href='/wan-image.html'"><span class="sb-icon">&#x1F5BC;</span> Images IA</div>
-        <div class="sb-item" onclick="window.location.href='/wan-video.html'"><span class="sb-icon">&#x1F3AC;</span> Videos IA</div>
+        <div class="sb-item" onclick="openCreation('image')"><span class="sb-icon">&#x1F5BC;</span> Images IA</div>
+        <div class="sb-item" onclick="openCreation('video')"><span class="sb-icon">&#x1F3AC;</span> Videos IA</div>
+        <div class="sb-item" onclick="openCreation('medias')"><span class="sb-icon">&#x1F3AC;</span> Medias</div>
         <div class="sb-item" onclick="showPanel('editor')"><span class="sb-icon">&#x270F;</span> Editeur</div>
         <div class="sb-item" onclick="showPanel('heartbeat')"><span class="sb-icon">&#x1F493;</span> Heartbeat</div>
       </div>
@@ -671,112 +672,9 @@
         </div>
       </div>
 
-      <!-- Creation IA -->
-      <div class="panel" id="panel-creation">
-        <div class="scroll-panel" style="flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:20px 24px">
-          <div class="mem-title" style="margin-bottom:14px">&#x2728; Creation IA</div>
-          <div class="creation-tabs">
-            <button class="creation-tab active" id="ctab-image" onclick="switchCreationTab('image')">&#x1F5BC; Images IA</button>
-            <button class="creation-tab" id="ctab-video" onclick="switchCreationTab('video')">&#x1F3AC; Videos IA</button>
-            <button class="creation-tab" id="ctab-bank" onclick="switchCreationTab('bank')">&#x1F4F7; Banque d'images</button>
-            <button class="creation-tab" id="ctab-videobank" onclick="switchCreationTab('videobank')">&#x1F3AC; Banque vidéo</button>
-          </div>
-          <div id="creation-image" class="creation-section active">
-            <div class="creation-search">
-              <div class="creation-search-row">
-                <div class="creation-input-wrap"><span>&#x1F5BC;</span><input class="creation-input" id="img-prompt" placeholder="Decris ton image..."></div>
-                <button class="btn-create" id="btn-img-gen" onclick="genWanImage()">&#x1F5BC; Generer</button>
-              </div>
-              <div class="creation-options">
-                <div class="creation-opt"><label>Modele</label><select id="img-model"><option value="wan2.7-image-pro">NyXia Pro (4K)</option><option value="wan2.7-image">NyXia Rapide</option></select></div>
-                <div class="creation-opt"><label>Resolution</label><select id="img-size"><option value="2K">2K</option><option value="1K">1K</option><option value="4K">4K</option></select></div>
-                <div class="creation-opt"><label>Nombre</label><select id="img-count"><option value="1">1</option><option value="2">2</option><option value="4">4</option></select></div>
-              </div>
-              <div class="creation-suggestions" id="img-suggestions"></div>
-            </div>
-            <div class="creation-result" id="img-result"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="section-title" style="font-size:14px">Mes Images <span class="badge" id="img-count">0</span></div><button id="btn-clear-img" onclick="clearImgHistory()" style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px">&#x1F5D1; Effacer</button></div>
-            <div class="creation-history" id="img-history" style="overflow-y:auto;flex:1"></div>
-          </div>
-          <div id="creation-video" class="creation-section">
-            <div class="creation-search">
-              <div style="display:flex;gap:6px;margin-bottom:12px">
-                <button id="vid-mode-t2v" class="btn-create" style="flex:1;padding:8px 16px;font-size:12px;border-radius:10px" onclick="switchVidMode('t2v')">&#x1F4DD; Texte &#x2192; Video</button>
-                <button id="vid-mode-i2v" class="btn-create" style="flex:1;padding:8px 16px;font-size:12px;border-radius:10px;background:rgba(11,13,23,0.6);border:1px solid rgba(123,92,255,0.15);color:var(--t3)" onclick="switchVidMode('i2v')">&#x1F5BC; Image &#x2192; Video</button>
-              </div>
-              <div id="vid-i2v-upload" style="display:none;margin-bottom:12px">
-                <div style="border:2px dashed rgba(123,92,255,0.25);border-radius:12px;padding:20px;text-align:center;cursor:pointer;color:var(--t3);font-size:13px" onclick="document.getElementById('vid-img-upload').click()">
-                  <div style="font-size:28px;margin-bottom:6px">&#x1F5BC;</div>
-                  Clique ou glisse une image ici
-                </div>
-                <input type="file" id="vid-img-upload" accept="image/*" style="display:none" onchange="handleVidImgUpload(event)">
-                <div id="vid-i2v-preview" style="display:none;margin-top:8px;position:relative">
-                  <img id="vid-i2v-thumb" style="width:100%;max-height:200px;object-fit:contain;border-radius:10px;display:block">
-                  <button onclick="clearVidImg()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px">&#x2716;</button>
-                </div>
-              </div>
-              <div class="creation-search-row">
-                <div class="creation-input-wrap"><span>&#x1F3AC;</span><input class="creation-input" id="vid-prompt" placeholder="Decris ta scene video..."></div>
-                <button class="btn-create" id="btn-vid-gen" onclick="genWanVideo()">&#x1F3AC; Generer</button>
-              </div>
-              <div class="creation-options">
-                <div class="creation-opt"><label>Modele</label><select id="vid-model"><option value="wan2.7-t2v">NyXia 2.7</option><option value="wan2.6-t2v">NyXia 2.6</option><option value="wan2.5-t2v-preview">NyXia 2.5</option></select></div>
-                <div class="creation-opt"><label>Format</label>
-                  <div style="display:flex;gap:3px;background:rgba(11,13,23,0.6);border:1px solid rgba(123,92,255,0.15);border-radius:50px;padding:3px">
-                    <button class="vid-format active" data-format="16:9" onclick="setVideoFormat(this,'16:9')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">16:9</button>
-                    <button class="vid-format" data-format="9:16" onclick="setVideoFormat(this,'9:16')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">9:16</button>
-                    <button class="vid-format" data-format="1:1" onclick="setVideoFormat(this,'1:1')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">1:1</button>
-                  </div>
-                </div>
-                <div class="creation-opt"><label>Resolution</label><select id="vid-res"><option value="1280*720">720p</option><option value="1920*1080">1080p</option></select></div>
-                <div class="creation-opt"><label>Duree</label><select id="vid-dur"><option value="5">5s</option><option value="10">10s</option><option value="15">15s</option></select></div>
-              </div>
-              <div class="creation-suggestions" id="vid-suggestions"></div>
-            </div>
-            <div class="creation-result" id="vid-result"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="section-title" style="font-size:14px">Mes Videos <span class="badge" id="vid-count">0</span></div></div>
-            <div class="creation-history" id="vid-history" style="overflow-y:auto;flex:1"></div>
-          </div>
-          <div id="creation-bank" class="creation-section">
-            <div class="creation-search">
-              <div class="creation-search-row">
-                <div class="creation-input-wrap"><span>&#x1F50D;</span><input class="creation-input" id="bank-query" placeholder="Rechercher des photos HD pour tes publications..."></div>
-                <button class="btn-create" id="btn-bank-search" onclick="searchBank()">&#x1F50D; Rechercher</button>
-              </div>
-              <div class="creation-suggestions" id="bank-suggestions"></div>
-            </div>
-            <div class="creation-result" id="bank-result"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="section-title" style="font-size:14px">Photos recentes <span class="badge" id="bank-photo-count">0</span></div></div>
-            <div class="creation-history" id="bank-photo-history" style="overflow-y:auto;flex:1"></div>
-          </div>
-          <div id="creation-videobank" class="creation-section">
-            <div class="creation-search">
-              <div class="creation-search-row">
-                <div class="creation-input-wrap"><span>&#x1F3AC;</span><input class="creation-input" id="vbank-query" placeholder="Rechercher des videos HD pour tes publications..."></div>
-                <button class="btn-create" id="btn-vbank-search" onclick="searchVideoBank()">&#x1F3AC; Rechercher</button>
-              </div>
-              <div class="creation-options">
-                <div class="creation-opt"><label>Format</label>
-                  <div style="display:flex;gap:3px;background:rgba(11,13,23,0.6);border:1px solid rgba(123,92,255,0.15);border-radius:50px;padding:3px">
-                    <button class="vbank-orient active" data-orient="landscape" onclick="setVideoOrientation(this,'landscape')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">16:9</button>
-                    <button class="vbank-orient" data-orient="portrait" onclick="setVideoOrientation(this,'portrait')" style="padding:5px 14px;border:none;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s">9:16</button>
-                  </div>
-                </div>
-                <div class="creation-opt"><label>Taille</label>
-                  <select id="vbank-size" style="background:rgba(10,22,40,0.6);border:1px solid rgba(123,92,255,0.2);border-radius:50px;color:var(--t2);font-family:'Outfit',sans-serif;font-size:12px;padding:6px 12px;outline:none;cursor:pointer">
-                    <option value="hd">HD (720p)</option>
-                    <option value="4k">4K (UHD)</option>
-                    <option value="sd">SD (rapide)</option>
-                  </select>
-                </div>
-              </div>
-              <div class="creation-suggestions" id="vbank-suggestions"></div>
-            </div>
-            <div class="creation-result" id="vbank-result"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="section-title" style="font-size:14px">Videos recentes <span class="badge" id="vbank-count">0</span></div><button onclick="clearVBankHistory()" style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px">&#x1F5D1; Effacer</button></div>
-            <div class="creation-history" id="vbank-history" style="overflow-y:auto;flex:1"></div>
-          </div>
-        </div>
+      <!-- Creation IA — iframe vers pages separees -->
+      <div class="panel" id="panel-creation" style="flex:1;overflow:hidden">
+        <iframe id="creation-iframe" src="" style="width:100%;height:100%;border:none;background:var(--bg1)"></iframe>
       </div>
 
       <!-- Heartbeat -->
@@ -1014,6 +912,15 @@
       if (name==='integrations') loadIntegrations();
       if (name==='heartbeat') loadHeartbeat();
       if (name==='editor') initEditorPanel();
+    }
+
+    function openCreation(type) {
+      var pages = { image: '/wan-image.html', video: '/wan-video.html', medias: '/medias.html' };
+      var iframe = document.getElementById('creation-iframe');
+      iframe.src = pages[type] || '/wan-image.html';
+      document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
+      document.querySelectorAll('.sb-item').forEach(function(n){n.classList.remove('active')});
+      document.getElementById('panel-creation').classList.add('active');
     }
 
     /* CHAT */

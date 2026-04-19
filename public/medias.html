@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/NyXia-FavIcon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NyXia IA — Médias</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg1: #0F1C3F; --bg2: #1A2554; --bg3: #2A3A6E;
+      --p: #7B5CFF; --p2: #5A6CFF; --p3: #4FA3FF;
+      --glow: rgba(123,92,255,0.4);
+      --t: #FFFFFF; --t2: #D6D9F0; --t3: #8891B8;
+      --green: #00E676; --gold: #F4C842; --r: 14px;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg1); color: var(--t2); font-family: 'Outfit', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 5%, rgba(123,92,255,0.13) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 35% at 85% 85%, rgba(79,163,255,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 50% 50%, rgba(62,45,122,0.06) 0%, transparent 70%);
+    }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: rgba(15,28,63,0.92); backdrop-filter: blur(24px); border-bottom: 1px solid rgba(123,92,255,0.1); }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid rgba(123,92,255,0.5); }
+    .nav-logo span { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #a78bfa, var(--p3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-link { color: var(--t3); text-decoration: none; font-size: 14px; font-weight: 500; padding: 7px 14px; border-radius: 50px; transition: all .2s; white-space: nowrap; }
+    .nav-link:hover { color: var(--t); background: rgba(123,92,255,0.1); }
+    .nav-link.active { color: var(--t); background: rgba(123,92,255,0.15); border: 1px solid rgba(123,92,255,0.3); }
+
+    /* MAIN */
+    main { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 48px 24px 100px; }
+
+    /* HERO */
+    .page-hero { display: flex; align-items: center; gap: 40px; margin-bottom: 52px; }
+    .nyxia-avatar { flex-shrink: 0; width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(123,92,255,0.5); box-shadow: 0 0 40px rgba(123,92,255,0.35), 0 0 80px rgba(123,92,255,0.12); animation: avatarFloat 4s ease-in-out infinite; }
+    @keyframes avatarFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); box-shadow: 0 0 60px rgba(123,92,255,0.55), 0 0 100px rgba(123,92,255,0.2); } }
+    .page-hero-text h1 { font-size: clamp(28px, 4vw, 46px); font-weight: 800; background: linear-gradient(135deg, #a78bfa, var(--p3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 18px rgba(123,92,255,0.4)); margin-bottom: 10px; line-height: 1.15; }
+    .page-hero-text p { color: var(--t3); font-size: 16px; max-width: 560px; line-height: 1.6; }
+    .page-hero-text p strong { color: var(--p3); font-weight: 600; }
+
+    /* TABS */
+    .tabs-wrap { display: flex; gap: 4px; background: rgba(26,37,84,0.4); border: 1px solid rgba(123,92,255,0.12); border-radius: 50px; padding: 4px; width: fit-content; margin-bottom: 36px; }
+    .tab-btn { padding: 10px 28px; border-radius: 50px; border: none; background: transparent; color: var(--t3); font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .25s; display: flex; align-items: center; gap: 7px; }
+    .tab-btn:hover { color: var(--t2); }
+    .tab-btn.active { background: linear-gradient(135deg, var(--p), var(--p2)); color: #fff; box-shadow: 0 0 20px rgba(123,92,255,0.4); }
+
+    /* SEARCH CARD */
+    .search-card { background: rgba(26,37,84,0.45); border: 1px solid rgba(123,92,255,0.14); border-radius: 20px; padding: 28px; backdrop-filter: blur(12px); margin-bottom: 28px; }
+    .search-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .search-input-wrap { flex: 1; min-width: 240px; position: relative; }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--t3); font-size: 16px; pointer-events: none; }
+    .search-input { width: 100%; background: rgba(15,28,63,0.65); border: 1px solid rgba(123,92,255,0.2); border-radius: 50px; color: var(--t); font-family: 'Outfit', sans-serif; font-size: 15px; padding: 13px 20px 13px 44px; outline: none; transition: border-color .2s, box-shadow .2s; }
+    .search-input:focus { border-color: rgba(123,92,255,0.5); box-shadow: 0 0 0 3px rgba(123,92,255,0.1); }
+    .search-input::placeholder { color: var(--t3); }
+
+    .btn-generate { padding: 13px 32px; border-radius: 50px; border: none; background: linear-gradient(135deg, var(--p), var(--p2)); color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 0 24px rgba(123,92,255,0.4); transition: all .25s; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+    .btn-generate:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 40px rgba(123,92,255,0.65); }
+    .btn-generate:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .options-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; align-items: center; }
+    .option-group { display: flex; align-items: center; gap: 6px; }
+    .option-label { font-size: 12px; font-weight: 600; color: var(--t3); font-family: 'Space Grotesk', sans-serif; }
+    .option-select { background: rgba(15,28,63,0.65); border: 1px solid rgba(123,92,255,0.2); border-radius: 50px; color: var(--t2); font-family: 'Outfit', sans-serif; font-size: 13px; padding: 7px 14px; outline: none; cursor: pointer; transition: border-color .2s; }
+    .option-select:focus { border-color: rgba(123,92,255,0.5); }
+
+    .suggestions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .sugg-btn { padding: 5px 14px; border-radius: 50px; border: 1px solid rgba(123,92,255,0.18); background: rgba(123,92,255,0.06); color: var(--t3); font-family: 'Outfit', sans-serif; font-size: 12px; cursor: pointer; transition: all .18s; }
+    .sugg-btn:hover { border-color: var(--p); color: var(--t2); background: rgba(123,92,255,0.12); }
+
+    /* LOADING */
+    .loading-state { display: none; text-align: center; padding: 60px 0; }
+    .loading-state.visible { display: block; }
+    .loader-ring { width: 52px; height: 52px; border: 3px solid rgba(123,92,255,0.15); border-top-color: var(--p); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-state p { color: var(--t3); font-size: 14px; }
+
+    /* RESULT */
+    .result-section { display: none; margin-bottom: 36px; animation: fadeUp .4s ease; }
+    .result-section.visible { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+    .result-card { background: rgba(26,37,84,0.45); border: 1px solid rgba(123,92,255,0.18); border-radius: 20px; overflow: hidden; backdrop-filter: blur(12px); }
+    .result-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid rgba(123,92,255,0.1); background: rgba(15,28,63,0.4); flex-wrap: wrap; gap: 10px; }
+    .result-meta { font-size: 13px; color: var(--t3); display: flex; align-items: center; gap: 8px; }
+    .nyxia-badge { background: linear-gradient(135deg, rgba(123,92,255,0.2), rgba(79,163,255,0.2)); border: 1px solid rgba(123,92,255,0.3); padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 700; color: var(--p3); font-family: 'Space Grotesk', sans-serif; }
+    .toolbar-actions { display: flex; gap: 8px; }
+
+    .btn-sm { padding: 7px 16px; border-radius: 50px; border: 1px solid rgba(123,92,255,0.28); background: rgba(123,92,255,0.08); color: var(--t2); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
+    .btn-sm:hover { border-color: var(--p); color: var(--t); background: rgba(123,92,255,0.18); }
+    .btn-sm.accent { background: linear-gradient(135deg, var(--p), var(--p2)); border-color: transparent; color: #fff; box-shadow: 0 0 16px rgba(123,92,255,0.35); }
+    .btn-sm.accent:hover { box-shadow: 0 0 28px rgba(123,92,255,0.6); transform: translateY(-1px); }
+
+    .result-img { width: 100%; max-height: 700px; object-fit: contain; display: block; background: rgba(10,16,36,0.5); }
+    .result-video { width: 100%; max-height: 560px; display: block; background: #000; }
+
+    /* HISTORY GRID */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; color: var(--t2); display: flex; align-items: center; gap: 10px; }
+    .badge { background: rgba(123,92,255,0.2); border: 1px solid rgba(123,92,255,0.3); border-radius: 50px; font-size: 12px; padding: 2px 10px; color: var(--p3); font-family: 'Outfit', sans-serif; }
+    #btn-clear { font-size: 12px; color: var(--t3); background: none; border: none; cursor: pointer; font-family: 'Outfit', sans-serif; padding: 4px 8px; border-radius: 6px; transition: color .2s; }
+    #btn-clear:hover { color: #ff6b6b; }
+
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .media-item { background: rgba(26,37,84,0.4); border: 1px solid rgba(123,92,255,0.1); border-radius: var(--r); overflow: hidden; cursor: pointer; transition: all .25s; position: relative; }
+    .media-item:hover { border-color: rgba(123,92,255,0.38); transform: translateY(-4px); box-shadow: 0 10px 36px rgba(0,0,0,0.35); }
+    .media-item img { width: 100%; height: 180px; object-fit: cover; display: block; }
+    .media-item-info { padding: 10px 12px; }
+    .media-item-query { font-size: 12px; color: var(--t3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .media-item-type { font-size: 11px; color: var(--p3); margin-top: 3px; }
+    .media-item-overlay { position: absolute; inset: 0; background: rgba(15,28,63,0.75); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .2s; gap: 10px; }
+    .media-item:hover .media-item-overlay { opacity: 1; }
+    .overlay-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(123,92,255,0.85); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; transition: transform .15s; text-decoration: none; color: #fff; }
+    .overlay-btn:hover { transform: scale(1.15); }
+
+    .empty-state { grid-column: 1/-1; text-align: center; padding: 56px 0; color: var(--t3); }
+
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+
+    /* Video grid special */
+    .video-thumb-wrap { width: 100%; height: 180px; background: rgba(10,22,40,0.6); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .video-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+    .video-play-btn { position: absolute; width: 40px; height: 40px; border-radius: 50%; background: rgba(123,92,255,0.85); display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; border: none; cursor: pointer; }
+    .video-duration { position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.7); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+
+    /* RESPONSIVE */
+    @media (max-width: 700px) {
+      nav { padding: 0 16px; } main { padding: 28px 14px 80px; }
+      .page-hero { flex-direction: column; gap: 20px; text-align: center; }
+      .nyxia-avatar { width: 80px; height: 80px; }
+      .search-row { flex-direction: column; }
+      .btn-generate { width: 100%; justify-content: center; }
+      .search-input-wrap { width: 100%; }
+      .options-row { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="starry-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></canvas>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="/NyXia.png" alt="NyXia">
+      <span>NyXia IA</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html"      class="nav-link">🏗 Générateur de sites</a>
+      <a href="medias.html"     class="nav-link active">🎬 Médias</a>
+      <a href="wan-video.html"  class="nav-link">✨ Studio Vidéo IA</a>
+      <a href="wan-image.html"  class="nav-link">🖼️ Images IA</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <div class="page-hero">
+      <img src="/NyXia.png" alt="NyXia IA" class="nyxia-avatar">
+      <div class="page-hero-text">
+        <h1>Médias</h1>
+        <p>
+          Recherche des <strong>photos et vidéos HD gratuites</strong> pour tes publications —
+          banque de millions de médias propulsée par <strong>NyXia AI</strong>.
+        </p>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-wrap">
+      <button class="tab-btn active" id="tab-photos" onclick="switchTab('photos')">
+        📸 Banque d'images
+      </button>
+      <button class="tab-btn" id="tab-videos" onclick="switchTab('videos')">
+        🎬 Banque vidéo
+      </button>
+    </div>
+
+    <!-- PHOTO SEARCH -->
+    <div id="section-photos">
+      <div class="search-card">
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="photo-query" placeholder="Rechercher des photos HD pour tes publications...">
+          </div>
+          <button class="btn-generate" id="btn-photo-search" onclick="searchPhotos()">
+            <div class="spinner" id="photo-spinner"></div>
+            <span id="photo-label">🔍 Rechercher</span>
+          </button>
+        </div>
+        <div class="suggestions" id="photo-suggestions"></div>
+      </div>
+
+      <div class="result-section" id="photo-result"></div>
+
+      <div>
+        <div class="section-header">
+          <div class="section-title">
+            Photos récentes
+            <span class="badge" id="photo-count">0</span>
+          </div>
+          <button id="btn-clear-photos" onclick="clearPhotoHistory()">🗑 Effacer</button>
+        </div>
+        <div class="media-grid" id="photo-history"></div>
+      </div>
+    </div>
+
+    <!-- VIDEO SEARCH -->
+    <div id="section-videos" style="display:none">
+      <div class="search-card">
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <span class="search-icon">🎬</span>
+            <input type="text" class="search-input" id="video-query" placeholder="Rechercher des vidéos HD pour tes publications...">
+          </div>
+          <button class="btn-generate" id="btn-video-search" onclick="searchVideos()">
+            <div class="spinner" id="video-spinner"></div>
+            <span id="video-label">🎬 Rechercher</span>
+          </button>
+        </div>
+        <div class="options-row">
+          <div class="option-group">
+            <span class="option-label">Format</span>
+            <div style="display:flex;gap:3px;background:rgba(15,28,63,0.65);border:1px solid rgba(123,92,255,0.2);border-radius:50px;padding:3px">
+              <button class="tab-btn active" id="orient-landscape" onclick="setOrientation('landscape')" style="padding:5px 14px;font-size:12px;border-radius:50px">16:9</button>
+              <button class="tab-btn" id="orient-portrait" onclick="setOrientation('portrait')" style="padding:5px 14px;font-size:12px;border-radius:50px">9:16</button>
+            </div>
+          </div>
+          <div class="option-group">
+            <span class="option-label">Taille</span>
+            <select class="option-select" id="opt-vsize">
+              <option value="hd">HD (720p)</option>
+              <option value="4k">4K (UHD)</option>
+              <option value="sd">SD (rapide)</option>
+            </select>
+          </div>
+        </div>
+        <div class="suggestions" id="video-suggestions"></div>
+      </div>
+
+      <div class="result-section" id="video-result"></div>
+
+      <div>
+        <div class="section-header">
+          <div class="section-title">
+            Vidéos récentes
+            <span class="badge" id="video-count">0</span>
+          </div>
+          <button id="btn-clear-videos" onclick="clearVideoHistory()">🗑 Effacer</button>
+        </div>
+        <div class="media-grid" id="video-history"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* ═══ STATE ═══ */
+    var currentTab = 'photos';
+    var orientation = 'landscape';
+    var photoHistory = JSON.parse(localStorage.getItem('nyxia_photo_history') || '[]');
+    var videoHistory = JSON.parse(localStorage.getItem('nyxia_video_history') || '[]');
+    var currentPhotoUrl = '';
+    var currentVideoUrl = '';
+
+    var PHOTO_SUGGS = [
+      'Nature montagne paysage',
+      'Boutique café ambiance',
+      'Femme élégante portrait',
+      'Fleur rose jardin',
+      'Coucher de soleil océan',
+      'Technologie bureau moderne',
+      'Nourriture gastronomie',
+      'Fitness sport motivation'
+    ];
+
+    var VIDEO_SUGGS = [
+      'Aurore boréale nuit',
+      'Vague océan slow motion',
+      'Timelapse ville nuit',
+      'Forêt automne vent',
+      'Drone paysage montagne',
+      'Personne qui marche ville',
+      'Feu cheminée cosy',
+      'Plage tropical paradis'
+    ];
+
+    /* ═══ TOKEN ═══ */
+    function getToken() {
+      try {
+        return parent ? (parent.sessionStorage ? parent.sessionStorage.getItem('nyxia_z_token') : null) : sessionStorage.getItem('nyxia_z_token');
+      } catch(e) {
+        return sessionStorage.getItem('nyxia_z_token');
+      }
+    }
+
+    /* ═══ TABS ═══ */
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tab-photos').classList.toggle('active', tab === 'photos');
+      document.getElementById('tab-videos').classList.toggle('active', tab === 'videos');
+      document.getElementById('section-photos').style.display = tab === 'photos' ? 'block' : 'none';
+      document.getElementById('section-videos').style.display = tab === 'videos' ? 'block' : 'none';
+    }
+
+    function setOrientation(orient) {
+      orientation = orient;
+      document.getElementById('orient-landscape').classList.toggle('active', orient === 'landscape');
+      document.getElementById('orient-portrait').classList.toggle('active', orient === 'portrait');
+    }
+
+    /* ═══ SUGGESTIONS ═══ */
+    function renderPhotoSuggs() {
+      document.getElementById('photo-suggestions').innerHTML = PHOTO_SUGGS.map(function(s) {
+        return '<button class="sugg-btn" onclick="document.getElementById(\'photo-query\').value=\'' + esc(s) + '\'">' + esc(s) + '</button>';
+      }).join('');
+    }
+
+    function renderVideoSuggs() {
+      document.getElementById('video-suggestions').innerHTML = VIDEO_SUGGS.map(function(s) {
+        return '<button class="sugg-btn" onclick="document.getElementById(\'video-query\').value=\'' + esc(s) + '\'">' + esc(s) + '</button>';
+      }).join('');
+    }
+
+    /* ═══ SEARCH PHOTOS ═══ */
+    function searchPhotos() {
+      var query = document.getElementById('photo-query').value.trim();
+      if (!query) { document.getElementById('photo-query').focus(); return; }
+
+      var token = getToken();
+      var btn = document.getElementById('btn-photo-search');
+      btn.disabled = true;
+      document.getElementById('photo-spinner').style.display = 'block';
+      document.getElementById('photo-label').textContent = '';
+
+      fetch('/api/media/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Nyxia-Token': token },
+        body: JSON.stringify({ query: query, type: 'photo' })
+      })
+      .then(function(r) { return r.json() })
+      .then(function(data) {
+        btn.disabled = false;
+        document.getElementById('photo-spinner').style.display = 'none';
+        document.getElementById('photo-label').textContent = '🔍 Rechercher';
+
+        if (!data.success || !data.dataUrl) {
+          showToast(data.error || 'Aucune photo trouvée');
+          return;
+        }
+
+        currentPhotoUrl = data.dataUrl;
+        var result = document.getElementById('photo-result');
+        result.innerHTML = '<div class="result-card"><div class="result-toolbar"><div class="result-meta"><span class="nyxia-badge">Pexels</span><span>' + esc(data.photographer ? 'par ' + data.photographer : '') + '</span></div><div class="toolbar-actions"><button class="btn-sm" onclick="searchPhotos()">🔄</button><button class="btn-sm accent" onclick="dlCurrentPhoto()">⬇️ Télécharger</button></div></div><img class="result-img" src="' + esc(data.dataUrl) + '" alt="Photo"></div>';
+        result.classList.add('visible');
+        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        addPhotoHistory({ query: query, url: data.dataUrl, photographer: data.photographer || '', date: new Date().toISOString() });
+      })
+      .catch(function(err) {
+        btn.disabled = false;
+        document.getElementById('photo-spinner').style.display = 'none';
+        document.getElementById('photo-label').textContent = '🔍 Rechercher';
+        showToast('Erreur de connexion');
+      });
+    }
+
+    /* ═══ SEARCH VIDEOS ═══ */
+    function searchVideos() {
+      var query = document.getElementById('video-query').value.trim();
+      if (!query) { document.getElementById('video-query').focus(); return; }
+
+      var token = getToken();
+      var size = document.getElementById('opt-vsize').value;
+      var btn = document.getElementById('btn-video-search');
+      btn.disabled = true;
+      document.getElementById('video-spinner').style.display = 'block';
+      document.getElementById('video-label').textContent = '';
+
+      fetch('/api/media/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Nyxia-Token': token },
+        body: JSON.stringify({ query: query, type: 'video', orientation: orientation, videoSize: size })
+      })
+      .then(function(r) { return r.json() })
+      .then(function(data) {
+        btn.disabled = false;
+        document.getElementById('video-spinner').style.display = 'none';
+        document.getElementById('video-label').textContent = '🎬 Rechercher';
+
+        if (!data.success || !data.video) {
+          showToast(data.error || 'Aucune vidéo trouvée');
+          return;
+        }
+
+        var v = data.video;
+        currentVideoUrl = v.videoUrl;
+        var result = document.getElementById('video-result');
+        var metaParts = [];
+        if (v.duration) metaParts.push(v.duration + 's');
+        if (v.width && v.height) metaParts.push(v.width + 'x' + v.height);
+
+        result.innerHTML = '<div class="result-card"><div class="result-toolbar"><div class="result-meta"><span class="nyxia-badge">Pexels</span><span>' + esc(query) + (metaParts.length ? ' · ' + metaParts.join(' · ') : '') + '</span></div><div class="toolbar-actions"><button class="btn-sm" onclick="searchVideos()">🔄</button><a class="btn-sm accent" href="' + esc(v.videoUrl) + '" target="_blank" download>⬇️ Télécharger</a></div></div><video class="result-video" controls autoplay muted loop playsinline src="' + esc(v.videoUrl) + '" poster="' + esc(v.thumbnail || '') + '"></video></div>';
+        result.classList.add('visible');
+        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        addVideoHistory({ query: query, videoUrl: v.videoUrl, thumbnail: v.thumbnail || '', duration: v.duration || 0, width: v.width || 0, height: v.height || 0, photographer: v.photographer || '', date: new Date().toISOString() });
+      })
+      .catch(function(err) {
+        btn.disabled = false;
+        document.getElementById('video-spinner').style.display = 'none';
+        document.getElementById('video-label').textContent = '🎬 Rechercher';
+        showToast('Erreur de connexion');
+      });
+    }
+
+    /* ═══ DOWNLOAD ═══ */
+    function dlCurrentPhoto() {
+      if (!currentPhotoUrl) return;
+      var a = document.createElement('a');
+      a.href = currentPhotoUrl;
+      a.download = 'nyxia-photo-' + Date.now() + '.jpg';
+      a.target = '_blank';
+      a.click();
+    }
+
+    /* ═══ PHOTO HISTORY ═══ */
+    function addPhotoHistory(item) {
+      photoHistory.unshift(item);
+      if (photoHistory.length > 30) photoHistory = photoHistory.slice(0, 30);
+      try { localStorage.setItem('nyxia_photo_history', JSON.stringify(photoHistory)); } catch(e) {}
+      renderPhotoHistory();
+    }
+
+    function renderPhotoHistory() {
+      var grid = document.getElementById('photo-history');
+      document.getElementById('photo-count').textContent = photoHistory.length;
+
+      if (!photoHistory.length) {
+        grid.innerHTML = '<div class="empty-state"><img src="/NyXia.png" alt="NyXia" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(123,92,255,0.4);box-shadow:0 0 30px rgba(123,92,255,0.3);margin:0 auto 16px;display:block;opacity:0.7"><p style="color:var(--t2);font-family:\'Space Grotesk\',sans-serif;font-size:15px;font-weight:600;margin-bottom:6px">Aucune photo pour le moment</p><p style="color:var(--t3);font-size:13px">Recherche des photos HD gratuites pour tes publications !</p></div>';
+        return;
+      }
+
+      grid.innerHTML = photoHistory.map(function(item, i) {
+        return '<div class="media-item" onclick="loadPhotoHist(' + i + ')"><img src="' + esc(item.url) + '" alt="' + esc(item.query) + '" loading="lazy"><div class="media-item-overlay"><button class="overlay-btn" title="Afficher">🔍</button><button class="overlay-btn" onclick="event.stopPropagation();dlPhotoUrl(\'' + esc(item.url) + '\')" title="Télécharger">⬇</button></div><div class="media-item-info"><div class="media-item-query">' + esc(item.query) + '</div><div class="media-item-type">📸 ' + esc(item.photographer || 'Pexels') + '</div></div></div>';
+      }).join('');
+    }
+
+    function loadPhotoHist(i) {
+      var item = photoHistory[i];
+      if (!item) return;
+      currentPhotoUrl = item.url;
+      var result = document.getElementById('photo-result');
+      result.innerHTML = '<div class="result-card"><div class="result-toolbar"><div class="result-meta"><span class="nyxia-badge">Pexels</span><span>' + esc(item.photographer ? 'par ' + item.photographer : '') + '</span></div><div class="toolbar-actions"><button class="btn-sm accent" onclick="dlCurrentPhoto()">⬇️ Télécharger</button></div></div><img class="result-img" src="' + esc(item.url) + '" alt="Photo"></div>';
+      result.classList.add('visible');
+      result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function dlPhotoUrl(url) {
+      var a = document.createElement('a');
+      a.href = url; a.download = 'nyxia-photo-' + Date.now() + '.jpg'; a.target = '_blank'; a.click();
+    }
+
+    function clearPhotoHistory() {
+      if (!photoHistory.length) return;
+      if (confirm('Effacer tout l\'historique des photos ?')) {
+        photoHistory = [];
+        localStorage.removeItem('nyxia_photo_history');
+        renderPhotoHistory();
+      }
+    }
+
+    /* ═══ VIDEO HISTORY ═══ */
+    function addVideoHistory(item) {
+      videoHistory.unshift(item);
+      if (videoHistory.length > 30) videoHistory = videoHistory.slice(0, 30);
+      try { localStorage.setItem('nyxia_video_history', JSON.stringify(videoHistory)); } catch(e) {}
+      renderVideoHistory();
+    }
+
+    function renderVideoHistory() {
+      var grid = document.getElementById('video-history');
+      document.getElementById('video-count').textContent = videoHistory.length;
+
+      if (!videoHistory.length) {
+        grid.innerHTML = '<div class="empty-state"><p style="font-size:32px;margin-bottom:8px">🎬</p><p style="color:var(--t2);font-family:\'Space Grotesk\',sans-serif;font-size:15px;font-weight:600;margin-bottom:6px">Aucune vidéo pour le moment</p><p style="color:var(--t3);font-size:13px">Recherche des vidéos HD gratuites pour tes publications !</p></div>';
+        return;
+      }
+
+      grid.innerHTML = videoHistory.map(function(item, i) {
+        var thumb = item.thumbnail;
+        var durInfo = item.duration ? ' · ' + item.duration + 's' : '';
+        return '<div class="media-item" onclick="loadVideoHist(' + i + ')"><div class="video-thumb-wrap">' + (thumb ? '<img src="' + esc(thumb) + '" alt="' + esc(item.query) + '">' : '') + '<button class="video-play-btn">▶</button>' + (item.duration ? '<span class="video-duration">' + item.duration + 's</span>' : '') + '</div><div class="media-item-overlay"><button class="overlay-btn" onclick="event.stopPropagation();window.open(\'' + esc(item.videoUrl) + '\',\'_blank\')">⬇</button></div><div class="media-item-info"><div class="media-item-query">' + esc(item.query) + '</div><div class="media-item-type">🎬 Pexels' + esc(durInfo) + '</div></div></div>';
+      }).join('');
+    }
+
+    function loadVideoHist(i) {
+      var item = videoHistory[i];
+      if (!item) return;
+      currentVideoUrl = item.videoUrl;
+      var result = document.getElementById('video-result');
+      result.innerHTML = '<div class="result-card"><div class="result-toolbar"><div class="result-meta"><span class="nyxia-badge">Pexels</span><span>' + esc(item.query) + (item.duration ? ' · ' + item.duration + 's' : '') + '</span></div><div class="toolbar-actions"><a class="btn-sm accent" href="' + esc(item.videoUrl) + '" target="_blank" download>⬇️ Télécharger</a></div></div><video class="result-video" controls autoplay muted loop playsinline src="' + esc(item.videoUrl) + '" poster="' + esc(item.thumbnail || '') + '"></video></div>';
+      result.classList.add('visible');
+      result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function clearVideoHistory() {
+      if (!videoHistory.length) return;
+      if (confirm('Effacer tout l\'historique des vidéos ?')) {
+        videoHistory = [];
+        localStorage.removeItem('nyxia_video_history');
+        renderVideoHistory();
+      }
+    }
+
+    /* ═══ UTILS ═══ */
+    function esc(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+
+    function showToast(msg) {
+      var existing = document.getElementById('nyxia-toast');
+      if (existing) existing.remove();
+      var toast = document.createElement('div');
+      toast.id = 'nyxia-toast';
+      toast.textContent = '⚠️ ' + msg;
+      toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:rgba(26,37,84,0.95);border:1px solid rgba(123,92,255,0.3);color:var(--t2);font-family:Outfit,sans-serif;font-size:14px;padding:12px 24px;border-radius:50px;z-index:9999;backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,0.4);animation:fadeUp .3s ease;max-width:90vw;text-align:center';
+      document.body.appendChild(toast);
+      setTimeout(function() { if (toast.parentNode) toast.remove() }, 5000);
+    }
+
+    /* ═══ INIT ═══ */
+    renderPhotoSuggs();
+    renderVideoSuggs();
+    renderPhotoHistory();
+    renderVideoHistory();
+    document.getElementById('photo-query').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchPhotos(); });
+    document.getElementById('video-query').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchVideos(); });
+  </script>
+
+  <script src="/js/starry-bg.js" defer></script>
+</body>
+</html>
