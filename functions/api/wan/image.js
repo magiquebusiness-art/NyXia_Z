@@ -9,9 +9,9 @@ export async function onRequestPost(context) {
   try {
     const body = await request.json();
     const prompt = body.prompt || '';
-    const model = body.model || 'wan2.7-image-pro';
+    const model = body.model || 'wan2.7-image';
     const size = body.size || '2K';
-    const n = body.n || 1;
+    const n = Math.min(body.n || 1, 4);
 
     if (!prompt) return new Response(JSON.stringify({ success: false, error: 'Prompt requis.' }), { headers: { 'Content-Type': 'application/json' } });
 
@@ -33,10 +33,15 @@ export async function onRequestPost(context) {
       },
       parameters: {
         size: size,
-        n: Math.min(n, 4),
+        n: n,
         watermark: false
       }
     };
+
+    // Thinking mode pour le modele Pro
+    if (model === 'wan2.7-image-pro') {
+      payload.parameters.thinking_mode = true;
+    }
 
     console.log('[WAN-IMAGE] Generation:', model, size, 'n:', n);
 
@@ -53,20 +58,25 @@ export async function onRequestPost(context) {
 
     if (!apiResponse.ok) {
       console.error('[WAN-IMAGE] Erreur API:', apiResponse.status, JSON.stringify(data));
-      return new Response(JSON.stringify({ success: false, error: 'Erreur API DashScope: ' + apiResponse.status + (data.message ? ' - ' + data.message : '') }), { headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ success: false, error: data.message || 'Erreur API DashScope: ' + apiResponse.status }), { headers: { 'Content-Type': 'application/json' } });
     }
 
     // Extraire les images de la reponse DashScope
+    // Format correct: output.choices[].message.content[].image
     var images = [];
-    var output = data.output || {};
-    var results = output.results || [];
+    var choices = (data.output && data.output.choices) || [];
+    for (var i = 0; i < choices.length; i++) {
+      var content = (choices[i].message && choices[i].message.content) || [];
+      for (var j = 0; j < content.length; j++) {
+        if (content[j].image) {
+          images.push(content[j].image);
+        }
+      }
+    }
 
-    if (results.length > 0) {
-      images = results.map(function(item) {
-        if (item.url) return item.url;
-        if (item.b64_image) return 'data:image/png;base64,' + item.b64_image;
-        return '';
-      }).filter(function(url) { return url; });
+    if (!images.length) {
+      console.error('[WAN-IMAGE] Pas d\'images:', JSON.stringify(data));
+      return new Response(JSON.stringify({ success: false, error: 'Aucune image generee - essaie un autre prompt' }), { headers: { 'Content-Type': 'application/json' } });
     }
 
     console.log('[WAN-IMAGE] ' + images.length + ' image(s) generee(s)');
